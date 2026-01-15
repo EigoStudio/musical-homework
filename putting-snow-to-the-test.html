@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Word Search - Putting Snow to the Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Kosugi+Maru&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4a90e2; --secondary: #ff9500; --success: #34c759;
+      --marker-h: rgba(255, 255, 0, 0.6); --marker-v: rgba(255, 105, 180, 0.5);
+      --correct: rgba(52, 199, 89, 0.4); 
+      --cell-size: 55px; --board-width: 550px; 
+    }
+    body { font-family: 'Kosugi Maru', 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #fcfcfc; padding: 20px; padding-bottom: 40px; }
+    h1 { display: table; margin: 0 auto 30px auto; font-size: 26px; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary); text-align: center; padding: 0 10px 5px 10px; order: 0; }
+    .controls { position: fixed; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .game-main { display: flex; flex-direction: row; align-items: flex-start; gap: 40px; margin-bottom: 40px; order: 1; }
+    #board { display: grid; grid-template-columns: repeat(10, var(--cell-size)); gap: 0; width: var(--board-width); background-color: #fff; touch-action: none; user-select: none; border: 1px solid #eee; isolation: isolate; }
+    .cell { width: var(--cell-size); height: var(--cell-size); line-height: var(--cell-size); font-size: 34px; text-align: center; font-weight: 700; font-family: 'Comic Neue', sans-serif; cursor: pointer; position: relative; }
+    .cell::after, .cell::before { content: ""; position: absolute; z-index: -1; mix-blend-mode: multiply; pointer-events: none; }
+    .cell.h::after, .cell.temp-h::after { display: block; left: 0; right: 0; top: 18%; bottom: 18%; background-color: var(--marker-h); }
+    .cell.v::before, .cell.temp-v::before { display: block; left: 18%; right: 18%; top: 0; bottom: 0; background-color: var(--marker-v); }
+    .cell.h-start::after, .cell.temp-h-start::after { border-top-left-radius: 28px; border-bottom-left-radius: 28px; }
+    .cell.h-end::after, .cell.temp-h-end::after { border-top-right-radius: 28px; border-bottom-right-radius: 28px; }
+    .cell.v-start::before, .cell.temp-v-start::before { border-top-left-radius: 28px; border-top-right-radius: 28px; }
+    .cell.v-end::before, .cell.temp-v-end::before { border-bottom-left-radius: 28px; border-bottom-right-radius: 28px; }
+    .cell.show-ans { background-color: var(--correct); border-radius: 50%; }
+    #word-list { display: flex; flex-direction: column; gap: 25px; min-width: 250px; }
+    .word-item { cursor: pointer; display: flex; align-items: center; font-size: 22px; padding: 4px; }
+    .word-item.checked { color: #ccc; text-decoration: line-through; }
+    .ja-text { font-size: 15px; color: #777; margin-left: 10px; }
+    #lyrics-container { width: 100%; max-width: 900px; border-top: 1px solid #eee; padding-top: 20px; order: 2; position: relative; }
+    .lyrics { font-size: 19px; line-height: 2.5; color: #333; text-align: left; padding-left: 40px; }
+    .blank { display: inline-block; min-width: 60px; border-bottom: 2px solid var(--primary); color: #ff4757; font-weight: bold; text-align: center; }
+    .blank.hidden { color: transparent; }
+    #read-aloud-section { text-align: center; margin: 20px 0; order: 3; display: none; }
+    .read-btn { background: var(--success); padding: 15px 40px; font-size: 20px; border-radius: 50px; border: none; color: white; cursor: pointer; font-weight: bold; }
+    .read-btn.playing { background: #ff4757; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+    /* 📱 スマホ用 */
+    @media screen and (max-width: 900px) {
+     /* タイトルを小さく調整 */
+      h1 { 
+        font-size: 18px !important; 
+        margin-top: 50px !important; /* ボタンに被らないよう少し下げる */
+        margin-bottom: 10px !important; 
+      }
+
+      .game-main { flex-direction: column; align-items: center; gap: 20px; }
+      :root { --cell-size: 9.2vw; --board-width: 92vw; }
+      .cell { font-size: 6.5vw; }
+      #word-list { display: grid; grid-template-columns: 1fr 1fr; width: 95%; gap: 8px 10px; /* 隙間を少し詰めました */ margin-top: 10px; }
+      .word-item { 
+        font-size: 16px !important; /* 英語を14pxに設定 */
+        line-height: 1.2;
+      }
+      .ja-text { 
+        font-size: 10px !important; /* 日本語を10pxに設定 */
+        margin-left: 5px; 
+      }
+      .lyrics { font-size: 13px; line-height: 2; padding: 0 10px; }
+      /* コントロールボタンをスマホでも押しやすく配置 */
+      .controls { position: relative; top: 0; left: 0; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; margin: 20px 0; order: 4; }
+      button { flex: 1; min-width: 100px; padding: 12px; font-size: 12px; }
+    }
+    /* --- スマホ版設定（ここまで） --- */
+
+/* 🖨️ PDF・印刷用専用設定 */
+@media print {
+  /* 基本設定：すべて黒字 */
+  * { 
+    color: black !important; 
+    background: transparent !important; 
+    box-shadow: none !important; 
+  }
+
+  body { background: white; padding: 0; margin: 0; }
+
+  /* 不要なボタンを排除 */
+  .controls, #read-aloud-section, .read-btn, button { 
+    display: none !important; 
+  }
+
+  h1 { 
+    margin-bottom: 15px !important; 
+    border-bottom: 1px solid black !important; 
+    text-align: center !important;
+  }
+
+  .game-main { 
+    display: flex !important; 
+    flex-direction: column !important; 
+    align-items: center !important; 
+    margin-bottom: 0 !important; 
+    gap: 5px !important; 
+  }
+
+  /* パズルボード：枠線なし */
+  #board { 
+    border: none !important; 
+    width: 450px !important; 
+    grid-template-columns: repeat(10, 45px) !important; 
+    margin-bottom: 5px !important;
+  }
+
+  .cell { 
+    width: 45px !important; 
+    height: 45px !important; 
+    line-height: 45px !important; 
+    border: none !important; 
+    font-size: 26px !important; 
+  }
+
+  /* ① ワードリスト：フォント20px / 行間2 */
+  #word-list { 
+    display: grid !important; 
+    grid-template-columns: 1fr 1fr !important; 
+    width: 450px !important; 
+    gap: 0 20px !important; 
+    margin: 0 auto !important;
+    padding: 5px !important;
+    border-top: 1px solid black;
+  }
+
+  .word-item { 
+    font-size: 20px !important; /* 指定サイズ */
+    line-height: 2 !important;  /* 指定行間 */
+    padding: 0px !important;
+    text-decoration: none !important; 
+  }
+
+  .ja-text { font-size: 14px !important; margin-left: 8px; }
+
+  /* ②&③ 歌詞エリア：フォント18px / 行間2 / 幅80%中央寄せ */
+  #lyrics-container { 
+    border-top: 1px solid black; 
+    margin: 0 auto !important;  /* 左右autoで中央に寄せます */
+    padding-top: 20px !important; 
+    width: 85% !important;      /* 幅を80%に制限 */
+  }
+
+  .lyrics { 
+    font-size: 17px !important; /* 指定サイズ */
+    line-height: 2 !important;  /* 指定行間 */
+    padding-left: 0 !important; /* コンテナを中央寄せにするため左余白をリセット */
+    text-align: left !important; /* 文字自体は左揃え */
+  }
+
+  /* 穴埋め部分（下線） */
+  .blank { 
+    border-bottom: 1px solid black !important; 
+    color: transparent !important; 
+  }
+}
+
+  </style>
+</head>
+<body>
+  <h1>Putting Snow to the Test</h1>
+  <div class="game-main">
+    <div id="board"></div>
+    <div id="word-list"></div>
+  </div>
+  <div id="lyrics-container">
+    <div class="lyrics" id="lyrics-text">
+      <strong>Zoe:</strong> Can we <span class="blank hidden" data-word="ask">ask</span> you a <span class="blank hidden" data-word="question">question</span>?<br>
+      <strong>Snow:</strong> Sure, go ahead.<br>
+      <strong>Tiny:</strong> Did you <span class="blank hidden" data-word="take">take</span> her <span class="blank hidden" data-word="sugar">sugar</span>?<br>
+      <strong>Snow:</strong> Bravey's <span class="blank hidden" data-word="sugar">sugar</span>? I have no <span class="blank hidden" data-word="idea">idea</span> what you're talking <span class="blank hidden" data-word="about">about</span>.<br>
+      <strong>Bravey:</strong> Never mind. Why don't you <span class="blank hidden" data-word="try">try</span> my new <span class="blank hidden" data-word="honest">Honest</span> Mochi!<br>
+      <strong>Snow:</strong> Thank you! I haven't eaten <span class="blank hidden" data-word="anything">anything</span> all day!<br>
+      <strong>Snow:</strong> Wow! It turned <span class="blank hidden" data-word="pink">pink</span>! Cool!
+    </div>
+  </div>
+  <div id="read-aloud-section"><button id="read-btn" class="read-btn" onclick="readLyrics()">📢 ゆっくり聴いてみる</button></div>
+  <div class="controls">
+    <button onclick="initGame()">パズルをシャッフル</button>
+    <button id="ans-btn" onclick="toggleAnswers()" style="background: var(--secondary);">答えを表示</button>
+    <button onclick="window.print()" style="background: var(--success);">PDF保存 / 印刷</button>
+  </div>
+
+  <script>
+    const wordsData = [
+      { en: "sugar", ja: "さとう" }, { en: "take", ja: "とる" },
+      { en: "ask", ja: "きく" }, { en: "question", ja: "しつもん" },
+      { en: "try", ja: "試す" }, { en: "honest", ja: "正直な" },
+      { en: "idea", ja: "考え" }, { en: "about", ja: "～について" },
+      { en: "anything", ja: "なにも" }, { en: "pink", ja: "ピンク" }
+    ];
+    const boardSize = 10;
+    let grid = [], answerCells = new Set(), isDragging = false, dragType = null, startR = null, startC = null, isEraser = false;
+
+    function initGame() {
+      const board = document.getElementById("board");
+      const wordListDiv = document.getElementById("word-list");
+      board.innerHTML = ""; wordListDiv.innerHTML = ""; answerCells.clear();
+      document.querySelectorAll('.blank').forEach(el => el.classList.add('hidden'));
+      document.getElementById('read-aloud-section').style.display = 'none';
+      grid = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
+      let sortedWords = [...wordsData].sort((a, b) => b.en.length - a.en.length);
+      
+      sortedWords.forEach((word) => {
+        let placed = false, attempts = 0;
+        while (!placed && attempts < 500) { // ★ ホワイトアウト対策：上限500回
+          attempts++;
+          let isH = Math.random() < 0.5;
+          let r = Math.floor(Math.random() * (isH ? boardSize : (boardSize - word.en.length + 1)));
+          let c = Math.floor(Math.random() * (isH ? (boardSize - word.en.length + 1) : boardSize));
+          if (canPlace(word.en, r, c, isH)) {
+            for (let i = 0; i < word.en.length; i++) {
+              let currR = isH ? r : r + i, currC = isH ? c + i : c;
+              grid[currR][currC] = word.en[i].toLowerCase();
+              answerCells.add(`${currR}-${currC}`);
+            }
+            placed = true;
+          }
+        }
+      });
+      for(let i=0; i<boardSize; i++)
+        for(let j=0; j<boardSize; j++)
+          if(grid[i][j] === '') grid[i][j] = String.fromCharCode(97 + Math.floor(Math.random()*26));
+      grid.forEach((row, r) => row.forEach((ch, c) => {
+        const cell = document.createElement("div");
+        cell.className = "cell"; cell.textContent = ch;
+        cell.dataset.r = r; cell.dataset.c = c;
+        cell.addEventListener('mousedown', (e) => onStart(r, c, e));
+        cell.addEventListener('mouseenter', () => onMove(r, c));
+        cell.addEventListener('touchstart', (e) => { e.preventDefault(); onStart(r, c, e.touches[0]); });
+        board.appendChild(cell);
+      }));
+      board.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.dataset.r !== undefined) onMove(parseInt(target.dataset.r), parseInt(target.dataset.c));
+      });
+      wordsData.forEach(w => {
+        const div = document.createElement("div"); 
+        div.className = "word-item";
+        div.innerHTML = `<span>□ ${w.en}<span class="ja-text">${w.ja}</span></span>`;
+        div.onclick = () => {
+          div.classList.toggle("checked");
+          document.querySelectorAll(`.blank[data-word="${w.en}"]`).forEach(el => 
+            div.classList.contains("checked") ? el.classList.remove('hidden') : el.classList.add('hidden'));
+          checkCompletion();
+        };
+        wordListDiv.appendChild(div);
+      });
+    }
+
+    function checkCompletion() {
+      const total = document.querySelectorAll('.word-item').length;
+      const checked = document.querySelectorAll('.word-item.checked').length;
+      if (total > 0 && total === checked) document.getElementById('read-aloud-section').style.display = 'block';
+    }
+
+    function readLyrics() {
+      const btn = document.getElementById('read-btn');
+      if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); btn.textContent = "📢 ゆっくり聴いてみる"; btn.classList.remove('playing'); return; }
+      let fullText = document.getElementById('lyrics-text').innerText;
+      let cleanText = fullText.replace(/^(Zoe:|Snow:|Tiny:|Bravey:)/gm, "");
+      const uttr = new SpeechSynthesisUtterance();
+      uttr.text = cleanText; uttr.lang = 'en-US'; uttr.rate = 0.7; uttr.pitch = 1.2;
+      const voices = window.speechSynthesis.getVoices();
+      const femaleVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Female') || v.name.includes('Google US English')));
+      if (femaleVoice) uttr.voice = femaleVoice;
+      uttr.onstart = () => { btn.textContent = "⏹️ 読み上げを止める"; btn.classList.add('playing'); };
+      uttr.onend = () => { btn.textContent = "📢 ゆっくり聴いてみる"; btn.classList.remove('playing'); };
+      window.speechSynthesis.speak(uttr);
+    }
+
+    function canPlace(s, r, c, h) { for (let i = 0; i < s.length; i++) { let cr = h ? r : r + i, cc = h ? c + i : c; if (grid[cr][cc] !== '' && grid[cr][cc] !== s[i]) return false; } return true; }
+    function onStart(r, c, e) { isDragging = true; startR = r; startC = c; dragType = null; const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); isEraser = cell.classList.contains('h') || cell.classList.contains('v'); }
+    function onMove(r, c) { if (!isDragging) return; if (dragType === null) { if (r !== startR) dragType = 'v'; else if (c !== startC) dragType = 'h'; else return; } document.querySelectorAll('.temp-h, .temp-v').forEach(el => el.classList.remove('temp-h', 'temp-v', 'temp-h-start', 'temp-h-end', 'temp-v-start', 'temp-v-end')); const minR = Math.min(startR, (dragType === 'h' ? startR : r)), maxR = Math.max(startR, (dragType === 'h' ? startR : r)); const minC = Math.min(startC, (dragType === 'v' ? startC : c)), maxC = Math.max(startC, (dragType === 'v' ? startC : c)); for (let i = minR; i <= maxR; i++) { for (let j = minC; j <= maxC; j++) { const el = document.querySelector(`.cell[data-r="${i}"][data-c="${j}"]`); if (el) { el.classList.add('temp-' + dragType); if (dragType === 'h') { if (j === minC) el.classList.add('temp-h-start'); if (j === maxC) el.classList.add('temp-h-end'); } else { if (i === minR) el.classList.add('temp-v-start'); if (i === maxR) el.classList.add('temp-v-end'); } } } } }
+    function onEnd() { if (!isDragging) return; isDragging = false; const type = dragType; document.querySelectorAll('.temp-' + type).forEach(el => { el.classList.remove('temp-' + type, 'temp-' + type + '-start', 'temp-' + type + '-end'); isEraser ? el.classList.remove(type) : el.classList.add(type); }); updateCaps(); }
+    function updateCaps() { document.querySelectorAll('.cell').forEach(cell => { cell.classList.remove('h-start', 'h-end', 'v-start', 'v-end'); const r = +cell.dataset.r, c = +cell.dataset.c; if (cell.classList.contains('h')) { if (!document.querySelector(`.cell[data-r="${r}"][data-c="${c-1}"]`)?.classList.contains('h')) cell.classList.add('h-start'); if (!document.querySelector(`.cell[data-r="${r}"][data-c="${c+1}"]`)?.classList.contains('h')) cell.classList.add('h-end'); } if (cell.classList.contains('v')) { if (!document.querySelector(`.cell[data-r="${r-1}"][data-c="${c}"]`)?.classList.contains('v')) cell.classList.add('v-start'); if (!document.querySelector(`.cell[data-r="${r+1}"][data-c="${c}"]`)?.classList.contains('v')) cell.classList.add('v-end'); } }); }
+    window.addEventListener('mouseup', onEnd); window.addEventListener('touchend', onEnd);
+    function toggleAnswers() { const btn = document.getElementById("ans-btn"); const isShowing = btn.textContent === "答えを隠す"; btn.textContent = isShowing ? "答えを表示" : "答えを隠す"; document.querySelectorAll(".cell").forEach(cell => { if (answerCells.has(`${cell.dataset.r}-${cell.dataset.c}`)) cell.classList.toggle("show-ans", !isShowing); }); }
+    window.onload = initGame;
+  </script>
+</body>
+</html>

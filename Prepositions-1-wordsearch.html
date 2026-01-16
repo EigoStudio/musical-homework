@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Prepositions Word Search #1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Kosugi+Maru&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1976d2; --secondary: #ff9800; --success: #2e7d32; --read: #673ab7;
+      --marker-h: rgba(144, 238, 144, 0.8);
+      --marker-v: rgba(255, 200, 150, 0.8);
+      --cell-size: 50px; --board-width: 500px; 
+    }
+    body { font-family: 'Kosugi Maru', 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #fcfcfc; padding: 20px; }
+    h1 { margin: 0 auto 20px auto; font-size: 24px; color: #333; border-bottom: 2px solid #333; text-align: center; }
+    
+    .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 160px; }
+    #shuffle-btn { background: var(--primary); }
+    #ans-btn { background: var(--secondary); }
+    #print-btn { background: var(--success); }
+    #read-btn { background: var(--read); }
+    #clear-btn { background: #f44336; }
+
+    .game-main { display: flex; flex-direction: row; align-items: flex-start; gap: 30px; margin-bottom: 30px; }
+    
+    /* ボード枠線なし */
+    #board { display: grid; grid-template-columns: repeat(10, var(--cell-size)); width: var(--board-width); background-color: #fff; touch-action: none; user-select: none; position: relative; border: none !important; gap: 0; outline: none; }
+    .cell { width: var(--cell-size); height: var(--cell-size); line-height: var(--cell-size); font-size: 32px; text-align: center; font-weight: 700; font-family: 'Comic Neue', sans-serif; position: relative; cursor: pointer; z-index: 1; border: none !important; outline: none; }
+    
+    .cell::after, .cell::before { content: ""; position: absolute; z-index: -1; pointer-events: none; }
+    .cell.selected-h::after { left: 0; right: 0; top: 20%; bottom: 20%; background-color: var(--marker-h); }
+    .cell.round-left::after { border-top-left-radius: 15px; border-bottom-left-radius: 15px; left: 4px; }
+    .cell.round-right::after { border-top-right-radius: 15px; border-bottom-right-radius: 15px; right: 4px; }
+    .cell.selected-v::before { top: 0; bottom: 0; left: 20%; right: 20%; background-color: var(--marker-v); }
+    .cell.round-top::before { border-top-left-radius: 15px; border-top-right-radius: 15px; top: 4px; }
+    .cell.round-bottom::before { border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; bottom: 4px; }
+
+    #word-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 320px; }
+    .word-item { cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 18px; padding: 6px; border: 1px solid #eee; border-radius: 8px; background: white; }
+    .word-item.checked { background-color: #f0f0f0; opacity: 0.5; text-decoration: line-through; }
+    .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; }
+    .icon-box svg { width: 35px; height: 35px; }
+
+    #sentences-container { width: 100%; max-width: 800px; border-top: 1px solid #eee; padding-top: 20px; }
+    .sentences { font-size: 19px; line-height: 2.2; color: #333; }
+    .blank { display: inline-block; min-width: 85px; border-bottom: 2px solid #333; color: #d32f2f; font-weight: bold; text-align: center; }
+    .blank.hidden { color: transparent; }
+
+ /* 📱 スマホ用 */
+    @media screen and (max-width: 900px) {
+     /* タイトルを小さく調整 */
+      h1 { 
+        font-size: 18px !important; 
+        margin-top: 50px !important; /* ボタンに被らないよう少し下げる */
+        margin-bottom: 10px !important; 
+      }
+
+      .game-main { flex-direction: column; align-items: center; gap: 20px; }
+      :root { --cell-size: 9.2vw; --board-width: 92vw; }
+      .cell { font-size: 6.5vw; }
+      #word-list { display: grid; grid-template-columns: 1fr 1fr; width: 95%; gap: 8px 10px; /* 隙間を少し詰めました */ margin-top: 10px; }
+      .word-item { 
+        font-size: 16px !important; /* 英語を14pxに設定 */
+        line-height: 1.2;
+      }
+      .ja-text { 
+        font-size: 10px !important; /* 日本語を10pxに設定 */
+        margin-left: 5px; 
+      }
+      .lyrics { font-size: 13px; line-height: 2; padding: 0 10px; }
+      /* コントロールボタンをスマホでも押しやすく配置 */
+      .controls { position: relative; top: 0; left: 0; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; margin: 20px 0; order: 4; }
+      button { flex: 1; min-width: 100px; padding: 12px; font-size: 12px; }
+    }
+    /* --- スマホ版設定（ここまで） --- */
+
+    @media print {
+      @page { size: A4; margin: 10mm !important; }
+      body { background: white !important; width: 100% !important; color: black !important; padding: 0 !important; }
+      .controls, button { display: none !important; }
+      .game-main { display: block !important; width: 80% !important; margin: 0 auto !important; }
+      #board { margin: 0 auto 15px auto !important; width: 350px !important; grid-template-columns: repeat(10, 35px) !important; border: none !important; background: none !important; gap: 0 !important; }
+      .cell { width: 40px !important; height: 40px !important; line-height: 35px !important; font-size: 24px !important; border: none !important; background: none !important; }
+      #word-list { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 2px 10px !important; width: 80% !important; margin: 5px auto !important; padding: 8px 0 !important; border-top: 1px solid black !important; border-bottom: 1px solid black !important; }
+      .word-item { display: flex !important; align-items: center !important; border: none !important; font-size: 16px !important; line-height: 1.0 !important; }
+      .icon-box { display: flex !important; width: 22px !important; height: 22px !important; margin-right: 5px !important; }
+      #sentences-container { display: block !important; width: 80% !important; margin: 10px auto !important; border: none !important; }
+      .sentences { font-size: 18px !important; line-height: 2 !important; }
+      .blank { min-width: 70px !important; border-bottom: 1.5px solid black !important; color: transparent !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prepositions Word Search #1</h1>
+
+  <div class="controls">
+    <button id="shuffle-btn" onclick="initGame()">パズルをシャッフル</button>
+    <button id="read-btn" onclick="readSentences()">📢 文を聴く</button>
+    <button id="ans-btn" onclick="toggleAnswers()">答えを表示</button>
+    <button id="print-btn" onclick="window.print()">PDF保存 / 印刷</button>
+    <button id="clear-btn" onclick="clearLines()">線をすべて消す</button>
+  </div>
+  
+  <div class="game-main">
+    <div id="board"></div>
+    <div id="word-list"></div>
+  </div>
+
+  <div id="sentences-container">
+    <div class="sentences" id="sentences-text">
+      1. The book is <span class="blank hidden" data-word="in">in</span> the box.<br>
+      2. The book is <span class="blank hidden" data-word="on">on</span> the box.<br>
+      3. The book is <span class="blank hidden" data-word="under">under</span> the box.<br>
+      4. The book is <span class="blank hidden" data-word="in front of">in front of</span> the box.<br>
+      5. The book is <span class="blank hidden" data-word="behind">behind</span> the box.<br>
+      6. The book is <span class="blank hidden" data-word="next to">next to</span> the box.<br>
+      7. The book is <span class="blank hidden" data-word="between">between</span> the boxes.<br>
+      8. She reads a book <span class="blank hidden" data-word="from">from</span> five <span class="blank hidden" data-word="to">to</span> six every day.<br>
+      9. She is <span class="blank hidden" data-word="at">at</span> the library.
+    </div>
+  </div>
+
+  <script>
+    const icons = {
+      in: `<svg viewBox="0 0 100 100"><rect x="20" y="40" width="60" height="40" fill="none" stroke="#333" stroke-width="4"/><circle cx="50" cy="60" r="12" fill="#666"/></svg>`,
+      on: `<svg viewBox="0 0 100 100"><rect x="20" y="50" width="60" height="30" fill="none" stroke="#333" stroke-width="4"/><circle cx="50" cy="38" r="12" fill="#666"/></svg>`,
+      under: `<svg viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="30" fill="none" stroke="#333" stroke-width="4"/><circle cx="50" cy="65" r="12" fill="#666"/></svg>`,
+      "in front of": `<svg viewBox="0 0 100 100"><rect x="35" y="25" width="50" height="40" fill="#eee" stroke="#333" stroke-width="2"/><circle cx="35" cy="70" r="15" fill="#666" stroke="#333" stroke-width="2"/></svg>`,
+      behind: `<svg viewBox="0 0 100 100"><circle cx="65" cy="35" r="15" fill="#666"/><rect x="20" y="40" width="60" height="40" fill="white" stroke="#333" stroke-width="4"/></svg>`,
+      "next to": `<svg viewBox="0 0 100 100"><rect x="10" y="40" width="40" height="40" fill="none" stroke="#333" stroke-width="4"/><circle cx="75" cy="60" r="12" fill="#666"/></svg>`,
+      between: `<svg viewBox="0 0 100 100"><rect x="5" y="40" width="30" height="40" fill="none" stroke="#333" stroke-width="4"/><rect x="65" y="40" width="30" height="40" fill="none" stroke="#333" stroke-width="4"/><circle cx="50" cy="60" r="10" fill="#666"/></svg>`,
+      from: `<svg viewBox="0 0 100 100"><circle cx="20" cy="50" r="8" fill="#333"/><line x1="25" y1="50" x2="80" y2="50" stroke="#333" stroke-width="4" stroke-dasharray="4"/><path d="M70 35 L90 50 L70 65" fill="none" stroke="#333" stroke-width="4"/></svg>`,
+      to: `<svg viewBox="0 0 100 100"><rect x="70" y="40" width="25" height="25" fill="#333"/><line x1="10" y1="52" x2="65" y2="52" stroke="#333" stroke-width="4"/><path d="M55 40 L70 52 L55 64" fill="none" stroke="#333" stroke-width="4"/></svg>`,
+      at: `<svg viewBox="0 0 100 100"><path d="M50 10 Q30 10 30 35 Q30 60 50 90 Q70 60 70 35 Q70 10 50 10" fill="none" stroke="#333" stroke-width="4"/><circle cx="50" cy="35" r="8" fill="#333"/></svg>`
+    };
+
+    const wordsData = [{ en: "in" }, { en: "on" }, { en: "under" }, { en: "in front of" }, { en: "behind" }, { en: "next to" }, { en: "between" }, { en: "from" }, { en: "to" }, { en: "at" }];
+    const boardSize = 10;
+    let grid = [], answerCells = new Set(), isDragging = false;
+    let startR = null, startC = null, currentMode = null;
+    let currentDragCells = [], initialLineState = new Set();
+
+    function initGame() {
+      const board = document.getElementById("board");
+      const wordListDiv = document.getElementById("word-list");
+      window.speechSynthesis.cancel(); // 音声をリセット
+      clearLines();
+      board.innerHTML = ""; wordListDiv.innerHTML = ""; answerCells.clear();
+      document.querySelectorAll('.blank').forEach(el => el.classList.add('hidden'));
+
+      grid = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
+      wordsData.sort((a,b) => b.en.length - a.en.length).forEach(word => {
+        let cleanWord = word.en.replace(/\s+/g, '').toLowerCase();
+        let placed = false, attempts = 0;
+        while (!placed && attempts < 500) {
+          attempts++;
+          let isH = Math.random() < 0.5;
+          let r = Math.floor(Math.random() * (isH ? boardSize : (boardSize - cleanWord.length + 1)));
+          let c = Math.floor(Math.random() * (isH ? (boardSize - cleanWord.length + 1) : boardSize));
+          let canPut = true;
+          for (let i = 0; i < cleanWord.length; i++) {
+            let cr = isH ? r : r + i, cc = isH ? c + i : c;
+            if (grid[cr][cc] !== '' && grid[cr][cc] !== cleanWord[i]) { canPut = false; break; }
+          }
+          if (canPut) {
+            for (let i = 0; i < cleanWord.length; i++) {
+              let cr = isH ? r : r + i, cc = isH ? c + i : c;
+              grid[cr][cc] = cleanWord[i];
+              answerCells.add(`${cr}-${cc}`);
+            }
+            placed = true;
+          }
+        }
+      });
+
+      for(let i=0; i<boardSize; i++)
+        for(let j=0; j<boardSize; j++)
+          if(grid[i][j] === '') grid[i][j] = String.fromCharCode(97 + Math.floor(Math.random()*26));
+
+      grid.forEach((row, r) => row.forEach((ch, c) => {
+        const cell = document.createElement("div");
+        cell.className = "cell"; cell.textContent = ch;
+        cell.dataset.r = r; cell.dataset.c = c;
+        cell.oncontextmenu = (e) => {
+          e.preventDefault();
+          cell.classList.remove('selected-h', 'selected-v', 'round-left', 'round-right', 'round-top', 'round-bottom');
+        };
+        const startHandler = (e) => {
+          if (e.cancelable) e.preventDefault();
+          isDragging = true; startR = r; startC = c; currentMode = null;
+          currentDragCells = []; initialLineState.clear();
+          document.querySelectorAll('.cell').forEach(el => {
+            if(el.classList.contains('selected-h')) initialLineState.add(`${el.dataset.r}-${el.dataset.c}-h`);
+            if(el.classList.contains('selected-v')) initialLineState.add(`${el.dataset.r}-${el.dataset.c}-v`);
+          });
+        };
+        cell.onmousedown = startHandler;
+        cell.addEventListener('touchstart', startHandler, {passive: false});
+        cell.onmouseenter = () => { if(isDragging) handleMove(r, c); };
+        board.appendChild(cell);
+      }));
+
+      wordsData.forEach(w => {
+        const div = document.createElement("div");
+        div.className = "word-item";
+        div.innerHTML = `<div class="icon-box">${icons[w.en]}</div><span>${w.en}</span>`;
+        div.onclick = () => {
+          div.classList.toggle("checked");
+          document.querySelectorAll(`.blank[data-word="${w.en}"]`).forEach(el => 
+            div.classList.contains("checked") ? el.classList.remove('hidden') : el.classList.add('hidden'));
+        };
+        wordListDiv.appendChild(div);
+      });
+    }
+
+    function handleMove(r, c) {
+      if (!isDragging) return;
+      if (currentMode === null) {
+        if (r === startR && c !== startC) currentMode = 'h';
+        else if (c === startC && r !== startR) currentMode = 'v';
+        else return;
+      }
+      currentDragCells.forEach(cell => {
+        if (currentMode === 'h') cell.classList.remove('selected-h', 'round-left', 'round-right');
+        else cell.classList.remove('selected-v', 'round-top', 'round-bottom');
+      });
+      currentDragCells = [];
+      if (currentMode === 'h' && r === startR) {
+        const min = Math.min(startC, c), max = Math.max(startC, c);
+        for(let i=min; i<=max; i++) {
+          const el = document.querySelector(`[data-r="${r}"][data-c="${i}"]`);
+          el.classList.add('selected-h');
+          if (i === min) el.classList.add('round-left');
+          if (i === max) el.classList.add('round-right');
+          currentDragCells.push(el);
+        }
+      } else if (currentMode === 'v' && c === startC) {
+        const min = Math.min(startR, r), max = Math.max(startR, r);
+        for(let i=min; i<=max; i++) {
+          const el = document.querySelector(`[data-r="${i}"][data-c="${c}"]`);
+          el.classList.add('selected-v');
+          if (i === min) el.classList.add('round-top');
+          if (i === max) el.classList.add('round-bottom');
+          currentDragCells.push(el);
+        }
+      }
+    }
+
+    window.onmouseup = window.ontouchend = () => { 
+      if (!isDragging) return;
+      let allOriginallySelected = currentDragCells.length > 0;
+      currentDragCells.forEach(cell => {
+        if (!initialLineState.has(`${cell.dataset.r}-${cell.dataset.c}-${currentMode}`)) allOriginallySelected = false;
+      });
+      if (allOriginallySelected) {
+        currentDragCells.forEach(cell => {
+          if (currentMode === 'h') cell.classList.remove('selected-h', 'round-left', 'round-right');
+          else cell.classList.remove('selected-v', 'round-top', 'round-bottom');
+        });
+      }
+      isDragging = false; currentDragCells = []; startR = startC = currentMode = null; 
+    };
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (target && target.classList.contains('cell')) handleMove(parseInt(target.dataset.r), parseInt(target.dataset.c));
+    }, {passive: false});
+
+    // 📢 音声読み上げ：声を明示的に選択する修正版
+function readSentences() {
+  const btn = document.getElementById('read-btn');
+  
+  if (window.speechSynthesis.speaking) {
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      btn.innerHTML = "⏸ 一時停止";
+    } else {
+      window.speechSynthesis.pause();
+      btn.innerHTML = "▶ 再開する";
+    }
+    return;
+  }
+
+  const text = document.getElementById('sentences-text').innerText;
+  const lines = text.split('\n').filter(line => line.trim() !== "");
+  
+  // 利用可能な声のリストを取得
+  const voices = window.speechSynthesis.getVoices();
+  
+  // 英語の声を探す (Googleの高品質な声、または iOSのSiriなどの en-US を優先)
+  const enVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) || 
+                  voices.find(v => v.lang === 'en-US') ||
+                  voices.find(v => v.lang.startsWith('en'));
+
+  btn.innerHTML = "⏸ 一時停止";
+  
+  lines.forEach((line, index) => {
+    const uttr = new SpeechSynthesisUtterance(line);
+    
+    // 言語設定
+    uttr.lang = 'en-US';
+    
+    // ★ ここが重要：見つかった英語の声をセットする
+    if (enVoice) {
+      uttr.voice = enVoice;
+    }
+    
+    uttr.rate = 0.8; // 少し聞き取りやすく速度を調整 (0.7〜0.8推奨)
+    uttr.pitch = 1.0;
+
+    if (index === lines.length - 1) {
+      uttr.onend = () => btn.innerHTML = "📢 文を聴く";
+    }
+    
+    window.speechSynthesis.speak(uttr);
+
+    // 文の間に少し間隔を空ける
+    if (index < lines.length - 1) {
+      const pause = new SpeechSynthesisUtterance("");
+      pause.duration = 500; // ミリ秒単位の間隔（ブラウザにより動作が異なります）
+      window.speechSynthesis.speak(pause);
+    }
+  });
+}
+
+// ページ読み込み時に声をロードしておく（特にChrome/Android対策）
+window.speechSynthesis.onvoiceschanged = () => {
+  window.speechSynthesis.getVoices();
+};
+
+    function toggleAnswers() {
+      const btn = document.getElementById("ans-btn");
+      const isShowing = btn.textContent === "答えを隠す";
+      btn.textContent = isShowing ? "答えを表示" : "答えを隠す";
+      document.querySelectorAll(".cell").forEach(cell => {
+        if (answerCells.has(`${cell.dataset.r}-${cell.dataset.c}`)) cell.classList.toggle("show-ans", !isShowing);
+      });
+    }
+
+    function clearLines() { document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('selected-h', 'selected-v', 'round-left', 'round-right', 'round-top', 'round-bottom')); }
+    window.onload = initGame;
+  </script>
+</body>
+</html>

@@ -16,6 +16,13 @@
     }
     body { font-family: 'Kosugi Maru', 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #fcfcfc; padding: 20px; }
     h1 { margin: 0 auto 20px auto; font-size: 24px; color: #333; border-bottom: 2px solid #333; text-align: center; }
+
+/* 「答えを表示」を押した時に正解のマスをハイライトする設定 */
+.cell.show-ans {
+  background-color: #ffeb3b !important; /* 目立つ黄色 */
+  color: #d32f2f !important;           /* 文字を赤く */
+  border-radius: 4px;
+}
     
     .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
     button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); min-width: 160px; }
@@ -273,67 +280,78 @@
       if (target && target.classList.contains('cell')) handleMove(parseInt(target.dataset.r), parseInt(target.dataset.c));
     }, {passive: false});
 
-    // 📢 音声読み上げ：声を明示的に選択する修正版
+    // --- ここから入れ替え ---
+let speechTimer; // PC版のフリーズ防止用タイマー
+
 function readSentences() {
   const btn = document.getElementById('read-btn');
-  
-  if (window.speechSynthesis.speaking) {
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
+  const synth = window.speechSynthesis;
+
+  // 1. 再生・一時停止・再開のコントロール
+  if (synth.speaking) {
+    if (synth.paused) {
+      synth.resume(); // 再開
       btn.innerHTML = "⏸ 一時停止";
+      resumeKeepAlive(); // 生存確認を再開
     } else {
-      window.speechSynthesis.pause();
+      synth.pause(); // 一時停止
       btn.innerHTML = "▶ 再開する";
+      clearTimeout(speechTimer); // タイマーを止める
     }
     return;
   }
 
+  // 2. 新しく読み上げを開始する処理
   const text = document.getElementById('sentences-text').innerText;
   const lines = text.split('\n').filter(line => line.trim() !== "");
   
-  // 利用可能な声のリストを取得
-  const voices = window.speechSynthesis.getVoices();
-  
-  // 英語の声を探す (Googleの高品質な声、または iOSのSiriなどの en-US を優先)
+  const voices = synth.getVoices();
+  // 英語の声を探す（あなたが設定で入れた高品質な声がここで選ばれます）
   const enVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) || 
                   voices.find(v => v.lang === 'en-US') ||
                   voices.find(v => v.lang.startsWith('en'));
 
   btn.innerHTML = "⏸ 一時停止";
-  
+
   lines.forEach((line, index) => {
     const uttr = new SpeechSynthesisUtterance(line);
-    
-    // 言語設定
     uttr.lang = 'en-US';
-    
-    // ★ ここが重要：見つかった英語の声をセットする
-    if (enVoice) {
-      uttr.voice = enVoice;
-    }
-    
-    uttr.rate = 0.8; // 少し聞き取りやすく速度を調整 (0.7〜0.8推奨)
+    if (enVoice) uttr.voice = enVoice;
+    uttr.rate = 0.8;
     uttr.pitch = 1.0;
 
+    // 全ての文が終わった時の処理
     if (index === lines.length - 1) {
-      uttr.onend = () => btn.innerHTML = "📢 文を聴く";
+      uttr.onend = () => {
+        btn.innerHTML = "📢 文を聴く";
+        clearTimeout(speechTimer);
+      };
     }
     
-    window.speechSynthesis.speak(uttr);
-
-    // 文の間に少し間隔を空ける
-    if (index < lines.length - 1) {
-      const pause = new SpeechSynthesisUtterance("");
-      pause.duration = 500; // ミリ秒単位の間隔（ブラウザにより動作が異なります）
-      window.speechSynthesis.speak(pause);
-    }
+    synth.speak(uttr);
   });
+
+  // 再生開始時に生存確認処理をスタート
+  resumeKeepAlive();
 }
 
-// ページ読み込み時に声をロードしておく（特にChrome/Android対策）
+/**
+ * PC版Chromeバグ対策：再生中に一瞬だけpause/resumeを繰り返して
+ * ブラウザが音声を勝手に切断するのを防ぐ
+ */
+function resumeKeepAlive() {
+  if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+    speechTimer = setTimeout(resumeKeepAlive, 10000); // 10秒ごとに実行
+  }
+}
+
+// ページ読み込み時に声をロードしておく
 window.speechSynthesis.onvoiceschanged = () => {
   window.speechSynthesis.getVoices();
 };
+// --- ここまで入れ替え ---
 
     function toggleAnswers() {
       const btn = document.getElementById("ans-btn");

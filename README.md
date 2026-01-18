@@ -1,7 +1,7 @@
 # Musical Homework
 
-Fun at-home activities for children taking my English musical lessons. They are designed to help children learn effectively in a relaxed environment and build a positive connection with English. <br>
-こども英語ミュージカルのレッスンを受講する生徒のための、楽しいアクティビティーです。リラックスした環境で取り組むことで学習効率を高め、英語を楽しい体験として定着させます。
+Fun at-home activities for children taking my English musical lessons. They are designed to help children learn effectively and build a positive connection with English. <br>
+こども英語ミュージカルのレッスンを受講する生徒のための、楽しいアクティビティーです。学習効率を高め、英語を楽しい体験として定着させることができます。。
 
 ## 🚀 サイト（ゲーム）はこちら
 ([https://eigostudio.github.io/musical-homework/](https://eigostudio.github.io/musical-homework/))

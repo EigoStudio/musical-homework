@@ -4,7 +4,7 @@ Fun at-home activities for children taking my English musical lessons. They are 
 こども英語ミュージカルのレッスンを受講する生徒のための、楽しいアクティビティーです。リラックスした環境で取り組むことで学習効率を高め、英語を楽しい体験として定着させます。
 
 ## 🚀 サイト（ゲーム）はこちら
-[https://eigostudio.github.io/Kikutan-3Q-Crossword/](https://eigostudio.github.io/Kikutan-3Q-Crossword/](https://eigostudio.github.io/musical-homework/)
+([https://eigostudio.github.io/musical-homework/](https://eigostudio.github.io/musical-homework/))
 （※URLをクリックすると目次ページが開きます）
 
 ---

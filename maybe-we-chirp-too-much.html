@@ -172,16 +172,60 @@
     }
 
     function readLyrics() {
-      const btn = document.getElementById('read-btn');
-      if (window.speechSynthesis.speaking) { window.speechSynthesis.cancel(); btn.textContent = "📢 ゆっくり聴いてみる"; btn.classList.remove('playing'); return; }
-      let fullText = document.getElementById('lyrics-text').innerText;
-      let cleanText = fullText.replace(/^(Sparrows:)/gm, "");
-      const uttr = new SpeechSynthesisUtterance();
-      uttr.text = cleanText; uttr.lang = 'en-US'; uttr.rate = 0.7; uttr.pitch = 1.0;
-      uttr.onstart = () => { btn.textContent = "⏹️ 読み上げを止める"; btn.classList.add('playing'); };
-      uttr.onend = () => { btn.textContent = "📢 ゆっくり聴いてみる"; btn.classList.remove('playing'); };
-      window.speechSynthesis.speak(uttr);
+    const btn = document.getElementById('read-btn');
+    const synth = window.speechSynthesis;
+
+    // 再生中なら停止
+    if (synth.speaking) {
+        synth.cancel();
+        btn.textContent = "📢 ゆっくり聴いてみる";
+        btn.classList.remove('playing');
+        return;
     }
+
+    let fullText = document.getElementById('lyrics-text').innerText;
+    // 文頭のスピーカー名などを削除
+    let cleanText = fullText.replace(/^(Sparrows:)/gm, "");
+
+    const uttr = new SpeechSynthesisUtterance(cleanText);
+    
+    // 基本設定
+    uttr.lang = 'en-US';
+    uttr.rate = 0.7;
+    uttr.pitch = 1.0;
+
+    // --- 【追加】英語の声を強制的に探してセットする ---
+    // ブラウザが持っている声のリストを取得
+    const voices = synth.getVoices();
+    
+    // 優先順位: 
+    // 1. Android/Chromeの良質な英語音声 'Google US English'
+    // 2. iOSの良質な英語音声 'Samantha'
+    // 3. その他 'en-US' (アメリカ英語) の音声
+    // 4. なければ英語系の音声どれか
+    const targetVoice = voices.find(v => v.name === 'Google US English') || 
+                        voices.find(v => v.name === 'Samantha') || 
+                        voices.find(v => v.lang === 'en-US') ||
+                        voices.find(v => v.lang.startsWith('en'));
+
+    // 英語の声が見つかればセットする
+    if (targetVoice) {
+        uttr.voice = targetVoice;
+        console.log("Voice set to: " + targetVoice.name); // 確認用ログ
+    }
+    // ------------------------------------------------
+
+    uttr.onstart = () => {
+        btn.textContent = "⏹️ 読み上げを止める";
+        btn.classList.add('playing');
+    };
+    uttr.onend = () => {
+        btn.textContent = "📢 ゆっくり聴いてみる";
+        btn.classList.remove('playing');
+    };
+
+    synth.speak(uttr);
+}
 
     function canPlace(s, r, c, h) { for (let i = 0; i < s.length; i++) { let cr = h ? r : r + i, cc = h ? c + i : c; if (grid[cr][cc] !== '' && grid[cr][cc] !== s[i]) return false; } return true; }
     function onStart(r, c, e) { isDragging = true; startR = r; startC = c; dragType = null; const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); isEraser = cell.classList.contains('h') || cell.classList.contains('v'); }

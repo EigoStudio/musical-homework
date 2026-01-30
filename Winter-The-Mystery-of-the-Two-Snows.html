@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winter — The Mystery of the Two Snows</title>
+    <style>
+        /* 基本デザイン */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0faff; color: #333; line-height: 1.6; margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 5px solid #ffb6c1; }
+        h1 { text-align: center; color: #ff69b4; font-size: 2.2em; }
+        h2 { color: #008b8b; border-bottom: 2px solid #add8e6; margin-top: 30px; }
+
+        /* ストーリーセクション */
+        .story-section { position: relative; margin-bottom: 20px; padding: 20px; border-radius: 15px; padding-bottom: 60px; }
+        .story-section:nth-child(even) { background-color: #fff0f5; }
+        .story-section:nth-child(odd) { background-color: #e6f7ff; }
+        .flashback { border-left: 8px solid #ff4081; font-style: italic; }
+
+        /* 読み上げボタン（右下固定） */
+        .audio-ctrl { position: absolute; bottom: 15px; right: 20px; }
+        .speak-btn { background: #ff69b4; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .speak-btn:hover { background: #ff1493; }
+
+        /* クイズデザイン */
+        .quiz-container { margin-top: 50px; padding: 25px; background-color: #e0f2f1; border-radius: 15px; border: 3px dashed #ffb6c1; }
+        .question { background: white; margin-bottom: 25px; padding: 20px; border-radius: 10px; border-left: 5px solid #87ceeb; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .option-btn { padding: 12px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: left; }
+        .option-btn:hover { background: #fce4ec; border-color: #ffb6c1; }
+        .feedback { font-weight: bold; margin-top: 10px; height: 24px; }
+        .correct { color: #28a745; }
+        .try-again { color: #dc3545; }
+
+        /* PDF用（印刷設定） */
+        @media print {
+            body { background: white !important; }
+            .container { border: none !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; }
+            .speak-btn, .audio-ctrl, .feedback, .option-btn { display: none !important; }
+            .story-section { background: none !important; border: none !important; border-bottom: 1px solid #ccc !important; padding: 10px 0 !important; page-break-inside: avoid; }
+            .question { page-break-inside: avoid; border: 1px solid #eee; margin-bottom: 15px; }
+            h1, h2 { color: black !important; text-shadow: none !important; }
+            p { font-size: 11pt !important; color: black !important; margin: 5px 0; }
+        }
+
+        @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Winter — The Mystery of the Two Snows</h1>
+
+    <div class="story-section" id="s1">
+        <h2>1. See You Next Spring!</h2>
+        <p class="text">Winter arrives in the small town. The Ants are singing as they march back to their cozy homes to sleep until spring.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s1')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s2">
+        <h2>2. Snowman Contest</h2>
+        <p class="text">Plum and Fortune are working hard to build a giant snowman that is bigger than a sumo wrestler.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s2')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s3">
+        <h2>3. I Want the Beautiful Gown!</h2>
+        <p class="text">Everyone in the town is competing in the "Snowman Contest". The person who makes the last standing snowman will win a beautiful gown as a prize. Snow (who is actually an Imposter in disguise) appears and watches them. When Snow says, "I must win that gown," Luna laughs and says, "Don't be silly. I've never seen you work hard." Snow smiles mysteriously and says, "Who said anything about hard work?"</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s3')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s4">
+        <h2>4. A Suspicious Afternoon at the Store</h2>
+        <p class="text">It is a bright afternoon. The Imposter goes to Bravey’s store with a dark plan. She is looking for sugar to build a fake snowman. She finds a large jar and confirms it is sugar. Then, to make sure everyone thinks the real Snow is a thief, she does something very strange. In an unnaturally loud voice, she shouts, "Oh, there it is! A big jar of sugar!". She wants the neighbors to hear her. She grabs the jar and runs off.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s4')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s5">
+        <h2>5. The Honest Mochi</h2>
+        <p class="text">Meanwhile, Bravey is enjoying tea with her friends Melody, Tiny, and Zoe. Bravey shows them her new product Honest Mochi. "If you are an honest person, it turns pink," Bravey explains. "But if you are a liar, it turns gray!". Tiny and Zoe look nervous. But Melody is brave and takes a bite. The mochi turns bright pink! Next, Tiny takes a bite, and then Zoe does too. It turns pink for both of them! All four friends cheer together, "We are honest!".</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s5')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s6">
+        <h2>6. Who took My Sugar?</h2>
+        <p class="text">After their tea time, Bravey returns to her kitchen and gasps. "My sugar! It's gone! Who took my sugar?" A neighbor calls out, "I saw Snow sneaking into your store! I even heard her shouting about sugar!".</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s6')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s7">
+        <h2>7. Putting Snow to the Test</h2>
+        <p class="text">The girls find the real Snow, but she is in a huge hurry to perform her snow art at a festival in the city. "Did you take Bravey's sugar?" they ask. Snow looks completely confused. Bravey offers her a piece of Honest Mochi. As she hasn't eaten anything all day, Snow gladly accepts it. When she takes a bite, it turns pink! The girls are deeply puzzled. "She is honest..." they whisper.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s7')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s8">
+        <h2>8. Look at My Perfect Snowman</h2>
+        <p class="text">In the town square, many snowmen are lined up. The "Fake Snow" stands by a small snowman. She shouts, "Look at my snowman! It's small, but it's perfect! It will NEVER melt, and I will win!". The townspeople are shocked. "That's impossible!". But the Fake Snow just smirks and says, "Not if you use... a secret ingredient".</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s8')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section flashback" id="s9">
+        <h2>9. The Ogre’s Grudge (Flashback)</h2>
+        <p class="text">Years ago, the Ogre ate 200 of Snow’s favorite dried persimmons. When Snow caught her, she didn't apologize. To teach her a lesson, Snow trapped her in ice for three long days. It was a terrible experience. She was freezing and shivering. She felt so humiliated that she decided to get revenge by pretending to be Snow and making everyone think she is a thief.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s9')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s10">
+        <h2>10. Something's not Right</h2>
+        <p class="text">The girls are looking at the Fake Snow suspiciously. They have just seen the real Snow leave the town a few minutes ago. Tiny feels something is wrong. She uses her magic mallet to shrink and slips into the pocket of this strange person to investigate.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s10')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s11">
+        <h2>11. Sugar Snowman</h2>
+        <p class="text">Ants wake up because of the sweet smell of sugar. They march and carry the sugar back to their nest. Very quickly, the "perfect" snowman begins to crumble! The Fake Snow starts crying, "Oh no! I used Bravey's sugar!". Tiny pops out and shouts, "You are not Snow! Who are you?". The Fake Snow screams in a scary Ogre voice, "I AM SNOW!".</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s11')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="story-section" id="s12">
+        <h2>12. Forgiveness and Soup</h2>
+        <p class="text">The real Snow arrives. The Ogre admits to trying to frame her. Snow explains her side and then says, "I forgive you". Bravey suggests red bean soup. "Yes, please!!" everyone shouts happily. They all enjoy the warm soup together.</p>
+        <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s12')">🔊 Read Aloud</button></div>
+    </div>
+
+    <div class="quiz-container">
+        <h1 class="quiz-title">Story Quiz (12 Questions)</h1>
+        
+        <div class="question">
+            <p><strong>1. What are the Ants doing at the beginning?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. Building a snowman.</button>
+                <button class="option-btn" onclick="ans(this,1)">B. Marching home to sleep.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. Eating Bravey's mochi.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. Singing at a city festival.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>2. What is the prize for the contest?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. A jar of sugar.</button>
+                <button class="option-btn" onclick="ans(this,0)">B. 200 persimmons.</button>
+                <button class="option-btn" onclick="ans(this,1)">C. A beautiful gown.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. A magic mallet.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>3. What does Luna say about Snow?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,1)">A. She has never seen Snow work hard.</button>
+                <button class="option-btn" onclick="ans(this,0)">B. She thinks Snow is the best artist.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. She wants to help Snow win.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. She is afraid of Snow's snowman.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>4. Why did the Imposter shout loudly at the store?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. She was scared of Bravey.</button>
+                <button class="option-btn" onclick="ans(this,0)">B. To wake up the sleeping ants.</button>
+                <button class="option-btn" onclick="ans(this,1)">C. So neighbors would think Snow is a thief.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. Because she found the mochi.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>5. What color does 'Honest Mochi' turn for a liar?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. Pink</button>
+                <button class="option-btn" onclick="ans(this,1)">B. Gray</button>
+                <button class="option-btn" onclick="ans(this,0)">C. Blue</button>
+                <button class="option-btn" onclick="ans(this,0)">D. White</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>6. Why did the mochi turn pink for Snow?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,1)">A. Because she was telling the truth.</button>
+                <button class="option-btn" onclick="ans(this,0)">B. Because she stole the sugar.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. Because she was hungry.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. Because she is a monster.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>7. What was special about the "Fake Snow's" snowman?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. It was made of mochi.</button>
+                <button class="option-btn" onclick="ans(this,1)">B. It would never melt.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. It was as big as a sumo wrestler.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. It could sing like the ants.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>8. Why did the Ogre want revenge?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. Snow stole her persimmons.</button>
+                <button class="option-btn" onclick="ans(this,1)">B. Snow trapped her in ice for 3 days.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. She lost the snowman contest.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. Bravey didn't give her soup.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>9. How does Tiny investigate the Fake Snow?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. She asks her questions.</button>
+                <button class="option-btn" onclick="ans(this,0)">B. She follows her to the city.</button>
+                <button class="option-btn" onclick="ans(this,1)">C. She shrinks and slips into her pocket.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. She uses the Honest Mochi.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>10. What woke up the Ants in winter?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. The Ogre's loud scream.</button>
+                <button class="option-btn" onclick="ans(this,1)">B. The sweet smell of sugar.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. Tiny's magic mallet.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. The snowman contest music.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>11. How did people know the identity of the Ogre?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. Her costume fell off.</button>
+                <button class="option-btn" onclick="ans(this,1)">B. She screamed in a scary Ogre voice.</button>
+                <button class="option-btn" onclick="ans(this,0)">C. She ate 200 persimmons.</button>
+                <button class="option-btn" onclick="ans(this,0)">D. The ants bit her.</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="question">
+            <p><strong>12. What did they all eat at the end?</strong></p>
+            <div class="options">
+                <button class="option-btn" onclick="ans(this,0)">A. Shaved ice</button>
+                <button class="option-btn" onclick="ans(this,0)">B. Dried persimmons</button>
+                <button class="option-btn" onclick="ans(this,1)">C. Red bean soup</button>
+                <button class="option-btn" onclick="ans(this,0)">D. Honest Mochi</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+    </div>
+
+    <div class="footer" style="text-align:center; margin-top:30px; font-size:0.8em; color:#666;">
+        English Learning Material — Story by User
+    </div>
+</div>
+
+<script>
+    // 読み上げ関数
+    function speakText(id) {
+        // window.speechSynthesis を直接使います
+        const synth = window.speechSynthesis;
+        
+        // 前の音声をキャンセル（重なり防止）
+        synth.cancel();
+
+        const text = document.querySelector(`#${id} .text`).innerText;
+        const uttr = new SpeechSynthesisUtterance(text);
+
+        // ★ワードサーチゲームと同じ声を探すロジック★
+        const voices = synth.getVoices();
+        const targetVoice = voices.find(v => v.name === 'Google US English') || 
+                            voices.find(v => v.name === 'Samantha') || 
+                            voices.find(v => v.lang === 'en-US') ||
+                            voices.find(v => v.lang.startsWith('en'));
+
+        if (targetVoice) {
+            uttr.voice = targetVoice;
+        }
+
+        uttr.lang = "en-US";
+        uttr.rate = 0.8;  // 少しゆっくり
+        uttr.pitch = 1.0; // 標準の高さ
+
+        synth.speak(uttr);
+    }
+
+    // 正解判定機能
+    function ans(btn, isCorrect) {
+        const feedback = btn.parentElement.nextElementSibling;
+        if (isCorrect) {
+            feedback.innerHTML = "<span class='correct'>✨ Correct! Excellent work!</span>";
+        } else {
+            feedback.innerHTML = "<span class='try-again'>❌ Try again. You can do it!</span>";
+        }
+    }
+
+    // 起動時にボイスリストを準備するおまじない
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    }
+</script>
+</body>
+</html>

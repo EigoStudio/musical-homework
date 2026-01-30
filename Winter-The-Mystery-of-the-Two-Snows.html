@@ -44,6 +44,20 @@
         }
 
         @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
+
+/* ロゴがキラキラ光るアニメーション */
+@keyframes shiny-glow {
+    0% { text-shadow: 0 0 5px #fff, 0 0 10px #ff69b4; color: #ff69b4; }
+    50% { text-shadow: 0 0 20px #fff, 0 0 30px #ff1493, 0 0 40px #ff1493; color: #fff; }
+    100% { text-shadow: 0 0 5px #fff, 0 0 10px #ff69b4; color: #ff69b4; }
+}
+
+.glow-animation {
+    animation: shiny-glow 1.5s ease-in-out infinite;
+    display: inline-block;
+    font-weight: bold;
+}
+
     </style>
 </head>
 <body>
@@ -71,19 +85,19 @@
 
     <div class="story-section" id="s4">
         <h2>4. A Suspicious Afternoon at the Store</h2>
-        <p class="text">It is a bright afternoon. The Imposter goes to Bravey’s store with a dark plan. She is looking for sugar to build a fake snowman. She finds a large jar and confirms it is sugar. Then, to make sure everyone thinks the real Snow is a thief, she does something very strange. In an unnaturally loud voice, she shouts, "Oh, there it is! A big jar of sugar!". She wants the neighbors to hear her. She grabs the jar and runs off.</p>
+        <p class="text">It is a bright afternoon. The Imposter goes to Bravey’s store with a dark plan. She is looking for sugar to build a fake snowman. She finds a large jar and confirms it is sugar. Then, to make sure everyone thinks the real Snow is a thief, she does something very strange. In an unnaturally loud voice, she shouts, "Oh, there it is! A big jar of sugar!" She wants the neighbors to hear her. She grabs the jar and runs off.</p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s4')">🔊 Read Aloud</button></div>
     </div>
 
     <div class="story-section" id="s5">
         <h2>5. The Honest Mochi</h2>
-        <p class="text">Meanwhile, Bravey is enjoying tea with her friends Melody, Tiny, and Zoe. Bravey shows them her new product Honest Mochi. "If you are an honest person, it turns pink," Bravey explains. "But if you are a liar, it turns gray!". Tiny and Zoe look nervous. But Melody is brave and takes a bite. The mochi turns bright pink! Next, Tiny takes a bite, and then Zoe does too. It turns pink for both of them! All four friends cheer together, "We are honest!".</p>
+        <p class="text">Meanwhile, Bravey is enjoying tea with her friends Melody, Tiny, and Zoe. Bravey shows them her new product Honest Mochi. "If you are an honest person, it turns pink," Bravey explains. "But if you are a liar, it turns gray!" Tiny and Zoe look nervous. But Melody is brave and takes a bite. The mochi turns bright pink! Next, Tiny takes a bite, and then Zoe does too. It turns pink for both of them! All four friends cheer together, "We are honest!"</p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s5')">🔊 Read Aloud</button></div>
     </div>
 
     <div class="story-section" id="s6">
         <h2>6. Who took My Sugar?</h2>
-        <p class="text">After their tea time, Bravey returns to her kitchen and gasps. "My sugar! It's gone! Who took my sugar?" A neighbor calls out, "I saw Snow sneaking into your store! I even heard her shouting about sugar!".</p>
+        <p class="text">After their tea time, Bravey returns to her kitchen and gasps. "My sugar! It's gone! Who took my sugar?" A neighbor calls out, "I saw Snow sneaking into your store! I even heard her shouting about sugar!"</p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s6')">🔊 Read Aloud</button></div>
     </div>
 
@@ -95,7 +109,7 @@
 
     <div class="story-section" id="s8">
         <h2>8. Look at My Perfect Snowman</h2>
-        <p class="text">In the town square, many snowmen are lined up. The "Fake Snow" stands by a small snowman. She shouts, "Look at my snowman! It's small, but it's perfect! It will NEVER melt, and I will win!". The townspeople are shocked. "That's impossible!". But the Fake Snow just smirks and says, "Not if you use... a secret ingredient".</p>
+        <p class="text">In the town square, many snowmen are lined up. The "Fake Snow" stands by a small snowman. She shouts, "Look at my snowman! It's small, but it's perfect! It will NEVER melt, and I will win!" The townspeople are shocked. "That's impossible!" But the Fake Snow just smirks and says, "Not if you use... a secret ingredient".</p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s8')">🔊 Read Aloud</button></div>
     </div>
 
@@ -113,13 +127,13 @@
 
     <div class="story-section" id="s11">
         <h2>11. Sugar Snowman</h2>
-        <p class="text">Ants wake up because of the sweet smell of sugar. They march and carry the sugar back to their nest. Very quickly, the "perfect" snowman begins to crumble! The Fake Snow starts crying, "Oh no! I used Bravey's sugar!". Tiny pops out and shouts, "You are not Snow! Who are you?". The Fake Snow screams in a scary Ogre voice, "I AM SNOW!".</p>
+        <p class="text">Ants wake up because of the sweet smell of sugar. They march and carry the sugar back to their nest. Very quickly, the "perfect" snowman begins to crumble! The Fake Snow starts crying, "Oh no! I used Bravey's sugar!" Tiny pops out and shouts, "You are not Snow! Who are you?" The Fake Snow screams in a scary Ogre voice, "I AM SNOW!"</p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s11')">🔊 Read Aloud</button></div>
     </div>
 
     <div class="story-section" id="s12">
         <h2>12. Forgiveness and Soup</h2>
-        <p class="text">The real Snow arrives. The Ogre admits to trying to frame her. Snow explains her side and then says, "I forgive you". Bravey suggests red bean soup. "Yes, please!!" everyone shouts happily. They all enjoy the warm soup together.</p>
+        <p class="text"> The real Snow arrives and asks what is going on . The Ogre finally admits to trying to frame her due to the grudge from the past. "I hate you because you trapped me in ice!"  Snow explains, "I did that because you ate my persimmons and didn't apologize." The Ogre realizes her mistake. "Then, I'm sorry," she says. Snow smiles and says, "I forgive you." To celebrate, Snow says, "Now, who wants some shaved ice?" The Ogre jumps back. "No thanks. I'm scared of ice!"  The others also shiver. "No thanks. It's too cold!" Everyone laughs. Bravey has a better idea. "How about some red bean soup?"  "Yes, please!!" everyone shouts happily. They all enjoy the warm soup together. </p>
         <div class="audio-ctrl"><button class="speak-btn" onclick="speakText('s12')">🔊 Read Aloud</button></div>
     </div>
 
@@ -259,50 +273,71 @@
         </div>
     </div>
 
-    <div class="footer" style="text-align:center; margin-top:30px; font-size:0.8em; color:#666;">
-        English Learning Material — Story by User
-    </div>
+    <div class="footer" style="text-align:center; margin-top:30px; padding: 25px; font-size:0.9em; color:#444; border-top: 2px solid #ffb6c1; background-color: #fff9fb; border-radius: 0 0 20px 20px;">
+    © 2026 <strong>Eigo Studio Step Forward</strong><br>
+    <span style="font-size: 0.85em; color: #666;">Original Story Material — All Rights Reserved.</span>
 </div>
 
 <script>
-    // 読み上げ関数
-    function speakText(id) {
-        // window.speechSynthesis を直接使います
-        const synth = window.speechSynthesis;
+let currentUtterances = []; // 再生キューを保持する配列
+
+function speakText(id) {
+    const synth = window.speechSynthesis;
+    synth.cancel(); // 進行中の読み上げを全て停止
+    currentUtterances = []; // キューをクリア
+
+    const fullText = document.querySelector(`#${id} .text`).innerText;
+
+    // 1. 文章を句読点（. や ! や ?）で分割して、短い塊のリストを作る
+    const sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
+
+    // 2. 分割された各文章に対して設定を行う
+    sentences.forEach((sentence, index) => {
+        const uttr = new SpeechSynthesisUtterance(sentence.trim());
         
-        // 前の音声をキャンセル（重なり防止）
-        synth.cancel();
-
-        const text = document.querySelector(`#${id} .text`).innerText;
-        const uttr = new SpeechSynthesisUtterance(text);
-
-        // ★ワードサーチゲームと同じ声を探すロジック★
+        // 声の選択（ワードサーチと同じロジック）
         const voices = synth.getVoices();
-        const targetVoice = voices.find(v => v.name === 'Google US English') || 
-                            voices.find(v => v.name === 'Samantha') || 
-                            voices.find(v => v.lang === 'en-US') ||
-                            voices.find(v => v.lang.startsWith('en'));
-
-        if (targetVoice) {
-            uttr.voice = targetVoice;
-        }
+        uttr.voice = voices.find(v => v.name === 'Google US English') || 
+                     voices.find(v => v.name === 'Samantha') || 
+                     voices.find(v => v.lang === 'en-US') ||
+                     voices.find(v => v.lang.startsWith('en'));
 
         uttr.lang = "en-US";
-        uttr.rate = 0.8;  // 少しゆっくり
-        uttr.pitch = 1.0; // 標準の高さ
+        uttr.rate = 0.8;
+        uttr.pitch = 1.0;
 
+        // 3. 参照が消えないように配列に保存（ゴミ捨て対策）
+        currentUtterances.push(uttr);
+
+        // 4. キューに追加して再生
         synth.speak(uttr);
-    }
+    });
+}
+
+// 起動時に声を準備
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
     // 正解判定機能
     function ans(btn, isCorrect) {
-        const feedback = btn.parentElement.nextElementSibling;
-        if (isCorrect) {
-            feedback.innerHTML = "<span class='correct'>✨ Correct! Excellent work!</span>";
-        } else {
-            feedback.innerHTML = "<span class='try-again'>❌ Try again. You can do it!</span>";
-        }
+    const feedback = btn.parentElement.nextElementSibling;
+    // フッターのロゴ部分を取得
+    const logo = document.querySelector('.footer strong');
+
+    if (isCorrect) {
+        feedback.innerHTML = "<span class='correct'>✨ Correct! Excellent work!</span>";
+        
+        // ロゴを光らせるクラスを追加
+        logo.classList.add('glow-animation');
+        
+        // 3秒後に光るのを止める（ずっと光らせるならこの3行は不要）
+        setTimeout(() => {
+            logo.classList.remove('glow-animation');
+        }, 3000);
+
+    } else {
+        feedback.innerHTML = "<span class='try-again'>❌ Try again. You can do it!</span>";
     }
+}
 
     // 起動時にボイスリストを準備するおまじない
     if (speechSynthesis.onvoiceschanged !== undefined) {

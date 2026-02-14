@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-color: #FFF5F7; 
+    --text-color: #4A4A4A;
+    --accent-pink: #FD79A8;
+    --accent-red: #D63031;
+    --accent-gray: #9e9e9e;
+    --highlight-bg: #FFE4E1;
+    --main-font: "Zen Maru Gothic", sans-serif;
+  }
+
+  body { font-family: var(--main-font); background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  .main-wrapper { display: flex; flex-direction: row; gap: 20px; width: 95vw; max-width: 1100px; padding: 25px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  
+  .illustration-side { flex: 1; display: flex; justify-content: center; align-items: center; border-right: 2px dashed #eee; padding-right: 20px; }
+  .illustration-large { width: 100%; max-height: 75vh; object-fit: contain; border-radius: 15px; background-color: #f9f9f9; }
+
+  .quiz-side { flex: 1.2; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 10px; }
+  h2 { font-size: 1.8rem; color: var(--accent-red); margin: 0; }
+  .sub-title { font-size: 0.9rem; color: var(--accent-gray); margin-bottom: 20px; }
+  
+  .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 20px; height: 12px; overflow: hidden; }
+  .progress-bar { height: 100%; background-color: var(--accent-pink); width: 0%; transition: width 0.3s; }
+
+  .question-box { font-size: 1.5rem; margin-bottom: 20px; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #fafafa; border-radius: 20px; padding: 20px; border: 3px solid #eee; font-weight: bold; line-height: 1.4; }
+  .order-phrase { margin-top: 10px; padding: 15px; background: #fff0f5; border-radius: 15px; color: #4a4a4a; font-size: 1.2rem; display: none; text-align: left; width: 90%; border-left: 5px solid var(--accent-pink); cursor: pointer; }
+
+  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+  .choice-btn { background-color: white; border: 2.5px solid var(--accent-pink); color: var(--text-color); padding: 15px 10px; border-radius: 50px; font-size: 1.1rem; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px 0 var(--highlight-bg); }
+  .choice-btn.selected { background-color: var(--accent-pink); color: white; border-color: var(--accent-pink); }
+  .choice-btn.correct-choice { background-color: var(--accent-red) !important; color: white !important; border-color: var(--accent-red) !important; }
+  .choice-btn.wrong-choice { background-color: #bdbdbd !important; color: white !important; border-color: #bdbdbd !important; box-shadow: none; }
+
+  .action-btn { padding: 15px 50px; font-size: 1.4rem; background-color: var(--accent-red); color: white; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #a30000; font-weight: bold; }
+  
+  @media (max-width: 800px) { .main-wrapper { flex-direction: column; height: auto; } .illustration-side { border-right: none; border-bottom: 2px dashed #eee; padding-bottom: 20px; } }
+</style>
+</head>
+<body>
+
+<div class="main-wrapper" id="mainContainer">
+  <div class="illustration-side">
+    <img src="" id="quizImg" class="illustration-large" alt="Valentine Illustration">
+  </div>
+  <div class="quiz-side" id="quizSide">
+    <h2 id="mainTitle">Valentine Quiz</h2>
+    <div class="sub-title">🔊 Listen and choose the correct word!</div>
+    <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    
+    <div class="question-box">
+      <div id="questionText">Loading...</div>
+      <div id="orderPhrase" class="order-phrase" onclick="speakPhrase()"></div>
+    </div>
+    
+    <div class="choices-grid" id="choicesGrid"></div>
+    <div id="msgArea" style="height: 25px; margin-bottom: 10px; font-weight: bold; color: var(--accent-red);"></div>
+    
+    <div class="controls">
+      <button class="action-btn" id="checkBtn" onclick="checkAnswer()">Check</button>
+      <button class="action-btn" id="nextBtn" onclick="nextQuestion()" style="display:none; background-color: var(--accent-gray); box-shadow: 0 4px 0 #777;">Next ➡</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 表示名は正しい英語（大文字含む）、ファイル名は小文字で指定
+const quizData = [
+    { name: "red roses", img: "red roses.jpg", display: "Red roses", sentence: "<u>___</u> for you!", options: ["Red roses", "Red apples", "Pink flowers", "Blue birds"], speak: "Red roses for you!" },
+    { name: "teddy bear", img: "teddy_bear.jpg", display: "Teddy bear", sentence: "A <u>___</u> for you!", options: ["Teddy bear", "Brown monkey", "Little cat", "Big dog"], speak: "A teddy bear for you!" },
+    { name: "pink lemonade", img: "pink lemonade.jpg", display: "pink lemonade", sentence: "I'm thirsty. <br>Can I have some <u>___</u>?", options: ["pink lemonade", "orange juice", "cold water", "hot cocoa"], speak: "I'm thirsty. Can I have some pink lemonade?" },
+    { name: "candy hearts", img: "candy hearts.jpg", display: "candy hearts", sentence: "How many <u>___</u> do you have? Let's count!", options: ["candy hearts", "sweet stars", "small cookies", "chocolate box"], speak: "How many candy hearts do you have? Let's count!" },
+    { name: "box of chocolate", img: "box of chocolate.jpg", display: "box of chocolate", sentence: "Wow! A <u>___</u>!<br>For me? Thank you!", options: ["box of chocolate", "box of donuts", "bag of candy", "birthday cake"], speak: "Wow! A box of chocolate! For me? Thank you!" },
+    { name: "valentine cards", img: "valentine cards.jpg", display: "Valentine cards", sentence: "Let's write some <u>___</u>!", options: ["Valentine cards", "Birthday cards", "Library books", "Thank you notes"], speak: "Let's write some Valentine cards!" },
+    { name: "valentine box", img: "valentine box.jpg", display: "Valentine box", sentence: "Put your card in my <br><u>___</u>, please!", options: ["Valentine box", "School bag", "Lunch box", "Toy box"], speak: "Put your card in my Valentine box, please!" },
+    { name: "hugs and kisses", img: "hugs and kisses.jpg", display: "hugs and kisses", sentence: "XOXO? What does it mean? <br>It means <u>___</u>!", options: ["hugs and kisses", "hot and cold", "high and low", "yes and no"], speak: "XOXO? What does it mean? It means hugs and kisses!" }
+];
+
+let currentIndex = 0;
+let selectedWord = "";
+let selectedBtn = null;
+
+// ★ここを実際のフォルダ名に合わせてください！★
+const imgPath = "images-valentine's-day/"; 
+
+function speak(text) {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const uttr = new SpeechSynthesisUtterance(text);
+    uttr.lang = "en-US";
+    uttr.rate = 0.8;
+    const voices = synth.getVoices();
+    const targetVoice = voices.find(v => v.name === 'Google US English') || voices.find(v => v.name === 'Samantha') || voices.find(v => v.lang === 'en-US');
+    if (targetVoice) uttr.voice = targetVoice;
+    synth.speak(uttr);
+}
+
+function speakPhrase() {
+    const phrase = quizData[currentIndex].speak;
+    speak(phrase);
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function loadQuestion() {
+    selectedWord = "";
+    selectedBtn = null;
+    document.getElementById('msgArea').textContent = "";
+    document.getElementById('orderPhrase').style.display = "none";
+    document.getElementById('checkBtn').style.display = "inline-block";
+    document.getElementById('nextBtn').style.display = "none";
+    document.getElementById('progressBar').style.width = (currentIndex / quizData.length * 100) + "%";
+
+    const q = quizData[currentIndex];
+    document.getElementById('quizImg').src = imgPath + q.img;
+    document.getElementById('questionText').innerHTML = q.sentence.replace("<u>___</u>", `<span style="color:var(--accent-pink)">___</span>`);
+
+    const grid = document.getElementById('choicesGrid');
+    grid.innerHTML = "";
+    const shuffledOptions = shuffle([...q.options]);
+    shuffledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "choice-btn";
+        btn.textContent = opt;
+        btn.onclick = () => {
+            if(document.getElementById('nextBtn').style.display === "inline-block") return;
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedWord = opt;
+            selectedBtn = btn;
+            speak(opt);
+        };
+        grid.appendChild(btn);
+    });
+}
+
+function checkAnswer() {
+    if(!selectedWord) return;
+    const q = quizData[currentIndex];
+    // 大文字小文字を気にせず比較
+    if(selectedWord.toLowerCase() === q.name.toLowerCase()) {
+        selectedBtn.classList.add('correct-choice');
+        document.getElementById('msgArea').textContent = "Excellent! ❤️";
+        
+        document.getElementById('questionText').innerHTML = q.sentence.replace("<u>___</u>", `<span style="color:var(--accent-red)">${selectedWord}</span>`);
+        
+        const phraseBox = document.getElementById('orderPhrase');
+        phraseBox.innerHTML = `✨ "${q.speak}"`;
+        phraseBox.style.display = "block";
+        speak(q.speak);
+
+        document.getElementById('checkBtn').style.display = "none";
+        document.getElementById('nextBtn').style.display = "inline-block";
+    } else {
+        selectedBtn.classList.add('wrong-choice');
+        document.getElementById('msgArea').textContent = "Try again!";
+        speak("Try again!");
+    }
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if(currentIndex < quizData.length) loadQuestion();
+    else {
+        const container = document.getElementById('mainContainer');
+        container.style.flexDirection = "column";
+        container.style.textAlign = "center";
+        container.innerHTML = `
+            <img src="${imgPath}all items.jpg" style="width:70%; max-width:500px; border-radius:20px; margin-bottom:20px;">
+            <h1 style="color:var(--accent-red); font-size:3rem; margin:10px 0;">Happy Valentine's Day!</h1>
+            <p style="font-size:1.5rem; color:#666;">You did a wonderful job!</p>
+            <button onclick='location.reload()' style='padding:15px 40px; font-size:1.2rem; border-radius:50px; cursor:pointer; background:var(--accent-red); color:white; border:none; font-weight:bold; margin-top:20px;'>Play Again</button>
+        `;
+        speak("Happy Valentine's Day! You did a wonderful job! Congratulations!");
+    }
+}
+
+window.speechSynthesis.getVoices();
+loadQuestion();
+</script>
+</body>
+</html>

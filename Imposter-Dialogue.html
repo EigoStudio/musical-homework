@@ -34,6 +34,14 @@
   <div class="chat-box" id="chatBox"></div>
   <button class="btn tts-btn" id="ttsBtn" onclick="toggleTTS()">読み上げ: ON 🔊</button>
   <button class="btn" id="actionBtn" onclick="handleAction()">スタート！</button>
+  <button class="btn tts-btn" onclick="repeatSpeech()" style="background:#ffa726; box-shadow: 0 4px 0 #f57c00; margin-bottom:10px;">
+  もう一度きく ⟲
+</button>
+  <div style="text-align:center; margin-bottom:10px;">
+  <label style="font-size:0.8rem;">スピード: </label>
+  <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="1.0" 
+         onchange="console.log('Speed set to:', this.value)">
+</div>
 </div>
 
 <script>
@@ -136,6 +144,10 @@ function speak(text) {
   if (!ttsEnabled) return;
   const uttr = new SpeechSynthesisUtterance(text);
   uttr.lang = 'en-US';
+  // スピード設定（0.1 〜 10.0 の間で設定可能）
+  // 0.8 にすると少しゆっくりになります
+  uttr.rate = document.getElementById('speedRange').value;
+  lastSpokenText = text; // テキストを保存
   window.speechSynthesis.speak(uttr);
 }
 
@@ -165,6 +177,12 @@ function handleAction() {
     speak(fullText);
     waiting = false; sIdx++;
     btn.textContent = (sIdx >= current.steps.length) ? "つぎのセクションへ ➔" : "つぎのセリフ";
+  }
+  
+  // --- リピート用関数の追加 ---
+function repeatSpeech() {
+  if (lastSpokenText) {
+    speak(lastSpokenText);
   }
 }
 

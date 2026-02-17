@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fame Musical - Full Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #e3f2fd; --snow: #ffffff; --ice: #90caf9; --accent: #1565c0; --ans: #e91e63; }
+  body { font-family: 'Zen Maru Gothic', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+  .container { width: 100%; max-width: 700px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 30px; border: 5px solid var(--snow); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  .nav { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
+  .nav-btn { flex: 1; min-width: 90px; padding: 8px; border: 2px solid var(--ice); background: white; border-radius: 15px; cursor: pointer; font-size: 0.75rem; font-weight: bold; font-family: 'Zen Maru Gothic'; }
+  .nav-btn.active { background: var(--accent); color: white; }
+  .chat-box { min-height: 500px; max-height: 600px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f8fbff; border-radius: 20px; border: 2px solid var(--ice); margin-bottom: 15px; }
+  .bubble { max-width: 85%; padding: 12px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+  .left-char { align-self: flex-start; background: white; border: 2px solid var(--ice); }
+  .right-char { align-self: flex-end; background: #fff9c4; border: 2px solid #ffd54f; }
+  .narrator-bubble { align-self: center; background: #e1f5fe; border: 1px dashed var(--accent); width: 92%; text-align: center; }
+  .role-name { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 4px; display: block; }
+  .jp { font-size: 0.8rem; color: #607d8b; display: block; margin-top: 5px; border-top: 1px solid #eee; padding-top: 3px; }
+  .blank { display: inline-block; background: #e0e0e0; min-width: 50px; height: 1.1em; vertical-align: middle; border-radius: 4px; }
+  .btn { width: 100%; padding: 15px; border: none; background: var(--accent); color: white; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 0 #0d47a1; margin-top: 5px; }
+  .tts-btn { background: #66bb6a; box-shadow: 0 4px 0 #388e3c; font-size: 0.9rem; }
+  .tts-btn.off { background: #b0bec5; box-shadow: 0 4px 0 #78909c; }
+  strong.ans { color: var(--ans); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="nav" id="navContainer"></div>
+  <h4 id="partTitle" style="text-align:center; color:var(--accent); margin:0 0 10px 0;">❄️ シーン練習 ❄️</h4>
+  <div class="chat-box" id="chatBox"></div>
+  <button class="btn tts-btn" id="ttsBtn" onclick="toggleTTS()">読み上げ: ON 🔊</button>
+  <button class="btn" id="actionBtn" onclick="handleAction()">スタート！</button>
+</div>
+
+<script>
+let ttsEnabled = true;
+const parts = [
+  {
+    title: "1: オニの独り言 (Sc.10)",
+    steps: [
+      { role: "Imposter", en: "<span class='blank'></span> <span class='blank'></span> that snow isn't <span class='blank'></span>.", ans: ["Nobody", "knows", "here"], jp: "誰もスノーがここにいないとは知らない。" },
+      { role: "Imposter", en: "Nobody knows that she's <span class='blank'></span> <span class='blank'></span> in the <span class='blank'></span>.", ans: ["busy", "performing", "city"], jp: "彼女が街で演技をしていて忙しいなんて誰も知らない。" },
+      { role: "Imposter", en: "No one will <span class='blank'></span> it's <span class='blank'></span>... the <span class='blank'></span> <span class='blank'></span>!", ans: ["know", "me", "Bad", "Ogre"], jp: "誰も私だと気づかないだろう…悪いオニだとな！" },
+      { role: "Narrator", en: "That's the <span class='blank'></span> <span class='blank'></span> <span class='blank'></span> as Snow.", ans: ["Bad", "Ogre", "disguised"], jp: "あれはスノーに変装した悪いオニです。" },
+      { role: "Narrator", en: "She <span class='blank'></span> no one will <span class='blank'></span>.", ans: ["thinks", "know"], jp: "彼女は誰も気づかないと思っています。" }
+    ]
+  },
+  {
+    title: "2: スノーへの信頼 (Sc.10)",
+    steps: [
+      { role: "Narrator", en: "She has no <span class='blank'></span> that Snow has already talked to <span class='blank'></span> and her <span class='blank'></span>.", ans: ["idea", "Bravey", "friends"], jp: "彼女はスノーがすでにブレイビーたちと話したことを知りません。" },
+      { role: "Narrator", en: "And <span class='blank'></span> the <span class='blank'></span> <span class='blank'></span> test.", ans: ["passed", "honest", "mochi"], jp: "そして正直もちテストに合格したことも。" },
+      { role: "Melody", en: "<span class='blank'></span> is Snow <span class='blank'></span>? She <span class='blank'></span> be at the snow <span class='blank'></span>.", ans: ["Why", "here", "should", "festival"], jp: "なんでスノーがここにいるの？彼女は雪まつりにいるはずなのに。" },
+      { role: "Bravey", en: "That <span class='blank'></span> <span class='blank'></span> Snow.", ans: ["can't", "be"], jp: "あれがスノーのはずがないわ。" },
+      { role: "Zoe", en: "Then <span class='blank'></span> <span class='blank'></span>?", ans: ["who's", "that"], jp: "じゃあ、あれは誰？" }
+    ]
+  },
+  {
+    title: "3: タイニーの潜入 (Sc.10-11)",
+    steps: [
+      { role: "Tiny", en: "I'll <span class='blank'></span>.", ans: ["check"], jp: "私が確かめてくる。" },
+      { role: "M,B,Z", en: "Are you <span class='blank'></span>?", ans: ["sure"], jp: "本当に行くの？" },
+      { role: "Tiny", en: "I'll be <span class='blank'></span>.", ans: ["fine"], jp: "大丈夫よ。" },
+      { role: "Imposter", en: "When they <span class='blank'></span> out Snow <span class='blank'></span>, everyone will <span class='blank'></span> her.", ans: ["find", "cheated", "hate"], jp: "スノーがズルをしたと分かれば、みんな彼女を嫌いになるぞ。" }
+    ]
+  },
+  {
+    title: "4: アリの行進と町の人 (Sc.11)",
+    steps: [
+      { role: "Ants", en: "We are <span class='blank'></span>! Won't <span class='blank'></span> a <span class='blank'></span>!", ans: ["marching", "take", "rest"], jp: "僕らは行進中！休みはしないよ！" },
+      { role: "Ants", en: "We are <span class='blank'></span> <span class='blank'></span> back to our <span class='blank'></span>!", ans: ["carrying", "sugar", "nest"], jp: "お砂糖を巣まで運んでいるんだ！" },
+      { role: "Townspeople", en: "Ants, aren't you <span class='blank'></span> to be <span class='blank'></span> this time of year?", ans: ["supposed", "sleeping"], jp: "アリさんたち、この時期は眠っているはずじゃないの？" },
+      { role: "Ants", en: "We were sleeping so <span class='blank'></span>, but the <span class='blank'></span> <span class='blank'></span> woke us up!", ans: ["tight", "sweet", "smell"], jp: "ぐっすり眠っていたけど、甘い匂いで目が覚めちゃったんだ！" }
+    ]
+  },
+  {
+    title: "5: ズルとドロボウの発覚 (Sc.11)",
+    steps: [
+      { role: "Townsperson 1", en: "Look! It was just a <span class='blank'></span> <span class='blank'></span> of <span class='blank'></span>!", ans: ["giant", "pile", "sugar"], jp: "見て！ただの大きなお砂糖の山だったんだ！" },
+      { role: "Townsperson 2", en: "And now, it's <span class='blank'></span> <span class='blank'></span>!", ans: ["completely", "gone"], jp: "そして今、完全になくなっちゃった！" },
+      { role: "Townsperson 3", en: "I can't <span class='blank'></span> it! Someone <span class='blank'></span>!!", ans: ["believe", "cheated"], jp: "信じられない！誰かがズルをしたぞ！！" },
+      { role: "Townsperson 4", en: "Wait! Bravey said her <span class='blank'></span> was <span class='blank'></span>!", ans: ["sugar", "stolen"], jp: "待って！ブレイビーがお砂糖を盗まれたって言ってたわ！" },
+      { role: "Townsperson 5", en: "The <span class='blank'></span> is also a <span class='blank'></span>!", ans: ["cheater", "thief"], jp: "ズルしたやつはドロボウでもあるんだ！" },
+      { role: "Imposter", en: "Oh nooo... I <span class='blank'></span> Bravey's sugar... I'm <span class='blank'></span>...", ans: ["used", "sorry"], jp: "あぁ、なんてこと…ブレイビーのお砂糖を使っちゃった…ごめんなさい…（嘘泣き）" },
+      { role: "Narrator", en: "The imposter is <span class='blank'></span> because no one is <span class='blank'></span>.", ans: ["confused", "angry"], jp: "ニセモノは困惑しています。なぜなら誰も怒っていないからです。" },
+      { role: "Narrator", en: "No one <span class='blank'></span> to <span class='blank'></span> that Snow <span class='blank'></span> by using sugar.", ans: ["seems", "care", "cheated"], jp: "スノーが砂糖を使ってズルをしたことを誰も気にしていないようです。" },
+      { role: "Narrator", en: "No one is <span class='blank'></span> Snow for <span class='blank'></span> the sugar.", ans: ["blaming", "stealing"], jp: "砂糖を盗んだことでスノーを責める人もいません。" },
+      { role: "Imposter", en: "What's <span class='blank'></span> <span class='blank'></span>?", ans: ["going", "on"], jp: "一体どうなっているんだ？" }
+    ]
+  },
+  {
+    title: "6: 正体発覚！ (Sc.12)",
+    steps: [
+      { role: "Tiny", en: "You are <span class='blank'></span> <span class='blank'></span>! <span class='blank'></span> are you?", ans: ["not", "Snow", "Who"], jp: "あなたはスノーじゃない！だれなの？" },
+      { role: "Imposter", en: "What? What? I <span class='blank'></span> <span class='blank'></span>!", ans: ["AM", "SNOW"], jp: "何だって？私がスノーだ！（地声で）" },
+      { role: "Townspeople", en: "That's not Snow's <span class='blank'></span>! You're not Snow!", ans: ["voice"], jp: "それはスノーの声じゃない！あなたはスノーじゃない！" },
+      { role: "Tiny", en: "I <span class='blank'></span> who you are! You're <span class='blank'></span>...", ans: ["know", "a"], jp: "あなたが誰だか分かっているわ！あなたは…" },
+      { role: "All", en: "<span class='blank'></span> <span class='blank'></span> <span class='blank'></span>!", ans: ["Bad", "bad", "ogre"], jp: "悪い、悪いオニめ！" }
+    ]
+  }
+];
+
+let pIdx = 0, sIdx = 0, waiting = false;
+
+function setupNav() {
+  const nav = document.getElementById('navContainer');
+  parts.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = `nav-btn ${i===0?'active':''}`;
+    b.textContent = `Part ${i+1}`;
+    b.onclick = () => switchPart(i);
+    nav.appendChild(b);
+  });
+}
+
+function switchPart(n) {
+  pIdx = n; sIdx = 0; waiting = false;
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+  document.getElementById('partTitle').textContent = parts[n].title;
+  document.getElementById('chatBox').innerHTML = "";
+  document.getElementById('actionBtn').textContent = "練習をはじめる";
+}
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  const btn = document.getElementById('ttsBtn');
+  btn.textContent = ttsEnabled ? "読み上げ: ON 🔊" : "読み上げ: OFF 🔇";
+  btn.classList.toggle('off', !ttsEnabled);
+}
+
+function speak(text) {
+  if (!ttsEnabled) return;
+  const uttr = new SpeechSynthesisUtterance(text);
+  uttr.lang = 'en-US';
+  window.speechSynthesis.speak(uttr);
+}
+
+function handleAction() {
+  const current = parts[pIdx];
+  const btn = document.getElementById('actionBtn');
+  if (sIdx >= current.steps.length) {
+    if (pIdx < parts.length - 1) switchPart(pIdx + 1);
+    else switchPart(0);
+    return;
+  }
+  const step = current.steps[sIdx];
+  if (!waiting) {
+    addBubble(step.role, step.en, step.jp);
+    btn.textContent = "答えをチェック！";
+    waiting = true;
+  } else {
+    const bubbles = document.querySelectorAll('.bubble');
+    const lastEnSpan = bubbles[bubbles.length - 1].querySelector('.en');
+    let fullText = step.en;
+    step.ans.forEach(a => { fullText = fullText.replace("<span class='blank'></span>", a); });
+    
+    let coloredText = step.en;
+    step.ans.forEach(a => { coloredText = coloredText.replace("<span class='blank'></span>", `<strong class="ans">${a}</strong>`); });
+    lastEnSpan.innerHTML = coloredText;
+    
+    speak(fullText);
+    waiting = false; sIdx++;
+    btn.textContent = (sIdx >= current.steps.length) ? "つぎのセクションへ ➔" : "つぎのセリフ";
+  }
+}
+
+function addBubble(role, en, jp) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  const type = (role === "Narrator") ? "narrator-bubble" : (["Imposter", "Snow"].includes(role) ? "right-char" : "left-char");
+  div.className = `bubble ${type}`;
+  div.innerHTML = `<span class="role-name">${role}</span><span class="en">${en}</span><span class="jp">${jp}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+window.onload = () => { setupNav(); switchPart(0); };
+</script>
+</body>
+</html>

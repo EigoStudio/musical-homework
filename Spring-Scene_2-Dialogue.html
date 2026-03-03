@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Scene 2 - Silver Branches v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --bg: #eceff1;
+    --ice: #cfd8dc;
+    --accent: #546e7a;
+    --ans: #d32f2f;
+  }
+  
+  body { font-family: 'Zen Maru Gothic', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+  .container { width: 100%; max-width: 700px; background: rgba(255,255,255,0.9); padding: 20px; border-radius: 30px; border: 5px solid var(--ice); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+  
+  .chat-box { min-height: 400px; max-height: 500px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #fbfbfb; border-radius: 20px; border: 2px solid var(--ice); margin-bottom: 15px; }
+  
+  .bubble { max-width: 85%; padding: 12px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+  .left-char { align-self: flex-start; background: white; border: 2px solid var(--ice); }
+  .right-char { align-self: flex-end; background: #eeeeee; border: 2px solid #bdbdbd; }
+  
+  .role-name { font-size: 0.75rem; font-weight: bold; color: var(--accent); margin-bottom: 4px; display: block; }
+  .jp { font-size: 0.8rem; color: #78909c; display: block; margin-top: 5px; border-top: 1px solid #eee; padding-top: 3px; }
+  .blank { display: inline-block; background: #cfd8dc; min-width: 60px; height: 1.1em; vertical-align: middle; border-radius: 4px; }
+  
+  .controls { display: flex; flex-direction: column; gap: 15px; align-items: center; background: white; padding: 15px; border-radius: 20px; border: 1px solid var(--ice); }
+  .btn-row { display: flex; gap: 10px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  
+  .btn { padding: 12px 25px; border: none; background: var(--accent); color: white; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 0 #37474f; transition: 0.1s; }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #37474f; }
+  
+  .s-btn { font-size: 0.8rem; padding: 8px 15px; background: #78909c; box-shadow: 0 4px 0 #546e7a; }
+  
+  .slider-container { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--accent); font-weight: bold; }
+  input[type=range] { cursor: pointer; width: 150px; }
+
+  strong.ans { color: var(--ans); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h4 style="text-align:center; color:var(--accent); margin-top:0;">🩶 Scene 2: No Flowers</h4>
+  <div class="chat-box" id="chatBox"></div>
+  
+  <div class="controls">
+    <button class="btn" id="actionBtn" onclick="handleAction()">練習をはじめる</button>
+    
+    <div class="btn-row">
+      <button class="btn s-btn" id="ttsBtn" onclick="toggleTTS()">読み上げ: ON</button>
+      <button class="btn s-btn" style="background:#90a4ae;" onclick="repeatSpeech()">もう一度 ⟲</button>
+      
+      <div class="slider-container">
+        <span>ゆっくり</span>
+        <input type="range" id="speedRange" min="0.3" max="1.2" step="0.1" value="0.8">
+        <span>速く</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let ttsEnabled = true;
+let lastSpokenText = "";
+let sIdx = 0;
+let waiting = false;
+
+// 修正：ALL -> all / 最終行の役名をSparrowsに修正 
+const script = [
+  { role: "Sparrow 1", en: "Huh? No <span class='blank'></span>...", ans: ["flowers"], jp: "あれ？花がひとつもないぞ…" },
+  { role: "Sparrow 2", en: "Look! The <span class='blank'></span> are <span class='blank'></span>!", ans: ["branches", "silver"], jp: "見て！枝が銀色になってる！" },
+  { role: "Sparrow 3", en: "Why are they <span class='blank'></span>?", ans: ["silver"], jp: "どうして銀色なの？" },
+  { role: "Ogre (voice)", en: "Sparrows, you <span class='blank'></span>, <span class='blank'></span>, <span class='blank'></span> all day long!", ans: ["chirp", "chirp", "chirp"], jp: "スズメどもめ、一日中チュンチュン、チュンチュン鳴きおって！" },
+  { role: "Ogre (voice)", en: "From <span class='blank'></span> to <span class='blank'></span>!", ans: ["morning", "night"], jp: "朝から晩までな！" },
+  { role: "Ogre (voice)", en: "I can't <span class='blank'></span> it anymore!", ans: ["take"], jp: "もう我慢ならん！" },
+  { role: "Ogre (voice)", en: "So I used <span class='blank'></span> <span class='blank'></span> to <span class='blank'></span> you!", ans: ["No-Bloom", "Powder", "punish"], jp: "だから「咲かずの粉」でお前たちを懲らしめてやったのだ！" },
+  { role: "Sparrows", en: "Oh, <span class='blank'></span>!!", ans: ["no"], jp: "なんてことだ！！" }
+];
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  document.getElementById('ttsBtn').textContent = ttsEnabled ? "読み上げ: ON" : "読み上げ: OFF";
+  document.getElementById('ttsBtn').style.background = ttsEnabled ? "#78909c" : "#cfd8dc";
+}
+
+function getFemaleVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  // 英語(US)の女性の声を優先
+  return voices.find(v => v.lang.startsWith('en-US') && (v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google'))) || 
+         voices.find(v => v.lang.startsWith('en'));
+}
+
+function speak(text) {
+  if (!ttsEnabled) return;
+  window.speechSynthesis.cancel();
+  const uttr = new SpeechSynthesisUtterance(text);
+  const voice = getFemaleVoice();
+  if (voice) uttr.voice = voice;
+  uttr.lang = 'en-US';
+  uttr.rate = document.getElementById('speedRange').value;
+  uttr.pitch = 1.0; 
+  lastSpokenText = text;
+  window.speechSynthesis.speak(uttr);
+}
+
+// ページ読み込み時に声をロード
+window.speechSynthesis.onvoiceschanged = getFemaleVoice;
+
+function repeatSpeech() {
+  if (lastSpokenText) speak(lastSpokenText);
+}
+
+function handleAction() {
+  const btn = document.getElementById('actionBtn');
+  if (sIdx >= script.length) {
+    location.reload();
+    return;
+  }
+
+  const step = script[sIdx];
+  if (!waiting) {
+    addBubble(step.role, step.en, step.jp);
+    btn.textContent = "答えをチェック！";
+    waiting = true;
+  } else {
+    const bubbles = document.querySelectorAll('.bubble');
+    const lastEnSpan = bubbles[bubbles.length - 1].querySelector('.en');
+    
+    let fullText = step.en;
+    let coloredText = step.en;
+    step.ans.forEach(a => {
+      fullText = fullText.replace("<span class='blank'></span>", a);
+      coloredText = coloredText.replace("<span class='blank'></span>", `<strong class="ans">${a}</strong>`);
+    });
+    
+    lastEnSpan.innerHTML = coloredText;
+    speak(fullText);
+    waiting = false; 
+    sIdx++;
+    btn.textContent = (sIdx >= script.length) ? "最初からやりなおす ➔" : "つぎのセリフ";
+  }
+}
+
+function addBubble(role, en, jp) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  const type = role.includes("Ogre") ? "right-char" : "left-char";
+  div.className = `bubble ${type}`;
+  div.innerHTML = `<span class="role-name">${role}</span><span class="en">${en}</span><span class="jp">${jp}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+</body>
+</html>

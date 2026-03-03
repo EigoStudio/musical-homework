@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Word Search - Spring [Scene 2 No Flowers]</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Kosugi+Maru&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #5d4037; 
+      --secondary: #78909c; 
+      --success: #2e7d32;
+      --marker-h: rgba(93, 64, 55, 0.45); 
+      --marker-v: rgba(120, 144, 156, 0.5);
+      --correct: rgba(93, 64, 55, 0.4); 
+      --cell-size: 55px; 
+    }
+    body { font-family: 'Kosugi Maru', 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #f3ede4; padding: 20px; padding-bottom: 40px; }
+    h1 { display: table; margin: 0 auto 20px auto; font-size: 26px; font-weight: 700; color: var(--primary); border-bottom: 2px solid var(--primary); text-align: center; padding: 0 10px 5px 10px; }
+    .sparrow-icons { font-size: 2rem; margin-bottom: 10px; }
+    .controls { position: fixed; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+    button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: opacity 0.2s; }
+    
+    .game-main { display: flex; flex-direction: row; align-items: flex-start; gap: 40px; margin-bottom: 40px; }
+    #board { display: grid; grid-template-columns: repeat(10, var(--cell-size)); gap: 0; width: calc(var(--cell-size) * 10); background-color: #fff; touch-action: none; user-select: none; border: 6px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 4px; isolation: isolate; }
+    
+    .cell { width: var(--cell-size); height: var(--cell-size); line-height: var(--cell-size); font-size: 32px; text-align: center; font-weight: 700; font-family: 'Comic Neue', sans-serif; cursor: pointer; position: relative; }
+    .cell::after, .cell::before { content: ""; position: absolute; z-index: -1; mix-blend-mode: multiply; pointer-events: none; }
+    .cell.h::after, .cell.temp-h::after { display: block; left: 0; right: 0; top: 15%; bottom: 15%; background-color: var(--marker-h); }
+    .cell.v::before, .cell.temp-v::before { display: block; left: 15%; right: 15%; top: 0; bottom: 0; background-color: var(--marker-v); }
+    .cell.h-start::after, .cell.temp-h-start::after { border-radius: 28px 0 0 28px; }
+    .cell.h-end::after, .cell.temp-h-end::after { border-radius: 0 28px 28px 0; }
+    .cell.v-start::before, .cell.temp-v-start::before { border-radius: 28px 28px 0 0; }
+    .cell.v-end::before, .cell.temp-v-end::before { border-radius: 0 0 28px 28px; }
+    .cell.show-ans { background-color: var(--correct); border-radius: 50%; }
+
+    #word-list { display: flex; flex-direction: column; gap: 12px; min-width: 250px; background: rgba(255,255,255,0.7); padding: 15px; border-radius: 15px; }
+    .word-item { cursor: pointer; display: flex; align-items: center; font-size: 19px; padding: 4px; color: var(--primary); white-space: nowrap; }
+    .word-item.checked { color: #ccc; text-decoration: line-through; }
+    .ja-text { font-size: 13px; color: #8d6e63; margin-left: 10px; font-weight: normal; }
+    
+    #script-container { width: 100%; max-width: 850px; background: white; padding: 25px; border-radius: 20px; border: 2px solid var(--secondary); margin-bottom: 30px; }
+    .script-line { font-size: 18px; line-height: 2.2; color: #333; margin-bottom: 15px; }
+    .speaker-name { font-weight: 800; color: var(--primary); display: inline-block; width: 110px; vertical-align: top; }
+    .indent { display: inline-block; padding-left: 115px; }
+    .blank { display: inline-block; min-width: 60px; border-bottom: 2px solid var(--primary); color: #d84315; font-weight: bold; text-align: center; padding: 0 5px; }
+    .blank.hidden { color: transparent; }
+
+    #read-aloud-section { text-align: center; margin: 20px 0; display: none; background: #fff; padding: 20px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .read-btn { background: var(--success); padding: 15px 40px; font-size: 20px; border-radius: 50px; border: none; color: white; cursor: pointer; font-weight: bold; transition: transform 0.1s; vertical-align: middle; }
+    .read-btn.playing { background: #ff4757; }
+    .speed-ctrl { display: inline-block; margin-left: 20px; vertical-align: middle; font-size: 14px; color: var(--primary); font-weight: bold; }
+    .speed-ctrl input { cursor: pointer; vertical-align: middle; width: 100px; }
+
+    @media screen and (max-width: 900px) {
+      .game-main { flex-direction: column; align-items: center; }
+      #board { width: 90vw; grid-template-columns: repeat(10, 9vw); }
+      .cell { width: 9vw; height: 9vw; line-height: 9vw; font-size: 6vw; }
+      #word-list { display: grid; grid-template-columns: 1fr 1fr; width: 92%; }
+      .controls { position: relative; top: 0; left: 0; flex-direction: row; width: 100%; justify-content: center; margin: 10px 0; }
+    }
+
+    /* 印刷用設定 */
+    @media print {
+      body { background-color: white !important; color: black !important; -webkit-print-color-adjust: exact; padding: 0; margin: 0; }
+      .controls, #read-aloud-section, .sparrow-icons, button { display: none !important; }
+      h1 { color: #5d4037 !important; border-bottom: 2px solid #5d4037 !important; margin-bottom: 5mm !important; }
+      
+      .game-main { display: flex !important; flex-direction: row !important; align-items: flex-start !important; gap: 40px !important; justify-content: center !important; width: 100% !important; margin-top: 5mm !important; }
+      
+      #board { border: 6px solid #78909c !important; width: 500px !important; grid-template-columns: repeat(10, 50px) !important; margin: 0 !important; }
+      .cell { width: 50px !important; height: 50px !important; line-height: 50px !important; font-size: 30px !important; color: black !important; }
+      
+      /* ワードリストの幅を広げて改行を防止 */
+      #word-list { background: none !important; width: 300px !important; padding: 0 !important; display: flex !important; flex-direction: column !important; gap: 12px !important; border: none !important; box-shadow: none !important; }
+      .word-item { color: black !important; font-size: 18px !important; line-height: 1.4 !important; white-space: nowrap !important; }
+      .ja-text { color: #5d4037 !important; font-size: 14px !important; display: inline-block !important; margin-left: 8px !important; margin-top: 0 !important; }
+      
+      #script-container { border: 2px solid #78909c !important; padding: 20px !important; margin: 10mm auto !important; width: 95% !important; box-shadow: none !important; }
+      .script-line { color: black !important; font-size: 18px !important; line-height: 2.5 !important; }
+      .blank { border-bottom: 1px solid black !important; color: transparent !important; min-width: 150px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sparrow-icons">🐦🐦🐦</div>
+  <h1>Spring [Scene 2 No Flowers]</h1>
+  
+  <div class="game-main">
+    <div id="board"></div>
+    <div id="word-list"></div>
+  </div>
+
+  <div id="script-container">
+    <div id="script-text">
+      <div class="script-line"><span class="speaker-name">Sparrow 1:</span> Huh? No <span class="blank hidden" data-word="flowers">flowers</span>...</div>
+      <div class="script-line"><span class="speaker-name">Sparrow 2:</span> Look! The <span class="blank hidden" data-word="branches">branches</span> are <span class="blank hidden" data-word="silver">silver</span>!</div>
+      <div class="script-line"><span class="speaker-name">Sparrow 3:</span> Why are they <span class="blank hidden" data-word="silver">silver</span>?</div>
+      <div class="script-line">
+        <span class="speaker-name">Ogre:</span> Sparrows, you <span class="blank hidden" data-word="chirp">chirp</span>, chirp, chirp all day long!<br>
+        <span class="indent">From <span class="blank hidden" data-word="morning">morning</span> to <span class="blank hidden" data-word="night">night</span>!</span><br>
+        <span class="indent">I can't <span class="blank hidden" data-word="take">take</span> it anymore!</span><br>
+        <span class="indent">So I used No-Bloom <span class="blank hidden" data-word="powder">powder</span> to <span class="blank hidden" data-word="punish">punish</span> you!</span>
+      </div>
+      <div class="script-line"><span class="speaker-name">Sparrows:</span> Oh, <span class="blank hidden" data-word="no">no</span>!!</div>
+    </div>
+  </div>
+
+  <div id="read-aloud-section">
+    <button id="read-btn" class="read-btn" onclick="readScript()">📢 聴いてみる</button>
+    <div class="speed-ctrl">
+      🐢 <span>Slow</span>
+      <input type="range" id="speedRange" min="0.3" max="1.2" step="0.1" value="0.7">
+      <span>Fast</span> 🐇
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="initGame()">パズルをシャッフル</button>
+    <button id="ans-btn" onclick="toggleAnswers()" style="background: var(--secondary);">答えを表示</button>
+    <button onclick="window.print()" style="background: var(--success);">PDF保存 / 印刷</button>
+  </div>
+
+  <script>
+    const wordsData = [
+      { en: "flowers", ja: "はな" },
+      { en: "branches", ja: "えだ" },
+      { en: "silver", ja: "ぎんいろ" },
+      { en: "chirp", ja: "チュンチュン鳴く" },
+      { en: "morning", ja: "あさ" },
+      { en: "night", ja: "よる" },
+      { en: "take", ja: "がまんする" },
+      { en: "powder", ja: "こな" },
+      { en: "punish", ja: "こらしめる" },
+      { en: "no", ja: "なんてことだ！/ そんなぁ！" }
+    ];
+
+    let grid = [], answerCells = new Set(), isDragging = false, dragType = null, startR = null, startC = null, isEraser = false;
+    const boardSize = 10;
+
+    function initGame() {
+      const board = document.getElementById("board");
+      const wordListDiv = document.getElementById("word-list");
+      board.innerHTML = ""; wordListDiv.innerHTML = ""; answerCells.clear();
+      document.querySelectorAll('.blank').forEach(el => el.classList.add('hidden'));
+      document.getElementById('read-aloud-section').style.display = 'none';
+
+      grid = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
+      [...wordsData].sort((a, b) => b.en.length - a.en.length).forEach((word) => {
+        let placed = false, attempts = 0;
+        while (!placed && attempts < 500) {
+          attempts++;
+          let isH = Math.random() < 0.5;
+          let r = Math.floor(Math.random() * (isH ? boardSize : (boardSize - word.en.length + 1)));
+          let c = Math.floor(Math.random() * (isH ? (boardSize - word.en.length + 1) : boardSize));
+          if (canPlace(word.en, r, c, isH)) {
+            for (let i = 0; i < word.en.length; i++) {
+              let currR = isH ? r : r + i, currC = isH ? c + i : c;
+              grid[currR][currC] = word.en[i].toLowerCase();
+              answerCells.add(`${currR}-${currC}`);
+            }
+            placed = true;
+          }
+        }
+      });
+
+      for(let i=0; i<boardSize; i++)
+        for(let j=0; j<boardSize; j++)
+          if(grid[i][j] === '') grid[i][j] = String.fromCharCode(97 + Math.floor(Math.random()*26));
+
+      grid.forEach((row, r) => row.forEach((ch, c) => {
+        const cell = document.createElement("div");
+        cell.className = "cell"; cell.textContent = ch;
+        cell.dataset.r = r; cell.dataset.c = c;
+        cell.addEventListener('mousedown', (e) => onStart(r, c, e));
+        cell.addEventListener('mouseenter', () => onMove(r, c));
+        cell.addEventListener('touchstart', (e) => { e.preventDefault(); onStart(r, c, e.touches[0]); });
+        board.appendChild(cell);
+      }));
+
+      board.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.dataset.r !== undefined) onMove(parseInt(target.dataset.r), parseInt(target.dataset.c));
+      });
+
+      wordsData.forEach(w => {
+        const div = document.createElement("div"); 
+        div.className = "word-item";
+        div.innerHTML = `<span>□ ${w.en}<span class="ja-text">${w.ja}</span></span>`;
+        div.onclick = () => {
+          div.classList.toggle("checked");
+          document.querySelectorAll(`.blank[data-word="${w.en}"]`).forEach(el => 
+            div.classList.contains("checked") ? el.classList.remove('hidden') : el.classList.add('hidden'));
+          if (document.querySelectorAll('.word-item.checked').length === wordsData.length) 
+            document.getElementById('read-aloud-section').style.display = 'block';
+        };
+        wordListDiv.appendChild(div);
+      });
+    }
+
+    function canPlace(s, r, c, h) { for (let i = 0; i < s.length; i++) { let cr = h ? r : r + i, cc = h ? c + i : c; if (grid[cr][cc] !== '' && grid[cr][cc] !== s[i]) return false; } return true; }
+    function onStart(r, c, e) { isDragging = true; startR = r; startC = c; dragType = null; const cell = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`); isEraser = cell.classList.contains('h') || cell.classList.contains('v'); }
+    function onMove(r, c) { if (!isDragging) return; if (dragType === null) { if (r !== startR) dragType = 'v'; else if (c !== startC) dragType = 'h'; else return; } document.querySelectorAll('.temp-h, .temp-v').forEach(el => el.classList.remove('temp-h', 'temp-v', 'temp-h-start', 'temp-h-end', 'temp-v-start', 'temp-v-end')); const minR = Math.min(startR, (dragType === 'h' ? startR : r)), maxR = Math.max(startR, (dragType === 'h' ? startR : r)); const minC = Math.min(startC, (dragType === 'v' ? startC : c)), maxC = Math.max(startC, (dragType === 'v' ? startC : c)); for (let i = minR; i <= maxR; i++) { for (let j = minC; j <= maxC; j++) { const el = document.querySelector(`.cell[data-r="${i}"][data-c="${j}"]`); if (el) { el.classList.add('temp-' + dragType); if (dragType === 'h') { if (j === minC) el.classList.add('temp-h-start'); if (j === maxC) el.classList.add('temp-h-end'); } else { if (i === minR) el.classList.add('temp-v-start'); if (i === maxR) el.classList.add('temp-v-end'); } } } } }
+    function onEnd() { if (!isDragging) return; isDragging = false; const type = dragType; document.querySelectorAll('.temp-' + type).forEach(el => { el.classList.remove('temp-' + type, 'temp-' + type + '-start', 'temp-' + type + '-end'); isEraser ? el.classList.remove(type) : el.classList.add(type); }); updateCaps(); }
+    function updateCaps() { document.querySelectorAll('.cell').forEach(cell => { cell.classList.remove('h-start', 'h-end', 'v-start', 'v-end'); const r = +cell.dataset.r, c = +cell.dataset.c; if (cell.classList.contains('h')) { if (!document.querySelector(`.cell[data-r="${r}"][data-c="${c-1}"]`)?.classList.contains('h')) cell.classList.add('h-start'); if (!document.querySelector(`.cell[data-r="${r}"][data-c="${c+1}"]`)?.classList.contains('h')) cell.classList.add('h-end'); } if (cell.classList.contains('v')) { if (!document.querySelector(`.cell[data-r="${r-1}"][data-c="${c}"]`)?.classList.contains('v')) cell.classList.add('v-start'); if (!document.querySelector(`.cell[data-r="${r+1}"][data-c="${c}"]`)?.classList.contains('v')) cell.classList.add('v-end'); } }); }
+    window.addEventListener('mouseup', onEnd); window.addEventListener('touchend', onEnd);
+
+    function readScript() {
+      const btn = document.getElementById('read-btn');
+      const synth = window.speechSynthesis;
+      if (synth.speaking) { synth.cancel(); btn.textContent = "📢 聴いてみる"; btn.classList.remove('playing'); return; }
+      
+      const text = document.getElementById('script-text').innerText.replace(/Sparrow \d:|Ogre:|Sparrows:/g, "");
+      const uttr = new SpeechSynthesisUtterance(text);
+      uttr.lang = 'en-US'; 
+      uttr.rate = document.getElementById('speedRange').value;
+      
+      const voices = synth.getVoices();
+      const femaleVoice = voices.find(v => (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Zira')) && v.lang.startsWith('en')) || voices.find(v => v.lang.startsWith('en'));
+      if (femaleVoice) uttr.voice = femaleVoice;
+      
+      uttr.onstart = () => { btn.textContent = "⏹️ 停止"; btn.classList.add('playing'); };
+      uttr.onend = () => { btn.textContent = "📢 聴いてみる"; btn.classList.remove('playing'); };
+      synth.speak(uttr);
+    }
+
+    function toggleAnswers() { const btn = document.getElementById("ans-btn"); const isShowing = btn.textContent === "答えを隠す"; btn.textContent = isShowing ? "答えを表示" : "答えを隠す"; document.querySelectorAll(".cell").forEach(cell => { if (answerCells.has(`${cell.dataset.r}-${cell.dataset.c}`)) cell.classList.toggle("show-ans", !isShowing); }); }
+    window.onload = initGame;
+  </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonics Lesson - Winter Scene 11</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background: linear-gradient(135deg, #e1f5fe, #ffffff);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; text-align: center;
+        }
+        .card {
+            background: white; padding: 40px; border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 85%; max-width: 850px;
+        }
+        .word-display { font-size: 5.5rem; font-weight: bold; margin: 15px 0; min-height: 130px; }
+        .phrase-display { font-size: 2.8rem; font-weight: bold; color: #2c3e50; line-height: 1.4; padding: 10px; }
+        .trans { font-size: 1.8rem; color: #888; margin-bottom: 25px; min-height: 2.2rem; }
+        .unit { display: inline-block; transition: 0.3s; color: #ccc; margin: 0 4px; }
+        .active { color: #ff4757; transform: scale(1.1); text-decoration: underline; }
+        .btn {
+            padding: 15px 35px; font-size: 1.4rem; border-radius: 50px;
+            border: none; cursor: pointer; margin: 8px; font-weight: bold;
+            box-shadow: 0 6px 0 #bbb; transition: 0.1s;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #bbb; }
+        .btn-yes { background: #2ed573; color: white; box-shadow: 0 6px 0 #26af5c; }
+        .btn-no { background: #ff4757; color: white; box-shadow: 0 6px 0 #d63031; }
+        .btn-next { background: #ffa502; color: white; box-shadow: 0 6px 0 #e67e22; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="q-text" style="font-size: 1.4rem; color: #555;">Can you read it?</div>
+    <div id="display" class="word-display"></div>
+    <div id="trans" class="trans"></div>
+
+    <div id="btns-init">
+        <button class="btn btn-yes" onclick="ansYes()">Yes! 👍</button>
+        <button class="btn btn-no" onclick="ansNo()">No 😢</button>
+    </div>
+    <div id="btns-step" class="hidden">
+        <button class="btn btn-next" onclick="doNext()">Next Step ➔</button>
+    </div>
+    <div id="btns-final" class="hidden">
+        <button class="btn btn-yes" id="main-btn" onclick="nextContent()">Next Word 🚀</button>
+    </div>
+</div>
+
+<script>
+    const wordList = [
+        { w: "just", s: ["j", "u", "st"], t: "ただの / ちょうど" },
+        { w: "giant", s: ["gi", "ant"], t: "巨大な" },
+        { w: "pile", s: ["p", "il(e)"], t: "山 / 積み重ね" },
+        { w: "of", s: ["of"], t: "〜の" },
+        { w: "sugar", s: ["su", "g", "ar"], t: "さとう" },
+        { w: "now", s: ["n", "ow"], t: "今" },
+        { w: "completely", s: ["com", "p", "let(e)", "ly"], t: "完全に" },
+        { w: "gone", s: ["gone"], t: "なくなった" },
+        { w: "believe", s: ["be", "lie", "ve"], t: "信じる" },
+        { w: "someone", s: ["some", "one"], t: "だれか" },
+        { w: "cheated", s: ["ch", "ea", "t", "ed"], t: "ズルをした" },
+        { w: "wait", s: ["w", "ai", "t"], t: "待って" },
+        { w: "said", s: ["s", "aid"], t: "言った" },
+        { w: "her", s: ["h", "er"], t: "彼女の" },
+        { w: "was", s: ["was"], t: "〜だった" },
+        { w: "stolen", s: ["s", "t", "ol", "en"], t: "ぬすまれた" },
+        { w: "cheater", s: ["ch", "ea", "t", "er"], t: "ズルをした人" },
+        { w: "also", s: ["al", "so"], t: "〜もまた" },
+        { w: "thief", s: ["th", "ie", "f"], t: "どろぼう" }
+    ];
+
+    const phraseList = [
+        { w: "It was just a giant pile of sugar!", t: "それはただの巨大な砂糖の山だったんだ！" },
+        { w: "And now, it's completely gone!", t: "そして今、それは完全になくなっちゃった！" },
+        { w: "I can't believe it!", t: "信じられないよ！" },
+        { w: "Someone cheated!", t: "だれかがズルをしたんだ！" },
+        { w: "Wait! Bravey said her sugar was stolen!", t: "待って！ブレイビーが砂糖を盗まれたって言ってたわ！" },
+        { w: "The cheater is also a thief!", t: "ズルをした人は、どろぼうでもあるってことだ！" }
+    ];
+
+    let currentIdx = -1;
+    let step = 0;
+    let isPhraseMode = false;
+
+    function speak(txt, rate = 0.7) {
+        window.speechSynthesis.cancel();
+        let u = new SpeechSynthesisUtterance(txt);
+        u.lang = "en-US"; u.rate = rate;
+        window.speechSynthesis.speak(u);
+    }
+
+    function nextContent() {
+        if (!isPhraseMode) {
+            currentIdx++;
+            if (currentIdx < wordList.length) {
+                initWord();
+            } else {
+                isPhraseMode = true;
+                currentIdx = 0;
+                initPhrase();
+            }
+        } else {
+            currentIdx++;
+            if (currentIdx < phraseList.length) {
+                initPhrase();
+            } else {
+                finishGame();
+            }
+        }
+    }
+
+    function initWord() {
+        step = -1;
+        const data = wordList[currentIdx];
+        document.getElementById('q-text').textContent = "Can you read it?";
+        document.getElementById('display').className = "word-display";
+        document.getElementById('display').innerHTML = data.w;
+        document.getElementById('trans').innerHTML = "(" + data.t + ")";
+        
+        document.getElementById('btns-init').classList.remove('hidden');
+        document.getElementById('btns-step').classList.add('hidden');
+        document.getElementById('btns-final').classList.add('hidden');
+        speak("Can you read it?");
+    }
+
+    function ansYes() {
+        confetti({ particleCount: 80, spread: 60 });
+        speak(wordList[currentIdx].w);
+        showFinalBtn();
+    }
+
+    function ansNo() {
+        step = 0;
+        document.getElementById('btns-init').classList.add('hidden');
+        document.getElementById('btns-step').classList.remove('hidden');
+        renderStep();
+    }
+
+    function renderStep() {
+        let h = "";
+        wordList[currentIdx].s.forEach((u, i) => {
+            h += `<span class="unit ${i === step ? 'active' : ''}">${u}</span>`;
+        });
+        document.getElementById('display').innerHTML = h;
+    }
+
+    function doNext() {
+        step++;
+        if (step >= wordList[currentIdx].s.length) {
+            document.getElementById('display').innerHTML = wordList[currentIdx].w;
+            speak(wordList[currentIdx].w);
+            showFinalBtn();
+        } else {
+            renderStep();
+        }
+    }
+
+    function initPhrase() {
+        document.getElementById('q-text').textContent = "Let's read the story!";
+        const area = document.getElementById('display');
+        area.className = "phrase-display";
+        area.innerHTML = phraseList[currentIdx].w;
+        document.getElementById('trans').innerHTML = "(" + phraseList[currentIdx].t + ")";
+        
+        document.getElementById('btns-init').classList.add('hidden');
+        document.getElementById('btns-step').classList.add('hidden');
+        document.getElementById('btns-final').classList.remove('hidden');
+        document.getElementById('main-btn').textContent = "Next ➔";
+        
+        speak(phraseList[currentIdx].w, 0.8);
+    }
+
+    function showFinalBtn() {
+        document.getElementById('btns-step').classList.add('hidden');
+        document.getElementById('btns-final').classList.remove('hidden');
+        document.getElementById('main-btn').textContent = "Next Word 🚀";
+    }
+
+    function finishGame() {
+        document.getElementById('q-text').textContent = "Great Job!";
+        document.getElementById('display').innerHTML = "Scene 11 Complete! ❄️";
+        document.getElementById('trans').innerHTML = "クライマックスに近づいてきたよ〜！";
+        document.getElementById('btns-final').classList.add('hidden');
+        speak("Excellent reading! Scene eleven is finished!");
+        confetti({ particleCount: 200, spread: 100 });
+    }
+
+    nextContent();
+</script>
+</body>
+</html>

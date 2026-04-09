@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialogues - Inspired by Spring, Scene 5🌸</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: linear-gradient(135deg, #fce4ec, #f8bbd0);
+            --theme-color: #e91e63;
+        }
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background: var(--bg-color);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; text-align: center;
+        }
+        .card {
+            background: white; padding: 40px; border-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 85%; max-width: 800px;
+        }
+        .title { font-size: 1.2rem; color: #555; margin-bottom: 10px; }
+        .dialogue-display { 
+            font-size: 2.2rem; font-weight: bold; color: #2c3e50; 
+            line-height: 1.4; min-height: 160px; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .trans { font-size: 1.4rem; color: #ff80ab; margin-top: 10px; min-height: 2rem; font-weight: bold;}
+        
+        .btn {
+            padding: 15px 40px; font-size: 1.4rem; border-radius: 50px;
+            border: none; cursor: pointer; margin: 8px; font-weight: bold;
+            display: inline-block; transition: 0.1s;
+        }
+        .btn-p1 { background: #ff9ff3; color: white; box-shadow: 0 6px 0 #f368e0; }
+        .btn-p2 { background: #f368e0; color: white; box-shadow: 0 6px 0 #d94da5; }
+        .btn-p3 { background: #ff4757; color: white; box-shadow: 0 6px 0 #ff6b81; }
+        .btn-p4 { background: #e91e63; color: white; box-shadow: 0 6px 0 #ad1457; }
+        .btn-next { background: #2196f3; color: white; box-shadow: 0 6px 0 #1976d2; }
+        .btn-speaker { 
+            background: #2196f3; color: white; font-size: 2.5rem; 
+            border-radius: 50%; width: 80px; height: 80px; 
+            display: flex; align-items: center; justify-content: center;
+            margin: 20px auto; border: none; box-shadow: 0 6px 0 #1976d2;
+        }
+        .btn-mini-speaker {
+            background: #f8bbd0; color: white; border: none; border-radius: 50%;
+            width: 35px; height: 35px; cursor: pointer; margin-left: 10px; font-size: 1rem;
+        }
+        .btn-print { background: #555; color: white; box-shadow: 0 6px 0 #333; margin-top: 20px; font-size: 1rem; }
+        .hidden { display: none !important; }
+        .full-text { font-size: 1.4rem; text-align: left; margin: 20px 0; line-height: 1.8; color: #2c3e50; overflow-y: auto; max-height: 380px; }
+        .full-text div { border-bottom: 1px solid #fce4ec; padding: 5px 0; display: flex; align-items: center; justify-content: space-between; }
+
+        @media print {
+            @page { size: A4; margin: 10mm; }
+            body { background: white !important; display: block; height: auto; }
+            .card { display: none !important; }
+            #print-area { display: block !important; text-align: left; }
+            h1 { font-size: 18pt; text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 5pt; }
+            .print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15pt; }
+            .print-part { margin-bottom: 10pt; page-break-inside: avoid; }
+            .print-title { font-weight: bold; font-size: 11pt; color: #e91e63; border-left: 4px solid #e91e63; padding-left: 6pt; margin-bottom: 5pt; display: block; }
+            .print-line { font-size: 10pt; margin-bottom: 2pt; line-height: 1.8; color: #333; }
+            .part-wide { grid-column: span 2; border-top: 1px dashed #eee; padding-top: 10pt; }
+        }
+        #print-area { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="menu">
+        <h2 style="font-size: 2rem; color: #333; margin-bottom: 30px;">Dialogues - Inspired by Spring, Scene 5🌸</h2>
+        <button class="btn btn-p1" onclick="startDialogue(0)">Part 1: Favorite Color</button><br>
+        <button class="btn btn-p2" onclick="startDialogue(1)">Part 2: My Scarf</button><br>
+        <button class="btn btn-p3" onclick="startDialogue(2)">Part 3: Are you okay?</button><br>
+        <button class="btn btn-p4" onclick="startDialogue(3)">Part 4: Seven Colors</button><br>
+        <button class="btn btn-print" onclick="window.print()">🖨 Save A4 PDF</button>
+    </div>
+
+    <div id="game-area" class="hidden">
+        <div id="part-title" class="title"></div>
+        <div id="display" class="dialogue-display"></div>
+        <div id="trans" class="trans"></div>
+        
+        <button class="btn btn-speaker" id="main-speaker" onclick="speakCurrent()">🔊</button>
+        
+        <div id="nav-btns" style="margin-top: 20px;">
+            <button id="next-btn" class="btn btn-next" onclick="nextSentence()">Next ➔</button>
+            <button class="btn" style="background:#ccc; box-shadow: 0 6px 0 #999; color:white;" onclick="resetMenu()">Menu</button>
+        </div>
+    </div>
+</div>
+
+<div id="print-area">
+    <h1>Dialogues - Inspired by Spring, Scene 5</h1>
+    <div class="print-grid" id="print-content"></div>
+</div>
+
+<script>
+    const dialogues = [
+        {
+            title: "Part 1: Favorite Color",
+            lines: [
+                { en: "A: What's your favorite color?", ja: "一番好きな色は何？" },
+                { en: "B: Pink! Pink is my favorite color.", ja: "ピンク！ピンクが一番好きなんだ。" },
+                { en: "A: Look! I have a pink scarf.", ja: "見て！ピンクのスカーフを持ってるよ。" },
+                { en: "B: Wow! It's pretty!", ja: "わあ！素敵ね！" }
+            ]
+        },
+        {
+            title: "Part 2: My pink Scarf",
+            lines: [
+                { en: "A: Do you like pink?", ja: "ピンクは好き？" },
+                { en: "B: Yes, I do!", ja: "うん、好きだよ！" },
+                { en: "A: Do you like my pink scarf?", ja: "私のピンクのスカーフはどう？" },
+                { en: "B: Yes, I do! It's pretty!", ja: "うん！とってもきれいだね！" }
+            ]
+        },
+        {
+            title: "Part 3: Are you okay?",
+            lines: [
+                { en: "A: Blink, blink, blink", ja: "（パチパチまばたきする）" },
+                { en: "B: You are blinking! Are you okay?", ja: "まばたきしてるね！大丈夫？" },
+                { en: "A: Something is in my eye.", ja: "おめめに何かが入っちゃった。" },
+                { en: "B: Oh, no! Wash your eye!", ja: "あらら！おめめを洗って！" }
+            ]
+        },
+        {
+            title: "Part 4: Seven Colors",
+            lines: [
+                { en: "A: Do you like red?", ja: "赤は好き？" }, { en: "B: Yes, I do!", ja: "うん、好きだよ！" },
+                { en: "A: Do you like yellow?", ja: "黄色は？" }, { en: "B: Yes, I do!", ja: "うん、好き！" },
+                { en: "A: Do you like pink?", ja: "ピンクは？" }, { en: "B: Yes, I do!", ja: "うん、好きだよ！" },
+                { en: "A: Do you like green?", ja: "緑は？" }, { en: "B: Yes, I do!", ja: "うん！" },
+                { en: "A: Do you like orange?", ja: "オレンジは？" }, { en: "B: Yes, I do!", ja: "好きだよ！" },
+                { en: "A: Do you like purple?", ja: "紫は？" }, { en: "B: Yes, I do!", ja: "うん！" },
+                { en: "A: Do you like blue?", ja: "青は？" }, 
+                { en: "B: Yes, I do! I like all the colors of the rainbow!", ja: "うん、好き！虹のすべての色が好きなんだ！" },
+                { en: "A: Me, too!", ja: "私も！" },
+                { en: "B: But my favorite color is pink!", ja: "でも、一番好きなのはピンクなんだ！" }
+            ]
+        }
+    ];
+
+    let currentPart = 0;
+    let currentLine = 0;
+
+    // 声の設定：明るい女性の声を選択
+    function getFemaleVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = ["Google US English", "Microsoft Zira", "Samantha", "Female"];
+        let selected = null;
+        for (let name of preferred) {
+            selected = voices.find(v => (v.lang === 'en-US' || v.lang === 'en_US') && v.name.includes(name));
+            if (selected) break;
+        }
+        return selected || voices.find(v => v.lang.startsWith('en'));
+    }
+
+    // 読み上げ本体
+    function speak(txt) {
+        window.speechSynthesis.cancel();
+        let speechText = txt.replace(/^[AB]:\s*/i, '').trim();
+        
+        setTimeout(() => {
+            const u = new SpeechSynthesisUtterance(speechText);
+            const v = getFemaleVoice();
+            if (v) u.voice = v;
+            u.lang = 'en-US';
+            u.rate = 0.7; // 以前の聞きやすい速度
+            window.speechSynthesis.speak(u);
+        }, 60); // 詰まり防止の間隔を少し広げました
+    }
+
+    function startDialogue(idx) {
+        currentPart = idx;
+        currentLine = 0;
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
+        document.getElementById('main-speaker').classList.remove('hidden');
+        document.getElementById('next-btn').classList.remove('hidden');
+        document.getElementById('part-title').textContent = dialogues[idx].title;
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        const data = dialogues[currentPart];
+        if (currentLine < data.lines.length) {
+            document.getElementById('display').innerText = data.lines[currentLine].en;
+            document.getElementById('trans').innerText = data.lines[currentLine].ja;
+        } else {
+            showSummary();
+        }
+    }
+
+    function speakCurrent() {
+        const data = dialogues[currentPart];
+        if (currentLine < data.lines.length) {
+            speak(data.lines[currentLine].en);
+        }
+    }
+
+    function nextSentence() {
+        currentLine++;
+        updateDisplay();
+    }
+
+    function showSummary() {
+        const data = dialogues[currentPart];
+        let fullHtml = "<div class='full-text'>";
+        data.lines.forEach((l, index) => {
+            // data-text属性にセリフを格納することで、' によるJSエラーを完全に回避
+            fullHtml += `<div><span>${l.en}</span><button class='btn-mini-speaker' data-text="${l.en.replace(/"/g, '&quot;')}" onclick='speak(this.getAttribute("data-text"))'>🔊</button></div>`;
+        });
+        fullHtml += "</div>";
+        document.getElementById('display').innerHTML = fullHtml;
+        document.getElementById('trans').innerText = "";
+        document.getElementById('main-speaker').classList.add('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+        confetti({ particleCount: 150, spread: 70 });
+    }
+
+    function resetMenu() {
+        document.getElementById('menu').classList.remove('hidden');
+        document.getElementById('game-area').classList.add('hidden');
+        window.speechSynthesis.cancel();
+    }
+
+    function preparePrint() {
+        const container = document.getElementById('print-content');
+        container.innerHTML = '';
+        dialogues.forEach((part, index) => {
+            const isWide = index === 3;
+            let html = `<div class="print-part ${isWide ? 'part-wide' : ''}"><span class="print-title">${part.title}</span>`;
+            part.lines.forEach(line => {
+                html += `<div class="print-line">${line.en}</div>`;
+            });
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    window.onbeforeprint = preparePrint;
+    // 初回読み込み時にも声をセット
+    window.speechSynthesis.onvoiceschanged = getFemaleVoice;
+</script>
+</body>
+</html>

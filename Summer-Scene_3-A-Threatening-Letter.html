@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer Sc.3 Activity - A Threatening Letter</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2196f3;
+            --bg: #e3f2fd;
+            --luna: #fff9c4;
+            --plum: #f8bbd0;
+            --zoe: #e8f5e9;
+            --others: #f5f5f5;
+            --font-en: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif;
+            --font-jp: 'Zen Maru Gothic', sans-serif;
+            --success: #4caf50;
+            --error: #f44336;
+        }
+
+        body { font-family: var(--font-jp); background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 900px; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1565c0; font-size: 1.6rem; margin-bottom: 25px; font-family: var(--font-en); }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+        .tab { padding: 12px 25px; border: none; background: #eee; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.3s; }
+        .tab.active { background: var(--primary); color: white; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .en { font-family: var(--font-en); font-size: 1.6rem; display: block; font-weight: bold; color: #333; line-height: 1.4; }
+        .jp { font-size: 1rem; color: #666; display: block; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 8px; }
+
+        .bubble { margin-bottom: 25px; padding: 25px; border-radius: 25px; position: relative; box-shadow: 2px 4px 15px rgba(0,0,0,0.06); }
+        .role-name { font-weight: bold; font-size: 1rem; color: #555; margin-bottom: 10px; display: block; font-family: var(--font-en); }
+        .luna-b { background: var(--luna); border: 4px solid #fbc02d; }
+        .plum-b { background: var(--plum); border: 4px solid #f06292; }
+        .zoe-b { background: var(--zoe); border: 4px solid #81c784; }
+        .others-b { background: var(--others); border: 4px solid #ccc; }
+
+        .speak-btn { background: white; border: 2px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 1.6rem; float: right; margin-left: 15px; display: flex; align-items: center; justify-content: center; }
+
+        .option { display: block; width: 100%; padding: 18px; margin: 12px 0; background: white; border: 2px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 1.3rem; font-family: var(--font-en); text-align: left; transition: 0.2s; }
+        .option:hover { background: #f0f7ff; border-color: var(--primary); }
+
+        .blank { background: #ccc; color: transparent; border-radius: 6px; padding: 0 10px; cursor: pointer; display: inline-block; min-width: 40px; margin: 0 2px; }
+        .blank.show { background: transparent; color: #d81b60; font-weight: bold; text-decoration: underline; }
+
+        .btn-main { display: block; width: 280px; margin: 20px auto; padding: 20px; background: var(--primary); color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 0 #0d47a1; }
+        .btn-report { display: block; width: 280px; margin: 10px auto; padding: 20px; background: var(--success); color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 0 #2e7d32; }
+        
+        .result-msg { font-size: 1.4rem; font-weight: bold; margin: 20px 0; }
+        .wrong-list { text-align: left; background: #fff1f0; padding: 15px; border-radius: 15px; border: 1px solid var(--error); margin: 20px auto; max-width: 500px; color: var(--error); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Summer Sc.3: A Threatening Letter</h1>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showSection(0)">1. Quiz</button>
+        <button class="tab" onclick="showSection(1)">2. Reading</button>
+        <button class="tab" onclick="showSection(2)">3. Memory</button>
+    </div>
+
+    <div id="section0" class="section active">
+        <div id="quiz-container"></div>
+    </div>
+
+    <div id="section1" class="section">
+        <div id="speakingBox"></div>
+    </div>
+
+    <div id="section2" class="section">
+        <div id="memoryBox"></div>
+        <button class="btn-main" onclick="revealAll()">Show All Answers</button>
+    </div>
+</div>
+
+<script>
+    const script = [
+        { role: "Plum", en: "Luna! Your roof is beautiful! No more holes!", jp: "ルナ！屋根がきれいだよ！穴も開いてないね！", style: "plum-b" },
+        { role: "Snow", en: "It looks amazing!", jp: "最高に見えるわ！", style: "others-b" },
+        { role: "Fortune", en: "Who fixed it for you? Was it a handsome prince?", jp: "誰が直してくれたの？ハンサムな王子様かしら？", style: "others-b" },
+        { role: "Luna", en: "That’s the strangest part! I have no idea who did it. No one asked for money, and no one left a note.", jp: "そこが一番変なところなの！誰がやったか全然分からないのよ。誰もお金を請求しなかったし、置き手紙もなかったわ。", style: "luna-b" },
+        { role: "Luna", en: "I thought it was a miracle, but whoever it was, I am grateful!", jp: "奇跡かと思ったけれど、誰であれ感謝しているわ！", style: "luna-b" },
+        { role: "Zoe", en: "Hello! Special mail for Luna!", jp: "ハロー！ルナに特別なお手紙だよ！", style: "zoe-b" },
+        { role: "Luna", en: "A letter for me? How sweet! Maybe it's a message from the magic builder!", jp: "私にお手紙？素敵！きっと魔法の修理人さんからのメッセージね！", style: "luna-b" },
+        { role: "Luna", en: "It's from... the Ogre!", jp: "鬼からだわ！", style: "luna-b" },
+        { role: "All", en: "Ogre?!", jp: "鬼？！", style: "others-b" },
+        { role: "Luna", en: "You called me ugly! You hurt my feelings! So I need to punish you! Beware! I will kidnap you!", jp: "お前は俺を醜いと言った！俺の心を傷つけた！だからお前を罰する必要がある！覚悟しろ！お前を誘拐してやる！", style: "luna-b" },
+        { role: "Fortune", en: "Oh, Luna... You called him ugly? That's not nice.", jp: "あら、ルナ…彼を醜いって言ったの？それは良くないわ。", style: "others-b" },
+        { role: "Luna", en: "I know, I know! But he was really, really you know...", jp: "分かってる、分かってるわよ！でも彼、本当に、本当にその…", style: "luna-b" },
+        { role: "Snow", en: "Dirty and smelly?", jp: "汚くて、くさかった？", style: "others-b" },
+        { role: "Luna", en: "Yeah, yeah!", jp: "そう、そうなのよ！", style: "luna-b" },
+        { role: "Plum", en: "Anyway, kidnapping is too much! Don't cry, Luna! I am here. Come to my Dojo! We will protect you together!", jp: "とにかく、誘拐なんてやりすぎだよ！泣かないで、ルナ！私がついているよ。うちの道場においで！一緒に守ってあげるから！", style: "plum-b" }
+    ];
+
+    const quizData = [
+        { q: "How is Luna's roof now?", a: [{t: "Still broken", c: false}, {t: "Perfect and beautiful", c: true}, {t: "Gone", c: false}, {t: "A little bit dirty", c: false}] },
+        { q: "Who is the 'The Forest Messenger'?", a: [{t: "Momotaro", c: false}, {t: "Zoe", c: true}, {t: "A prince", c: false}, {t: "A magic builder", c: false}] },
+        { q: "Why is the Ogre angry?", a: [{t: "Luna ate his lunch", c: false}, {t: "Luna said he's ugly", c: true}, {t: "Luna didn't pay", c: false}, {t: "Luna lost the letter", c: false}] },
+        { q: "What will the Ogre do to Luna?", a: [{t: "Give her a present", c: false}, {t: "Kidnap her", c: true}, {t: "Fix more holes", c: false}, {t: "Call her names", c: false}] },
+        { q: "Plum says: 'Come to my ______!'", a: [{t: "House", c: false}, {t: "Cafe", c: false}, {t: "Dojo", c: true}, {t: "Garden", c: false}] }
+    ];
+
+    let currentQuiz = 0;
+    let wrongAnswers = [];
+
+    function showSection(idx) {
+        document.querySelectorAll('.section').forEach((s, i) => s.classList.toggle('active', i === idx));
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+
+    // 配列をシャッフルする関数
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function loadQuiz() {
+        const container = document.getElementById('quiz-container');
+        if (currentQuiz >= quizData.length) {
+            showFinalResult(container);
+            return;
+        }
+        const data = quizData[currentQuiz];
+        // 選択肢をコピーしてシャッフル
+        const shuffledOptions = shuffleArray([...data.a]);
+        
+        let html = `<p style='font-size:1.4rem; font-weight:bold;'>Q${currentQuiz+1}: ${data.q}</p>`;
+        shuffledOptions.forEach((opt) => {
+            html += `<button class="option" onclick="check(${opt.c})">${opt.t}</button>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function check(isCorrect) {
+        if (isCorrect) {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        } else {
+            wrongAnswers.push({ num: currentQuiz + 1, q: quizData[currentQuiz].q });
+        }
+        currentQuiz++;
+        setTimeout(loadQuiz, 500);
+    }
+
+    function showFinalResult(container) {
+        const score = quizData.length - wrongAnswers.length;
+        let html = `<div style='text-align:center;'>`;
+        
+        if (wrongAnswers.length === 0) {
+            html += `<h2 style='color:var(--success);'>5/5 Perfect! 🌟</h2>
+                     <p class='result-msg'>全問正解！Tamaki先生に報告しよう！</p>
+                     <button class='btn-report' onclick='sendEmail()'>Tamaki先生に報告する</button>`;
+        } else {
+            html += `<h2 style='color:var(--error);'>${score}/5 Correct</h2>
+                     <p class='result-msg'>おしかったね！間違えたところを確認してもう一度！</p>
+                     <div class='wrong-list'>
+                        <strong>【間違えた問題】</strong><br>
+                        ${wrongAnswers.map(w => `・Q${w.num}: ${w.q}`).join('<br>')}
+                     </div>`;
+        }
+        
+        html += `<button class='btn-main' style='background:#9e9e9e; box-shadow: 0 6px 0 #616161;' onclick='resetQuiz()'>もういちど挑戦する</button></div>`;
+        container.innerHTML = html;
+    }
+
+    function resetQuiz() {
+        currentQuiz = 0;
+        wrongAnswers = [];
+        loadQuiz();
+    }
+
+    function sendEmail() {
+        const teacherEmail = "tamaki@eigostudio-stepforward.com";
+        const subject = encodeURIComponent("Summer Sc.3 クイズ結果報告");
+        const body = encodeURIComponent("Tamaki先生へ\n\nSummer Scene 3のクイズで全問正解(5/5)しました！\nセリフも完璧に覚えるまで練習します！");
+        window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+    }
+
+    function loadSpeaking() {
+        const box = document.getElementById('speakingBox');
+        box.innerHTML = script.map(line => `
+            <div class="bubble ${line.style}">
+                <button class="speak-btn" onclick="speak('${line.en.replace(/'/g, "\\'")}')">🔊</button>
+                <span class="role-name">${line.role}</span>
+                <span class="en">${line.en}</span>
+                <span class="jp">${line.jp}</span>
+            </div>
+        `).join('');
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const uttr = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        let voice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Samantha') || v.name.includes('Zira')));
+        uttr.voice = voice || voices.find(v => v.lang.includes('en'));
+        uttr.rate = 0.8;
+        window.speechSynthesis.speak(uttr);
+    }
+
+    function loadMemory() {
+        const box = document.getElementById('memoryBox');
+        box.innerHTML = script.map(line => {
+            const masked = line.en.split(' ').map((word, i) => {
+                const clean = word.replace(/[!,?.]/g, "").toLowerCase();
+                const hideList = ["beautiful", "holes", "amazing", "fixed", "handsome", "prince", "strangest", "idea", "money", "note", "miracle", "grateful", "special", "mail", "sweet", "message", "ogre", "ugly", "feelings", "punish", "beware", "kidnap", "nice", "dirty", "smelly", "anyway", "cry", "dojo", "protect", "together"];
+                if (hideList.includes(clean) || (clean.length > 4 && i % 2 === 0)) {
+                    return `<span class="blank" onclick="this.classList.toggle('show')">${word}</span>`;
+                }
+                return word;
+            }).join(' ');
+            return `<div class="bubble ${line.style}"><span class="role-name">${line.role}</span><span class="en">${masked}</span><span class="jp">${line.jp}</span></div>`;
+        }).join('');
+    }
+
+    function revealAll() { document.querySelectorAll('.blank').forEach(b => b.classList.add('show')); }
+
+    window.onload = () => { loadQuiz(); loadSpeaking(); loadMemory(); window.speechSynthesis.onvoiceschanged = () => {}; };
+</script>
+</body>
+</html>

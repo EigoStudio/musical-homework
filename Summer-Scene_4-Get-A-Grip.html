@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer Sc.4 Activity - Get a Grip!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e91e63;
+            --bg: #fff0f5;
+            --plum: #fce4ec;
+            --bravey: #e1f5fe;
+            --others: #f5f5f5;
+            --font-en: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif;
+            --font-jp: 'Zen Maru Gothic', sans-serif;
+            --success: #4caf50;
+            --error: #f44336;
+        }
+
+        body { font-family: var(--font-jp); background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 900px; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); font-size: 1.6rem; margin-bottom: 20px; font-family: var(--font-en); }
+
+        .controls { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; border: 1px solid #ddd; }
+        .controls label { font-weight: bold; font-size: 0.9rem; color: #555; }
+        #speedSlider { width: 150px; cursor: pointer; }
+        #speedValue { font-weight: bold; color: var(--primary); width: 40px; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+        .tab { padding: 12px 25px; border: none; background: #eee; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.3s; }
+        .tab.active { background: var(--primary); color: white; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .bubble { margin-bottom: 20px; padding: 20px; border-radius: 25px; position: relative; box-shadow: 2px 4px 15px rgba(0,0,0,0.06); }
+        .role-name { font-weight: bold; font-size: 1rem; color: #555; margin-bottom: 8px; display: block; font-family: var(--font-en); }
+        .en { font-family: var(--font-en); font-size: 1.5rem; display: block; font-weight: bold; color: #333; line-height: 1.4; white-space: pre-line; }
+        .jp { font-size: 0.95rem; color: #666; display: block; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 8px; }
+
+        .plum-b { background: var(--plum); border: 4px solid #f06292; }
+        .bravey-b { background: var(--bravey); border: 4px solid #4fc3f7; }
+        .others-b { background: var(--others); border: 4px solid #ccc; }
+
+        .speak-btn { background: white; border: 2px solid var(--primary); border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 1.4rem; float: right; margin-left: 10px; display: flex; align-items: center; justify-content: center; }
+        .option { display: block; width: 100%; padding: 15px; margin: 10px 0; background: white; border: 2px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 1.2rem; font-family: var(--font-en); text-align: left; transition: 0.2s; }
+        .option:hover { background: #fff0f5; border-color: var(--primary); }
+        .blank { background: #ccc; color: transparent; border-radius: 6px; padding: 0 8px; cursor: pointer; display: inline-block; min-width: 30px; margin: 0 2px; }
+        .blank.show { background: transparent; color: #d81b60; font-weight: bold; text-decoration: underline; }
+        
+        .btn-main { display: block; width: 280px; margin: 20px auto; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 #ad1457; }
+        .btn-report { display: block; width: 280px; margin: 10px auto; padding: 18px; background: var(--success); color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 #2e7d32; }
+        
+        .wrong-list { text-align: left; background: #fff1f0; padding: 15px; border-radius: 15px; border: 1px solid var(--error); margin: 20px auto; max-width: 500px; color: var(--error); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Summer Sc.4: Get a Grip!</h1>
+
+    <div class="controls">
+        <label>Speaking Speed:</label>
+        <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.1" value="0.8">
+        <span id="speedValue">0.8x</span>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showSection(0)">1. Quiz</button>
+        <button class="tab" onclick="showSection(1)">2. Reading</button>
+        <button class="tab" onclick="showSection(2)">3. Memory</button>
+    </div>
+
+    <div id="section0" class="section active">
+        <div id="quiz-container"></div>
+    </div>
+
+    <div id="section1" class="section">
+        <div id="speakingBox"></div>
+    </div>
+
+    <div id="section2" class="section">
+        <div id="memoryBox"></div>
+        <button class="btn-main" onclick="revealAll()">Show All Answers</button>
+    </div>
+</div>
+
+<script>
+    const script = [
+        { role: "Narrator", en: "The girls are hiding at Plum's Dojo. Plum is trying to act tough.", jp: "女の子たちはプラムの道場に隠れています。プラムは強がっています。", style: "others-b" },
+        { role: "Plum ♪", en: "Get a grip!\nDon't let your courage slip!\nMy brother's gone, he's not around.\nBut I won't let us hit the ground!\nI'm the leader, I'm the boss.\nI'll show that Ogre who's the boss!\nTake a breath, one, two, three...\nI'm as brave as I can be!", jp: "しっかりして！勇気をくじいちゃダメ！\nお兄ちゃんはいないけれど、みんなを負けさせたりしないわ！\n私がリーダー、私がボス。あの鬼にどっちが上か思い知らせてやるんだから！\n深呼吸して、1、2、3……。私は最高に勇敢なんだから！", style: "plum-b" },
+        { role: "Plum", en: "Believe in yourself! You got this! Don't be a chicken!\nYou have to protect Luna!", jp: "自分を信じて！あんたならできる！ビビっちゃダメよ！ルナを守らなきゃいけないんだから！", style: "plum-b" },
+        { role: "Bravey", en: "Hey, Plum! Check it out.", jp: "やあ、プラム！これ見て。", style: "bravey-b" },
+        { role: "Plum", en: "What are these?", jp: "これ、何？", style: "plum-b" },
+        { role: "Bravey", en: "Magic dumplings!", jp: "魔法の団子（黍団子）だよ！", style: "bravey-b" },
+        { role: "Plum", en: "Magic dumplings?", jp: "魔法の団子？", style: "plum-b" },
+        { role: "Bravey", en: "One bite and you'll feel like a superhero!", jp: "一口食べれば、スーパーヒーローみたいな気分になれるよ！", style: "bravey-b" },
+        { role: "Plum", en: "Okay...", jp: "わかったわ……。", style: "plum-b" },
+        { role: "Plum", en: "Whoa! I can feel the power! I'm not scared anymore.\nThanks, Bravey!", jp: "うわあ！パワーが湧いてくるわ！もう怖くない。\nありがとう、ブレイヴィー！", style: "plum-b" }
+    ];
+
+    const quizData = [
+        { q: "Where are the girls hiding?", a: [{t: "At Plum's Dojo", c: true}, {t: "In the forest", c: false}, {t: "On the roof", c: false}] },
+        { q: "Why is Plum nervous?", a: [{t: "Her brother is not around.", c: true}, {t: "She lost her hammer.", c: false}, {t: "She wants a fur coat.", c: false}] },
+        { q: "What does Plum say to herself?", a: [{t: "Don't be a chicken!", c: true}, {t: "I'm a mouse!", c: false}, {t: "Go away!", c: false}] },
+        { q: "What did Bravey bring to Plum?", a: [{t: "Magic dumplings", c: true}, {t: "A magic spell", c: false}, {t: "A bunch of nails", c: false}] },
+        { q: "How does Plum feel at the end of the scene?", a: [{t: "She's not scared anymore.", c: true}, {t: "She's still crying.", c: false}, {t: "She's very angry.", c: false}] }
+    ];
+
+    let currentQuiz = 0;
+    let wrongAnswers = [];
+    const speedSlider = document.getElementById('speedSlider');
+    const speedValue = document.getElementById('speedValue');
+
+    speedSlider.addEventListener('input', () => { speedValue.textContent = speedSlider.value + 'x'; });
+
+    function showSection(idx) {
+        document.querySelectorAll('.section').forEach((s, i) => s.classList.toggle('active', i === idx));
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function loadQuiz() {
+        const container = document.getElementById('quiz-container');
+        if (currentQuiz >= quizData.length) {
+            showFinalResult(container);
+            return;
+        }
+        const data = quizData[currentQuiz];
+        const shuffledOptions = shuffleArray([...data.a]);
+        let html = `<p style='font-size:1.3rem; font-weight:bold;'>Q${currentQuiz+1}: ${data.q}</p>`;
+        shuffledOptions.forEach((opt) => { html += `<button class="option" onclick="check(${opt.c})">${opt.t}</button>`; });
+        container.innerHTML = html;
+    }
+
+    function check(isCorrect) {
+        if (isCorrect) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        else wrongAnswers.push({ num: currentQuiz + 1, q: quizData[currentQuiz].q });
+        currentQuiz++;
+        setTimeout(loadQuiz, 500);
+    }
+
+    function showFinalResult(container) {
+        let html = `<div style='text-align:center;'>`;
+        if (wrongAnswers.length === 0) {
+            html += `<h2 style='color:var(--success);'>Perfect! 🍡🌟</h2>
+                     <p>全問正解！Tamaki先生に報告しよう！</p>
+                     <button class='btn-report' onclick='sendEmail()'>Tamaki先生に報告する</button>`;
+        } else {
+            html += `<h2 style='color:var(--error);'>Finished!</h2>
+                     <div class='wrong-list'>
+                        <strong>【もう一度確認しよう】</strong><br>
+                        ${wrongAnswers.map(w => `・Q${w.num}: ${w.q}`).join('<br>')}
+                     </div>`;
+        }
+        html += `<button class='btn-main' style='background:#9e9e9e;' onclick='resetQuiz()'>Try Again</button></div>`;
+        container.innerHTML = html;
+    }
+
+    function resetQuiz() { currentQuiz = 0; wrongAnswers = []; loadQuiz(); }
+
+    function sendEmail() {
+        const teacherEmail = "tamaki@eigostudio-stepforward.com";
+        const subject = encodeURIComponent("Summer Sc.4 クイズ全問正解報告！");
+        const body = encodeURIComponent("Tamaki先生へ\n\nSummer Scene 4のクイズで全問正解(5/5)しました！\n黍団子のパワーでセリフ練習も頑張ります！");
+        window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const uttr = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Google US English')));
+        if (femaleVoice) uttr.voice = femaleVoice;
+        uttr.lang = 'en-US';
+        uttr.rate = parseFloat(speedSlider.value);
+        window.speechSynthesis.speak(uttr);
+    }
+
+    function loadSpeaking() {
+        document.getElementById('speakingBox').innerHTML = script.map(line => `
+            <div class="bubble ${line.style}">
+                <button class="speak-btn" onclick="speak('${line.en.replace(/\n/g, " ").replace(/'/g, "\\'")}')">🔊</button>
+                <span class="role-name">${line.role}</span>
+                <span class="en">${line.en}</span>
+                <span class="jp">${line.jp}</span>
+            </div>
+        `).join('');
+    }
+
+    function loadMemory() {
+        document.getElementById('memoryBox').innerHTML = script.map(line => {
+            const masked = line.en.split(/\s+/).map((word, i) => {
+                const clean = word.replace(/[!,?.]/g, "").toLowerCase();
+                const hideList = ["grip", "courage", "boss", "chicken", "dumplings", "power", "protect", "around"];
+                if (hideList.includes(clean) || (clean.length > 5 && i % 2 === 0)) {
+                    return `<span class="blank" onclick="this.classList.toggle('show')">${word}</span>`;
+                }
+                return word;
+            }).join(' ');
+            return `<div class="bubble ${line.style}"><span class="role-name">${line.role}</span><span class="en">${masked}</span><span class="jp">${line.jp}</span></div>`;
+        }).join('');
+    }
+
+    function revealAll() { document.querySelectorAll('.blank').forEach(b => b.classList.add('show')); }
+    window.onload = () => { loadQuiz(); loadSpeaking(); loadMemory(); };
+    window.speechSynthesis.onvoiceschanged = () => { loadSpeaking(); };
+</script>
+</body>
+</html>

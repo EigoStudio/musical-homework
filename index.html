@@ -27,20 +27,24 @@
             list-style: none;
             padding: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
+            /* 基本を横3列に指定 */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
             max-width: 1000px;
             margin: 0 auto;
         }
         li a {
             display: block;
-            padding: 15px 5px;
+            padding: 15px 8px;
+            height: 100%; /* 高さを揃える */
             background-color: #ffffff;
             border: 3px solid #ffcc00; /* 元気な黄色い枠線 */
             border-radius: 15px; /* 角をさらに丸く */
             text-decoration: none;
             color: #d35400; /* オレンジ系の文字色 */
             font-weight: bold;
+            font-size: 14px;
+            line-height: 1.4;
             transition: all 0.2s ease;
             box-shadow: 0 4px 0 #e6b800; /* ボタンっぽく立体的な影 */
         }
@@ -49,6 +53,18 @@
             transform: translateY(2px); /* 少し沈む動き */
             box-shadow: 0 2px 0 #e6b800;
             background-color: #fffdf0;
+        }
+
+        /* 画面幅が狭いスマホ等（幅600px以下）での折り返し表示調整 */
+        @media (max-width: 600px) {
+            ul {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                gap: 10px;
+            }
+            li a {
+                font-size: 12px;
+                padding: 10px 5px;
+            }
         }
     </style>
 </head>
@@ -102,17 +118,17 @@
            Winter - Scene 11
       </a></li>
 
-         <li><a href="Spring-Scene_2-Wordsearch.html">2026年3月3日<br>
+        <li><a href="Spring-Scene_2-Wordsearch.html">2026年3月3日<br>
           Wordsearch Game<br>
            Spring - Scene 2
       </a></li> 
 
-    <li><a href="Spring-Scene_2-Dialogue.html">2026年3月3日<br>
+        <li><a href="Spring-Scene_2-Dialogue.html">2026年3月3日<br>
           Script-Reading<br>
            Spring - Scene 2
       </a></li>    
 
-<li><a href="Spring-Scene_5-Dialogue.html">2026年2月24日<br>
+        <li><a href="Spring-Scene_5-Dialogue.html">2026年2月24日<br>
           Script-Reading<br>
            Spring - Scene 5
       </a></li>
@@ -121,33 +137,42 @@
           Script-Reading<br>
            Winter - Scene 10-12
       </a></li>
-    <ul>
+
         <li><a href="Valentine-Multiple-Choice-Quiz.html">2026年2月14日<br>
           Happy Valentine's Day!<br>
-            Multiple Choice Quiz
+           Multiple Choice Quiz
       </a></li>
+
         <li><a href="Snow-Snowballs-Snowflakes-Wow.html">2026年2月6日<br>
           Snow! Snowballs! Snowflakes! Wow!<br>
-            Wordsearch Game
+           Wordsearch Game
       </a></li>
+
         <li><a href="She-Has-No-Idea.html">2026年2月3日<br>
           She Has No Idea<br>
-            Wordsearch Game
+           Wordsearch Game
       </a></li>
-      <li><a href="Winter-The-Mystery-of-the-Two-Snows.html">2026年1月30日<br>
+
+        <li><a href="Winter-The-Mystery-of-the-Two-Snows.html">2026年1月30日<br>
           Winter -- The Mystery of the Two Snows<br>
           Reading Comprehension & Quiz
       </a></li>  
-      <li><a href="The-Ogre's-Grudge-2.html">2026年1月30日<br>
+
+        <li><a href="The-Ogre's-Grudge-2.html">2026年1月30日<br>
           The Ogre's Grudge #2
       </a></li>
-      <li><a href="The-Ogre's-Grudge-1.html">2026年1月27日<br>
-      The Ogre's Grudge #1
+
+        <li><a href="The-Ogre's-Grudge-1.html">2026年1月27日<br>
+          The Ogre's Grudge #1
       </a></li>
-      <li><a href="maybe-we-chirp-too-much.html">2026年1月20日</a></li>
-      <li><a href="Prepositions-1-wordsearch.html">2026年1月16日</a></li>
-      <li><a href="putting-snow-to-the-test.html">2026年1月13日</a></li>
-      <li><a href="spring-is-here.html">2026年1月6日</a></li>   
+
+        <li><a href="maybe-we-chirp-too-much.html">2026年1月20日</a></li>
+
+        <li><a href="Prepositions-1-wordsearch.html">2026年1月16日</a></li>
+
+        <li><a href="putting-snow-to-the-test.html">2026年1月13日</a></li>
+
+        <li><a href="spring-is-here.html">2026年1月6日</a></li>   
     </ul>
 
 </body>

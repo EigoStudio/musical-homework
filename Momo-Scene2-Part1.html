@@ -18,17 +18,19 @@
         body {
             background-color: #f3f4f6;
             margin: 0;
-            padding: 40px 0;
+            padding: 20px 10px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 30px;
             align-items: center;
             font-family: 'Comic Neue', 'Zen Maru Gothic', sans-serif;
+            overflow-x: hidden; /* スマホでの横スクロール崩れを防止 */
         }
 
         .slide-container {
-            width: 1280px;
-            height: 720px;
+            width: 100%;
+            max-width: 1280px; /* 横幅固定を解除し、最大幅に変更 */
+            min-height: 720px;
             background-color: #fff3dd;
             border-radius: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -47,6 +49,8 @@
             margin-bottom: 20px;
             border-bottom: 4px solid #e67e22;
             padding-bottom: 10px;
+            flex-wrap: wrap; /* スマホ用に折り返しを許可 */
+            gap: 15px;
         }
         .header-titles {
             display: flex;
@@ -68,6 +72,7 @@
         .header-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .story-btn {
             background: #9b59b6;
@@ -126,6 +131,7 @@
             gap: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.03);
             transition: transform 0.2s;
+            flex-wrap: wrap; /* 小さい画面で要素が潰れないように設定 */
         }
         .dialogue-box:hover {
             transform: translateY(-2px);
@@ -165,6 +171,7 @@
         /* テキストエリア */
         .text-group {
             flex-grow: 1;
+            min-width: 200px;
         }
         .english-text {
             font-size: 24px;
@@ -172,6 +179,7 @@
             color: #2c3e50;
             margin: 0;
             line-height: 1.2;
+            word-break: break-word;
         }
         .japanese-text {
             font-size: 17px;
@@ -180,6 +188,7 @@
             display: none;
             font-family: 'Zen Maru Gothic', sans-serif;
             font-weight: 500;
+            word-break: break-word;
         }
 
         /* ボタンエリア */
@@ -234,12 +243,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .stage-text {
             font-style: italic;
             font-size: 20px;
             color: #4a5568;
             margin: 0;
+            word-break: break-word;
         }
 
         /* 歌詞スタイル */
@@ -256,13 +268,14 @@
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 4px;
+            word-break: break-word;
         }
 
         /* フッター・ページ番号 */
         .footer {
             display: flex;
             justify-content: flex-end;
-            margin-top: 5px;
+            margin-top: 15px;
         }
         .page-num {
             font-size: 16px;
@@ -271,6 +284,46 @@
             background: #edf2f7;
             padding: 3px 12px;
             border-radius: 8px;
+        }
+
+        /* --- スマートフォン用調整 (レスポンシブ) --- */
+        @media screen and (max-width: 768px) {
+            .slide-container {
+                padding: 20px 15px;
+                min-height: auto;
+            }
+            .main-title {
+                font-size: 22px;
+            }
+            .sub-title {
+                font-size: 14px;
+            }
+            .english-text, .lyrics-line {
+                font-size: 18px;
+            }
+            .stage-text {
+                font-size: 16px;
+            }
+            .japanese-text {
+                font-size: 14px;
+            }
+            .dialogue-box {
+                padding: 10px;
+                gap: 10px;
+            }
+            .speaker-info {
+                min-width: 60px;
+            }
+            .icon-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .btn-group {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 5px;
+            }
         }
 
         /* --- モーダル（解説ポップアップ） --- */
@@ -352,63 +405,71 @@
         }
 
         /* --- 印刷スタイル最適化 --- */
+        /* --- 印刷スタイル最適化（余白・サイズ調整で白紙ページを防止） --- */
+        /* --- 印刷スタイル最適化（印刷ダイアログのスケール変更を有効化） --- */
         @media print {
+            @page {
+                margin: 10mm 12mm; /* size指定を削除してブラウザの倍率変更を復活 */
+            }
+
+            /* 1. 画面用の要素（スライドやモーダルなど）を完全に存在ごと消す */
+            body > *:not(#print-area) {
+                display: none !important;
+            }
+
             body {
                 background: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                width: 100% !important;
             }
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
+
+            /* 2. 印刷用エリアだけを表示 */
             #print-area {
                 display: block !important;
-                position: absolute;
-                left: 0; top: 0;
-                width: 100%;
+                position: static !important;
+                width: 100% !important;
                 color: #000;
                 background: #fff;
-                padding: 15mm;
+                padding: 0;
                 font-family: 'Zen Maru Gothic', sans-serif;
             }
+
             .print-page-title {
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: bold;
-                margin-bottom: 12px;
+                margin-bottom: 8px;
                 border-bottom: 2px solid #000;
                 padding-bottom: 4px;
             }
             .print-section {
-                margin-bottom: 15px;
+                margin-bottom: 10px;
             }
             .print-section-title {
-                font-size: 15px;
+                font-size: 14px;
                 font-weight: bold;
                 background: #eee;
-                padding: 4px 8px;
-                margin-bottom: 8px;
+                padding: 3px 6px;
+                margin-bottom: 6px;
                 border-radius: 4px;
             }
             .print-story-box {
-                font-size: 12px;
-                line-height: 1.5;
+                font-size: 11px;
+                line-height: 1.4;
                 color: #222;
                 background: #f9f9f9;
-                padding: 10px 12px;
+                padding: 8px 10px;
                 border-radius: 6px;
                 border: 1px solid #ddd;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
             .print-story-box p {
-                margin-bottom: 6px;
+                margin-bottom: 4px;
             }
             .print-dialogue {
-                margin-bottom: 8px;
-                font-size: 13px;
-                line-height: 1.35;
+                margin-bottom: 6px;
+                font-size: 12px;
+                line-height: 1.3;
                 page-break-inside: avoid;
             }
             .print-speaker {
@@ -417,19 +478,18 @@
             }
             .print-en {
                 font-weight: bold;
-                font-size: 14px;
+                font-size: 13px;
             }
             .print-jp {
                 color: #444;
-                font-size: 12px;
-                margin-left: 8px;
+                font-size: 11px;
+                margin-left: 6px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1ページ目 -->
     <div class="slide-container">
         <div class="header">
             <div class="header-titles">
@@ -443,7 +503,6 @@
         </div>
 
         <div class="content-area">
-            <!-- 行 1: Nino -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
@@ -459,7 +518,6 @@
                 </div>
             </div>
 
-            <!-- 行 2: Nino's Friends -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-friends"><i class="fa-solid fa-users"></i></div>
@@ -475,7 +533,6 @@
                 </div>
             </div>
 
-            <!-- 行 3: Nico -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
@@ -491,7 +548,6 @@
                 </div>
             </div>
 
-            <!-- 行 4: Nico's Friends -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-friends"><i class="fa-solid fa-users"></i></div>
@@ -513,7 +569,6 @@
         </div>
     </div>
 
-    <!-- 2ページ目 -->
     <div class="slide-container">
         <div class="header">
             <div class="header-titles">
@@ -527,7 +582,6 @@
         </div>
 
         <div class="content-area">
-            <!-- 行 1: Nino -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
@@ -543,7 +597,6 @@
                 </div>
             </div>
 
-            <!-- 行 2: Nino's Friends -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-friends"><i class="fa-solid fa-users"></i></div>
@@ -559,7 +612,6 @@
                 </div>
             </div>
 
-            <!-- 行 3: Nico -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
@@ -575,7 +627,6 @@
                 </div>
             </div>
 
-            <!-- 行 4: Nico's Friends -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-friends"><i class="fa-solid fa-users"></i></div>
@@ -597,7 +648,6 @@
         </div>
     </div>
 
-    <!-- 3ページ目 -->
     <div class="slide-container">
         <div class="header">
             <div class="header-titles">
@@ -611,7 +661,6 @@
         </div>
 
         <div class="content-area">
-            <!-- 行 1: Nino -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
@@ -627,7 +676,6 @@
                 </div>
             </div>
 
-            <!-- 行 2: Nico -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
@@ -643,7 +691,6 @@
                 </div>
             </div>
 
-            <!-- 行 3: All -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-all"><i class="fa-solid fa-users-line"></i></div>
@@ -659,7 +706,6 @@
                 </div>
             </div>
 
-            <!-- 解説（ト書き） -->
             <div class="stage-direction">
                 <div class="text-group">
                     <p class="stage-text">[Momo is dragged into the middle of the clash.]</p>
@@ -677,7 +723,6 @@
         </div>
     </div>
 
-    <!-- 4ページ目 -->
     <div class="slide-container">
         <div class="header">
             <div class="header-titles">
@@ -691,7 +736,6 @@
         </div>
 
         <div class="content-area">
-            <!-- 歌詞エリア -->
             <div class="lyrics-box">
                 <div class="lyrics-line">Shout, shout! (Spitting fire!)</div>
                 <div class="lyrics-line">Anger rising (Higher and higher!)</div>
@@ -704,20 +748,19 @@
                     トゲトゲした言葉！（鋭くて熱い！）<br>
                     複雑に絡まり合った結び目は、もう解けない！
                 </p>
-                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
                     <button class="audio-btn" onclick="speakWithPauses('Shout, shout! Spitting fire! Anger rising, higher and higher! Spiky words! Sharp and hot! Tangled up in a heavy knot!')"><i class="fa-solid fa-volume-high"></i> 🔊 歌の読み上げ</button>
                     <button class="trans-btn" onclick="toggleJp('jp-song')">歌詞の和訳</button>
                 </div>
             </div>
 
-            <!-- 最後のセリフ: All -->
             <div class="dialogue-box">
                 <div class="speaker-info">
                     <div class="icon-circle icon-all"><i class="fa-solid fa-users-line"></i></div>
                     <span class="speaker-name">All</span>
                 </div>
                 <div class="text-group">
-                    <p class="english-text" style="font-size: 30px; color: #c0392b;">Say something, Momo!</p>
+                    <p class="english-text" style="font-size: 26px; color: #c0392b;">Say something, Momo!</p>
                     <p class="japanese-text" id="jp13">何か言ってよ、モモ！</p>
                 </div>
                 <div class="btn-group">
@@ -732,7 +775,6 @@
         </div>
     </div>
 
-    <!-- 背景解説ポップアップ（モーダル） -->
     <div class="modal-overlay" id="storyModal" onclick="closeStoryModal(event)">
         <div class="modal-content">
             <button class="modal-close" onclick="closeStoryModalDirect()">✕</button>
@@ -750,21 +792,20 @@
                 <h3>🔥 ふたりが怒っているポイント！</h3>
                 
                 <div class="point-card nino">
-                    <div class="point-title nino">🍷 ニノ（Nino）の言い分：</div>
+                    <div class="point-title nino">🍷 ニノの言い分：</div>
                     「隠された小切手のことを知っていて俺を騙したんだろう！ペテン師で泥棒だ！俺の金を返せ！」
                 </div>
 
                 <div class="point-card nico">
-                    <div class="point-title nico">🧱 ニコ（Nico）の言い分：</div>
+                    <div class="point-title nico">🧱 ニコの言い分：</div>
                     「俺はラジオと交換して正々堂々と手に入れたんだ！後から難癖をつけるなんて、見苦しい負け犬だ！」
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 印刷用レイアウト（余白・ページ数を最適化） -->
     <div id="print-area">
-        <div class="print-page-title">Momo - Scene 2 - Part 1: Nino and Nico's Angry Clash (台本)</div>
+        <div class="print-page-title">Momo - Scene 2 - Part 1: Nino and Nico's Angry Clash </div>
         
         <div class="print-section">
             <div class="print-section-title">📖 背景のお話</div>
@@ -782,7 +823,7 @@
         </div>
 
         <div class="print-section">
-            <div class="print-section-title">🎭 台本 (Dialogue)</div>
+            <div class="print-section-title">🎭 Dialogue</div>
             
             <div class="print-dialogue"><span class="print-speaker">Nino:</span> <span class="print-en">You are a cheater and a thief! Give me back my money!</span><br><span class="print-jp">（お前はペテン師で泥棒だ！俺の金を返せ！）</span></div>
             <div class="print-dialogue"><span class="print-speaker">Nino's Friends:</span> <span class="print-en">Yeah! Give it back, you thief!</span><br><span class="print-jp">（そうだ！返せ、この泥棒！）</span></div>
@@ -810,7 +851,6 @@
         </div>
     </div>
 
-    <!-- JS処理：和訳切替＆ポーズ付き音声読み上げ機能＆モーダル管理 -->
     <script>
         // モーダル表示/非表示
         function openStoryModal() {

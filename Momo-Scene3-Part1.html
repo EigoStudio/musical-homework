@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Momo - Scene 3 - Part 1: Nice and Sunny!</title>
+    <script src="auth.js"></script>
+<script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-orange: #e67e22;
+            --accent-yellow: #ffd54f;
+            --bg-color: #fffaf0;
+            --text-color: #2c3e50;
+            --marker-h: rgba(255, 215, 0, 0.6); 
+            --marker-v: rgba(255, 127, 80, 0.5);
+            --cell-size: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Comic Neue', 'Zen Maru Gothic', cursive, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            touch-action: pan-y;
+        }
+
+        #game-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+            padding: 25px;
+            width: 100%;
+            max-width: 950px;
+            text-align: center;
+            border: 6px dashed var(--primary-orange);
+            position: relative;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header-titles { text-align: left; }
+        h1 { color: #d35400; font-size: 2.2rem; margin: 0; font-weight: 700; }
+        h2.sub-title { color: #7f8c8d; font-size: 1.2rem; margin: 2px 0 0 0; font-weight: 700; }
+
+        .print-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            box-shadow: 0 4px 0 #27ae60;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.1s;
+        }
+        .print-btn:hover { background: #27ae60; }
+        .print-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            background: #f1f2f6;
+            color: #7f8c8d;
+            border: 2px solid #dfe4ea;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            border-color: #d35400;
+            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
+        }
+
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            width: 100%;
+        }
+        .page.active { display: flex; }
+
+        /* Page 1: Slides UI */
+        .slide-card {
+            background: #fffdf9;
+            border: 3px double #f5deb3;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 680px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .picture-box {
+            width: 100%;
+            height: 300px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #eee;
+            background: #fcfaf6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .picture-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .svg-fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            color: #d35400;
+        }
+        .svg-fallback i { font-size: 5rem; margin-bottom: 10px; }
+
+        .phrase-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #d35400;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .speaker-btn {
+            background: #9b59b6;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #763e8f;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.1s;
+        }
+        .speaker-btn:hover { background: #af69cc; }
+        .speaker-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .slide-dots { display: flex; gap: 10px; margin: 12px 0; }
+        .dot { width: 15px; height: 15px; border-radius: 50%; background-color: #ccc; cursor: pointer; }
+        .dot.active { background-color: var(--primary-orange); transform: scale(1.2); }
+
+        .nav-btn {
+            background-color: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.3rem;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #d35400;
+            transition: 0.1s;
+        }
+        .nav-btn:hover { background: #d35400; }
+        .nav-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        /* Page 2: Word Search UI */
+        .instruction { color: #7f8c8d; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; }
+
+        .wordsearch-layout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin: 10px 0;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        #board { 
+            display: grid; 
+            grid-template-columns: repeat(7, var(--cell-size)); 
+            gap: 0; 
+            background-color: #fff; 
+            touch-action: none; 
+            user-select: none; 
+            isolation: isolate; 
+            border: 3px solid #ebd3dd;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .cell { 
+            width: var(--cell-size); 
+            height: var(--cell-size); 
+            line-height: var(--cell-size); 
+            font-size: 32px; 
+            text-align: center; 
+            font-weight: 700; 
+            cursor: pointer; 
+            position: relative; 
+            pointer-events: auto; 
+            text-transform: lowercase;
+            color: #2c3e50;
+        }
+
+        .cell::after, .cell::before { 
+            content: ""; 
+            position: absolute; 
+            z-index: -1; 
+            mix-blend-mode: multiply; 
+            display: none; 
+            pointer-events: none; 
+        }
+
+        .cell.active-h::after, .cell.h-locked-flag::after { display: block; left: 0; right: 0; top: 15%; bottom: 15%; background-color: var(--marker-h); }
+        .cell.active-v::before, .cell.v-locked-flag::before { display: block; left: 15%; right: 15%; top: 0; bottom: 0; background-color: var(--marker-v); }
+
+        .cell.h-start::after { border-top-left-radius: 30px; border-bottom-left-radius: 30px; }
+        .cell.h-end::after { border-top-right-radius: 30px; border-bottom-right-radius: 30px; }
+        .cell.v-start::before { border-top-left-radius: 30px; border-top-right-radius: 30px; }
+        .cell.v-end::before { border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+
+        .word-list-side { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            justify-content: center;
+            align-items: flex-start;
+            min-width: 180px;
+        }
+
+        .word-tag { 
+            padding: 8px 20px; 
+            background: #fff9e6; 
+            border: 2px solid #f5deb3;
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 3px 0 #d2b48c;
+            text-transform: lowercase;
+            cursor: pointer;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .word-tag:active { transform: translateY(2px); box-shadow: none; }
+        .word-tag.found { background: #2ecc71; color: white; text-decoration: line-through; box-shadow: 0 3px 0 #27ae60; border-color: #27ae60; }
+
+        .congrats-text {
+            font-size: 1.8rem;
+            color: #2ecc71;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* 画面上非表示の印刷専用エリア */
+        .print-only { display: none; }
+
+        /* 🖨️ 印刷（Command+P）専用スタイル：白黒・シンプルワードサーチのみ */
+        @media print {
+            body * { visibility: hidden !important; }
+            .print-only, .print-only * { visibility: visible !important; }
+            .print-only {
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                position: absolute;
+                left: 0; top: 0; width: 100%;
+                color: #000 !important;
+                background: #fff !important;
+                font-family: 'Comic Neue', 'Zen Maru Gothic', cursive, sans-serif !important;
+                padding: 10mm;
+            }
+            .print-header {
+                text-align: center;
+                margin-bottom: 25px;
+                border-bottom: 2px solid #000;
+                width: 100%;
+                padding-bottom: 10px;
+            }
+            .print-header h1 { font-size: 24pt; margin: 0; color: #000; }
+            .print-header p { font-size: 14pt; margin: 5px 0 0 0; color: #333; }
+            
+            .print-grid-container {
+                display: flex;
+                gap: 40px;
+                align-items: flex-start;
+                justify-content: center;
+                margin-top: 20px;
+                width: 100%;
+            }
+            .print-board {
+                display: grid;
+                grid-template-columns: repeat(7, 50px);
+                grid-template-rows: repeat(7, 50px);
+                border: 2px solid #000;
+            }
+            .print-cell {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                text-align: center;
+                font-size: 26pt;
+                font-weight: 700;
+                border: 1px solid #666;
+                text-transform: lowercase;
+                font-family: 'Comic Neue', cursive, sans-serif !important;
+            }
+            .print-word-list {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .print-word-item {
+                font-size: 18pt;
+                font-weight: 700;
+                text-transform: lowercase;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-family: 'Comic Neue', cursive, sans-serif !important;
+            }
+            .print-word-item::before {
+                content: "▢";
+                font-size: 16pt;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-titles">
+                <h1>Momo - Scene 3 - Part 1</h1>
+                <h2 class="sub-title">☀️ Nice and Sunny!</h2>
+            </div>
+            <div class="header-actions">
+                <button class="print-btn" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> 🖨️ プリントアウト (Cmd+P)
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab1" onclick="switchTab(1)">🖼️ 1. Picture Cards</button>
+            <button class="tab-btn" id="tab2" onclick="switchTab(2)">🔍 2. Word Search</button>
+        </div>
+
+        <!-- Page 1: Story Cards -->
+        <div id="page1" class="page active">
+            <div class="slide-card">
+                <div class="picture-box" id="picture-display"></div>
+                <div class="phrase-display" id="phrase-text">Nice and sunny!</div>
+                <button class="speaker-btn" onclick="speakCurrentPhrase()">
+                    <i class="fa-solid fa-volume-high"></i> 🔊 Listen
+                </button>
+            </div>
+
+            <div class="slide-dots" id="dots-container"></div>
+
+            <div class="controls-row" style="display: flex; gap: 15px; margin-top: 10px;">
+                <button class="nav-btn" onclick="prevSlide()">◀ Back</button>
+                <button class="nav-btn" onclick="nextSlide()">Next ▶</button>
+            </div>
+        </div>
+
+        <!-- Page 2: Word Search -->
+        <div id="page2" class="page">
+            <div class="instruction">
+                単語をタップして発音を聴こう！グリッドの中で指でなぞって見つけてね！ 🔍
+            </div>
+
+            <div class="wordsearch-layout">
+                <div id="board"></div>
+                <div class="word-list-side" id="ws-list"></div>
+            </div>
+
+            <div class="congrats-text" id="ws-congrats" style="display: none;">
+                🎉 Super Job! You Found All Words! 🎉
+            </div>
+        </div>
+    </div>
+
+    <!-- 🖨️ 印刷専用レイアウト（白黒・シンプル） -->
+    <div class="print-only">
+        <div class="print-header">
+            <h1>Momo - Scene 3 - Part 1</h1>
+            <p>Word Search Worksheet</p>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: space-between; font-size: 14pt; margin-bottom: 20px;">
+            <span>Name: _______________________</span>
+            <span>Date: ____________</span>
+        </div>
+        <div class="print-grid-container">
+            <div class="print-board" id="print-board"></div>
+            <div class="print-word-list" id="print-word-list"></div>
+        </div>
+    </div>
+
+    <script>
+        /* --- 音声読み上げ設定 --- */
+        let preferredVoice = null;
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) return;
+            preferredVoice = 
+                voices.find(v => v.lang === "en-US" && v.name.includes("Google US English")) ||
+                voices.find(v => v.lang === "en-US" && v.name.includes("Samantha")) ||
+                voices.find(v => v.lang.startsWith("en-US")) ||
+                voices.find(v => v.lang.startsWith("en"));
+        }
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const uttr = new SpeechSynthesisUtterance(text);
+            if (preferredVoice) uttr.voice = preferredVoice;
+            uttr.rate = 0.72;
+            uttr.pitch = 1.1;
+            window.speechSynthesis.speak(uttr);
+        }
+
+        /* --- Page 1: スライドデータ --- */
+        const slides = [
+            { phrase: "Nice and sunny!", icon: "fa-sun", image: "images-momo-scene3-part1/sunny1.jpg" },
+            { phrase: "Nice and warm!", icon: "fa-temperature-high", image: "images-momo-scene3-part1/warm.jpg" },
+            { phrase: "The weather's nice today!", icon: "fa-cloud-sun", image: "images-momo-scene3-part1/weather1.jpg" },
+            { phrase: "Look at the sun!", icon: "fa-face-sunny", image: "images-momo-scene3-part1/sun.jpg" },
+            { phrase: "Look at the sky!", icon: "fa-skyatlas", image: "images-momo-scene3-part1/sky.jpg" },
+            { phrase: "The weather's nice today!", icon: "fa-cloud-sun", image: "images-momo-scene3-part1/weather1.jpg" }
+        ];
+
+        let currentSlideIdx = 0;
+
+        function loadSlide(index) {
+            currentSlideIdx = index;
+            const slide = slides[index];
+
+            document.getElementById('phrase-text').textContent = slide.phrase;
+            const picBox = document.getElementById('picture-display');
+            
+            picBox.innerHTML = `
+                <img src="${slide.image}" alt="${slide.phrase}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="svg-fallback" style="display:none;">
+                    <i class="fa-solid ${slide.icon}"></i>
+                    <span style="font-weight:bold; font-size:1.3rem;">${slide.phrase}</span>
+                </div>
+            `;
+
+            const dotsContainer = document.getElementById('dots-container');
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === index ? 'active' : ''}`;
+                dot.onclick = () => loadSlide(i);
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function speakCurrentPhrase() { speak(slides[currentSlideIdx].phrase); }
+        function prevSlide() { loadSlide((currentSlideIdx - 1 + slides.length) % slides.length); }
+        function nextSlide() { loadSlide((currentSlideIdx + 1) % slides.length); }
+
+        /* --- Page 2: ワードサーチアルゴリズム --- */
+        const wordsData = ["sun", "sky", "weather", "nice", "today", "sunny", "warm"];
+        const boardSize = 7;
+        let grid = [];
+        let wordLocations = {}; 
+        let foundWords = new Set();
+        let isDragging = false, dragType = null, startR = null, startC = null;
+        let cellRects = []; 
+
+        function setupWordSearch() {
+            const board = document.getElementById("board");
+            const listEl = document.getElementById("ws-list");
+            const printBoard = document.getElementById("print-board");
+            const printList = document.getElementById("print-word-list");
+
+            board.innerHTML = ""; listEl.innerHTML = ""; 
+            printBoard.innerHTML = ""; printList.innerHTML = "";
+            wordLocations = {}; foundWords.clear();
+            document.getElementById('ws-congrats').style.display = 'none';
+
+            grid = Array.from({length: boardSize}, () => Array(boardSize).fill(''));
+            let sortedWords = [...wordsData].sort((a,b) => b.length - a.length);
+            
+            sortedWords.forEach(word => {
+                let placed = false; let attempts = 0;
+                while (!placed && attempts < 300) {
+                    attempts++;
+                    let isH = Math.random() < 0.5;
+                    let r = Math.floor(Math.random() * (isH ? boardSize : (boardSize - word.length + 1)));
+                    let c = Math.floor(Math.random() * (isH ? (boardSize - word.length + 1) : boardSize));
+                    
+                    let canPlace = true;
+                    for (let i = 0; i < word.length; i++) {
+                        let currR = isH ? r : r + i; let currC = isH ? c + i : c;
+                        if (grid[currR][currC] !== '' && grid[currR][currC] !== word[i]) { canPlace = false; break; }
+                    }
+                    
+                    if (canPlace) {
+                        for (let i = 0; i < word.length; i++) {
+                            let currR = isH ? r : r + i; let currC = isH ? c + i : c;
+                            grid[currR][currC] = word[i];
+                        }
+                        wordLocations[word] = {
+                            startR: r, startC: c,
+                            endR: isH ? r : r + word.length - 1,
+                            endC: isH ? c + word.length - 1 : c,
+                            type: isH ? 'h' : 'v'
+                        };
+                        placed = true;
+                    }
+                }
+            });
+
+            for(let i=0; i<boardSize; i++){
+                for(let j=0; j<boardSize; j++){
+                    if(grid[i][j] === '') grid[i][j] = String.fromCharCode(97 + Math.floor(Math.random()*26));
+                }
+            }
+
+            // 画面表示用ボードのレンダリング
+            grid.forEach((row, r) => row.forEach((ch, c) => {
+                const cell = document.createElement("div");
+                cell.className = "cell"; cell.textContent = ch.toLowerCase();
+                cell.dataset.r = r; cell.dataset.c = c;
+                
+                cell.addEventListener('mousedown', (e) => { e.preventDefault(); onStart(r, c); });
+                cell.addEventListener('mouseenter', () => { if (isDragging) onMove(r, c); });
+                board.appendChild(cell);
+
+                // 印刷用セルの追加
+                const pCell = document.createElement("div");
+                pCell.className = "print-cell";
+                pCell.textContent = ch.toLowerCase();
+                printBoard.appendChild(pCell);
+            }));
+
+            setTimeout(updateCellRects, 300);
+
+            // タッチイベント設定
+            board.addEventListener('touchstart', (e) => {
+                e.preventDefault(); updateCellRects(); 
+                const touch = e.touches[0];
+                const targetCell = getCellFromCoords(touch.clientX, touch.clientY);
+                if (targetCell) onStart(parseInt(targetCell.dataset.r), parseInt(targetCell.dataset.c));
+            }, {passive: false});
+
+            board.addEventListener('touchmove', (e) => {
+                e.preventDefault(); 
+                const touch = e.touches[0];
+                const targetCell = getCellFromCoords(touch.clientX, touch.clientY);
+                if (targetCell) onMove(parseInt(targetCell.dataset.r), parseInt(targetCell.dataset.c));
+            }, {passive: false});
+
+            window.addEventListener('mouseup', onEnd);
+            window.addEventListener('touchend', onEnd);
+            window.addEventListener('resize', updateCellRects);
+
+            wordsData.forEach(w => {
+                // 画面用タグ
+                const tag = document.createElement('div');
+                tag.className = 'word-tag';
+                tag.id = 'tag-' + w;
+                tag.innerHTML = `<span>${w.toLowerCase()}</span> <i class="fa-solid fa-volume-high" style="font-size:0.9rem;"></i>`;
+                tag.addEventListener('click', () => speak(w));
+                listEl.appendChild(tag);
+
+                // 印刷用タグ
+                const pItem = document.createElement('div');
+                pItem.className = 'print-word-item';
+                pItem.textContent = w.toLowerCase();
+                printList.appendChild(pItem);
+            });
+        }
+
+        function updateCellRects() {
+            cellRects = [];
+            document.querySelectorAll('#board .cell').forEach(cell => {
+                const rect = cell.getBoundingClientRect();
+                cellRects.push({ element: cell, left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom });
+            });
+        }
+
+        function getCellFromCoords(x, y) {
+            for (let i = 0; i < cellRects.length; i++) {
+                const c = cellRects[i];
+                if (x >= c.left - 2 && x <= c.right + 2 && y >= c.top - 2 && y <= c.bottom + 2) return c.element;
+            }
+            return null;
+        }
+
+        function onStart(r, c) {
+            isDragging = true; startR = r; startC = c; dragType = null;
+            clearTemporaryMarkers();
+        }
+
+        function onMove(r, c) {
+            if (!isDragging) return;
+            if (dragType === null) {
+                if (r !== startR) { dragType = 'v'; }
+                else if (c !== startC) { dragType = 'h'; }
+                else { return; }
+            }
+            
+            clearTemporaryMarkers();
+
+            let minR = Math.min(startR, r), maxR = Math.max(startR, r);
+            let minC = Math.min(startC, c), maxC = Math.max(startC, c);
+
+            if (dragType === 'h') {
+                for (let currC = minC; currC <= maxC; currC++) {
+                    const cell = document.querySelector(`.cell[data-r="${startR}"][data-c="${currC}"]`);
+                    if (cell) cell.classList.add('active-h');
+                }
+            } else if (dragType === 'v') {
+                for (let currR = minR; currR <= maxR; currR++) {
+                    const cell = document.querySelector(`.cell[data-r="${currR}"][data-c="${startC}"]`);
+                    if (cell) cell.classList.add('active-v');
+                }
+            }
+            updateEdgeStyles();
+        }
+
+        function onEnd() { 
+            if (!isDragging) return;
+            isDragging = false;
+
+            let currentCells = document.querySelectorAll('.cell.active-h, .cell.active-v');
+            if (currentCells.length === 0) return;
+
+            let finalMinR = 99, finalMaxR = -1, finalMinC = 99, finalMaxC = -1;
+            let hasActiveNewDrag = false;
+            
+            currentCells.forEach(cell => {
+                const isAlreadyLocked = (dragType === 'h' && cell.classList.contains('h-locked-flag')) || 
+                                        (dragType === 'v' && cell.classList.contains('v-locked-flag'));
+                if (isAlreadyLocked) return;
+
+                hasActiveNewDrag = true;
+                let r = parseInt(cell.dataset.r);
+                let c = parseInt(cell.dataset.c);
+                if (r < finalMinR) finalMinR = r;
+                if (r > finalMaxR) finalMaxR = r;
+                if (c < finalMinC) finalMinC = c;
+                if (c > finalMaxC) finalMaxC = c;
+            });
+
+            if (!hasActiveNewDrag) {
+                clearTemporaryMarkers();
+                updateEdgeStyles();
+                return;
+            }
+
+            let matchedWord = null;
+            wordsData.forEach(word => {
+                if (foundWords.has(word)) return;
+                let loc = wordLocations[word];
+                if (!loc) return;
+
+                let matchNormal = (finalMinR === loc.startR && finalMaxR === loc.endR && finalMinC === loc.startC && finalMaxC === loc.endC);
+
+                if (matchNormal && dragType === loc.type) {
+                    matchedWord = word;
+                }
+            });
+
+            if (matchedWord) {
+                currentCells.forEach(cell => {
+                    if (dragType === 'h') cell.classList.add('h-locked-flag');
+                    else if (dragType === 'v') cell.classList.add('v-locked-flag');
+                });
+                markWordFound(matchedWord);
+            } else {
+                clearTemporaryMarkers();
+            }
+            updateEdgeStyles();
+        }
+
+        function clearTemporaryMarkers() {
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('active-h', 'active-v');
+            });
+        }
+
+        function updateEdgeStyles() {
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.classList.remove('h-start', 'h-end', 'v-start', 'v-end');
+                const r = parseInt(cell.dataset.r), c = parseInt(cell.dataset.c);
+                
+                if (cell.classList.contains('active-h') || cell.classList.contains('h-locked-flag')) {
+                    const prev = document.querySelector(`.cell[data-r="${r}"][data-c="${c-1}"]`);
+                    const next = document.querySelector(`.cell[data-r="${r}"][data-c="${c+1}"]`);
+                    const hasLeftMatch = prev && (prev.classList.contains('active-h') || prev.classList.contains('h-locked-flag'));
+                    const hasRightMatch = next && (next.classList.contains('active-h') || next.classList.contains('h-locked-flag'));
+                    
+                    if (!hasLeftMatch) cell.classList.add('h-start');
+                    if (!hasRightMatch) cell.classList.add('h-end');
+                }
+                
+                if (cell.classList.contains('active-v') || cell.classList.contains('v-locked-flag')) {
+                    const prev = document.querySelector(`.cell[data-r="${r-1}"][data-c="${c}"]`);
+                    const next = document.querySelector(`.cell[data-r="${r+1}"][data-c="${c}"]`);
+                    const hasTopMatch = prev && (prev.classList.contains('active-v') || prev.classList.contains('v-locked-flag'));
+                    const hasBottomMatch = next && (next.classList.contains('active-v') || next.classList.contains('v-locked-flag'));
+                    
+                    if (!hasTopMatch) cell.classList.add('v-start');
+                    if (!hasBottomMatch) cell.classList.add('v-end');
+                }
+            });
+        }
+
+        function markWordFound(word) {
+            foundWords.add(word);
+            const tag = document.getElementById('tag-' + word);
+            if (tag) tag.classList.add('found');
+            
+            speak(word);
+
+            if (foundWords.size === wordsData.length) {
+                document.getElementById('ws-congrats').style.display = 'block';
+                speak("Super Job! You Found All Words!");
+            }
+        }
+
+        /* --- Tabs --- */
+        function switchTab(tabNum) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+            document.getElementById(`tab${tabNum}`).classList.add('active');
+            document.getElementById(`page${tabNum}`).classList.add('active');
+
+            if (tabNum === 2 && foundWords.size === 0) {
+                setupWordSearch();
+            }
+        }
+
+        // 初期表示
+        loadSlide(0);
+        setupWordSearch();
+    </script>
+</body>
+</html>

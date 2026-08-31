@@ -27,7 +27,7 @@
             list-style: none;
             padding: 0;
             display: grid;
-            /* 基本を横3列に指定 */
+            /* カラム数を「3」に固定 */
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             max-width: 1000px;
@@ -36,10 +36,10 @@
         li a {
             display: block;
             padding: 15px 8px;
-            height: 100%; /* 高さを揃える */
+            height: 100%; /* 高さ揃え */
             background-color: #ffffff;
             border: 3px solid #ffcc00; /* 元気な黄色い枠線 */
-            border-radius: 15px; /* 角をさらに丸く */
+            border-radius: 15px; /* 角を丸く */
             text-decoration: none;
             color: #d35400; /* オレンジ系の文字色 */
             font-weight: bold;
@@ -55,15 +55,14 @@
             background-color: #fffdf0;
         }
 
-        /* 画面幅が狭いスマホ等（幅600px以下）での折り返し表示調整 */
+        /* スマホなど画面幅が狭い場合の表示崩れ防止 */
         @media (max-width: 600px) {
             ul {
-                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
                 gap: 10px;
             }
             li a {
                 font-size: 12px;
-                padding: 10px 5px;
+                padding: 10px 4px;
             }
         }
     </style>

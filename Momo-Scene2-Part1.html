@@ -862,19 +862,29 @@
         }
 
         function stopRecording() {
-            if (recordingTimer) clearTimeout(recordingTimer);
-            if (mediaRecorder && mediaRecorder.state === "recording") {
-                mediaRecorder.stop();
-            }
-            if (recognition) {
-                try { recognition.stop(); } catch(e){}
-            }
-            isRecording = false;
-            if (activeRecBtn) {
-                activeRecBtn.classList.remove("recording");
-                activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
-            }
-        }
+    if (recordingTimer) clearTimeout(recordingTimer);
+    
+    // 1. MediaRecorderの停止
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+    }
+    
+    // 2. 音声認識の停止
+    if (recognition) {
+        try { recognition.stop(); } catch(e){}
+    }
+
+    // ★ 3. スマホの通話モードを解除するため、マイクのトラック（Stream）を完全に停止・消去する
+    if (mediaRecorder && mediaRecorder.stream) {
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+
+    isRecording = false;
+    if (activeRecBtn) {
+        activeRecBtn.classList.remove("recording");
+        activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
+    }
+}
 
         function playTargetVoice() {
             speak(currentTargetText);

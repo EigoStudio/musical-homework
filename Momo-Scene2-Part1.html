@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Momo - Scene 2 - Part 1: Nino and Nico's Angry Clash</title>
-<script src="auth.js"></script>
+    <script src="auth.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* 基本スタイル */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             background-color: #f3f4f6;
             margin: 0;
@@ -24,12 +22,12 @@
             gap: 30px;
             align-items: center;
             font-family: 'Comic Neue', 'Zen Maru Gothic', sans-serif;
-            overflow-x: hidden; /* スマホでの横スクロール崩れを防止 */
+            overflow-x: hidden;
         }
 
         .slide-container {
             width: 100%;
-            max-width: 1280px; /* 横幅固定を解除し、最大幅に変更 */
+            max-width: 1280px;
             min-height: 720px;
             background-color: #fff3dd;
             border-radius: 24px;
@@ -49,31 +47,14 @@
             margin-bottom: 20px;
             border-bottom: 4px solid #e67e22;
             padding-bottom: 10px;
-            flex-wrap: wrap; /* スマホ用に折り返しを許可 */
+            flex-wrap: wrap;
             gap: 15px;
         }
-        .header-titles {
-            display: flex;
-            flex-direction: column;
-        }
-        .main-title {
-            font-size: 30px;
-            font-weight: 700;
-            color: #d35400;
-            margin: 0;
-        }
-        .sub-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #7f8c8d;
-            margin: 0;
-        }
+        .header-titles { display: flex; flex-direction: column; }
+        .main-title { font-size: 30px; font-weight: 700; color: #d35400; margin: 0; }
+        .sub-title { font-size: 18px; font-weight: 700; color: #7f8c8d; margin: 0; }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .story-btn {
             background: #9b59b6;
             color: white;
@@ -86,9 +67,7 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             box-shadow: 0 3px 0 #8e44ad;
             transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px;
         }
         .story-btn:hover { background: #8e44ad; }
         .story-btn:active { transform: translateY(3px); box-shadow: none; }
@@ -105,9 +84,7 @@
             font-family: 'Zen Maru Gothic', sans-serif;
             box-shadow: 0 3px 0 #27ae60;
             transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: flex; align-items: center; gap: 6px;
         }
         .print-btn:hover { background: #27ae60; }
         .print-btn:active { transform: translateY(3px); box-shadow: none; }
@@ -131,7 +108,7 @@
             gap: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.03);
             transition: transform 0.2s;
-            flex-wrap: wrap; /* 小さい画面で要素が潰れないように設定 */
+            flex-wrap: wrap;
         }
         .dialogue-box:hover {
             transform: translateY(-2px);
@@ -139,352 +116,153 @@
         }
 
         /* キャラクターアイコン */
-        .speaker-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 80px;
-        }
+        .speaker-info { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
         .icon-circle {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: white;
-            margin-bottom: 2px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: white; margin-bottom: 2px;
         }
-        .speaker-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #475569;
-        }
+        .speaker-name { font-size: 13px; font-weight: 700; color: #475569; }
 
-        /* アイコンの色分け */
         .icon-nino { background-color: #e67e22; }
         .icon-nico { background-color: #2980b9; }
         .icon-friends { background-color: #7f8c8d; }
         .icon-all { background-color: #c0392b; }
 
-        /* テキストエリア */
-        .text-group {
-            flex-grow: 1;
-            min-width: 200px;
-        }
-        .english-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 0;
-            line-height: 1.2;
-            word-break: break-word;
-        }
-        .japanese-text {
-            font-size: 17px;
-            color: #d35400;
-            margin-top: 4px;
-            display: none;
-            font-family: 'Zen Maru Gothic', sans-serif;
-            font-weight: 500;
-            word-break: break-word;
-        }
+        .text-group { flex-grow: 1; min-width: 200px; }
+        .english-text { font-size: 24px; font-weight: 700; color: #2c3e50; margin: 0; line-height: 1.2; word-break: break-word; }
+        .japanese-text { font-size: 17px; color: #d35400; margin-top: 4px; display: none; font-family: 'Zen Maru Gothic', sans-serif; font-weight: 500; word-break: break-word; }
 
         /* ボタンエリア */
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-        /* 音声再生ボタン */
         .audio-btn {
             background: #ff78ae;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 3px 0 #d64d8a;
-            transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: white; border: none;
+            padding: 8px 14px; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: bold;
+            box-shadow: 0 3px 0 #d64d8a; transition: all 0.1s;
+            display: flex; align-items: center; gap: 6px;
         }
         .audio-btn:hover { background: #e06194; }
         .audio-btn:active { transform: translateY(3px); box-shadow: none; }
 
-        /* 和訳ボタン */
+        .record-btn {
+            background: #e74c3c;
+            color: white; border: none;
+            padding: 8px 14px; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: bold;
+            box-shadow: 0 3px 0 #c0392b; transition: all 0.1s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .record-btn:hover { background: #ff5252; }
+        .record-btn:active { transform: translateY(3px); box-shadow: none; }
+        .record-btn.recording {
+            background: #2ecc71;
+            box-shadow: 0 3px 0 #27ae60;
+            animation: pulse-rec 1s infinite;
+        }
+
+        @keyframes pulse-rec {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         .trans-btn {
             background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
+            color: white; border: none;
+            padding: 8px 14px; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: bold;
             font-family: 'Zen Maru Gothic', sans-serif;
-            box-shadow: 0 3px 0 #2980b9;
-            transition: all 0.1s;
+            box-shadow: 0 3px 0 #2980b9; transition: all 0.1s;
         }
         .trans-btn:hover { background: #2980b9; }
         .trans-btn:active { transform: translateY(3px); box-shadow: none; }
 
-        /* ト書き（解説）スタイル */
         .stage-direction {
-            background: #edf2f7;
-            border-left: 6px solid #4a5568;
-            border-radius: 8px;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
+            background: #edf2f7; border-left: 6px solid #4a5568;
+            border-radius: 8px; padding: 10px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 10px;
         }
-        .stage-text {
-            font-style: italic;
-            font-size: 20px;
-            color: #4a5568;
-            margin: 0;
-            word-break: break-word;
-        }
+        .stage-text { font-style: italic; font-size: 20px; color: #4a5568; margin: 0; word-break: break-word; }
 
-        /* 歌詞スタイル */
         .lyrics-box {
-            background: #fff;
-            border: 3px dashed #e67e22;
-            border-radius: 20px;
-            padding: 15px 20px;
-            text-align: center;
-            margin-bottom: 5px;
+            background: #fff; border: 3px dashed #e67e22;
+            border-radius: 20px; padding: 15px 20px;
+            text-align: center; margin-bottom: 5px;
         }
-        .lyrics-line {
-            font-size: 24px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 4px;
-            word-break: break-word;
-        }
+        .lyrics-line { font-size: 24px; font-weight: 700; color: #2c3e50; margin-bottom: 4px; word-break: break-word; }
 
-        /* フッター・ページ番号 */
-        .footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-        .page-num {
-            font-size: 16px;
-            font-weight: bold;
-            color: #a0aec0;
-            background: #edf2f7;
-            padding: 3px 12px;
-            border-radius: 8px;
-        }
+        .footer { display: flex; justify-content: flex-end; margin-top: 15px; }
+        .page-num { font-size: 16px; font-weight: bold; color: #a0aec0; background: #edf2f7; padding: 3px 12px; border-radius: 8px; }
 
-        /* --- スマートフォン用調整 (レスポンシブ) --- */
-        @media screen and (max-width: 768px) {
-            .slide-container {
-                padding: 20px 15px;
-                min-height: auto;
-            }
-            .main-title {
-                font-size: 22px;
-            }
-            .sub-title {
-                font-size: 14px;
-            }
-            .english-text, .lyrics-line {
-                font-size: 18px;
-            }
-            .stage-text {
-                font-size: 16px;
-            }
-            .japanese-text {
-                font-size: 14px;
-            }
-            .dialogue-box {
-                padding: 10px;
-                gap: 10px;
-            }
-            .speaker-info {
-                min-width: 60px;
-            }
-            .icon-circle {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
-            }
-            .btn-group {
-                width: 100%;
-                justify-content: flex-end;
-                margin-top: 5px;
-            }
-        }
-
-        /* --- モーダル（解説ポップアップ） --- */
+        /* モーダル */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+            padding: 20px; backdrop-filter: blur(4px);
         }
         .modal-content {
-            background: #ffffff;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 800px;
-            padding: 30px 35px;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            border: 4px solid #9b59b6;
-            max-height: 85vh;
-            overflow-y: auto;
+            background: #ffffff; border-radius: 24px; width: 100%;
+            max-width: 800px; padding: 30px 35px; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 4px solid #9b59b6;
+            max-height: 85vh; overflow-y: auto;
         }
         .modal-close {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
+            position: absolute; top: 20px; right: 20px;
+            background: #e74c3c; color: white; border: none;
+            width: 36px; height: 36px; border-radius: 50%;
+            font-size: 18px; font-weight: bold; cursor: pointer;
             box-shadow: 0 3px 0 #c0392b;
         }
-        .modal-title {
-            font-size: 24px;
-            color: #8e44ad;
-            margin-bottom: 15px;
-            border-bottom: 2px dashed #9b59b6;
-            padding-bottom: 8px;
-        }
-        .story-section {
-            margin-bottom: 20px;
-        }
-        .story-section h3 {
-            font-size: 18px;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .story-section p {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
-        .point-card {
-            background: #f8f4fc;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            border-left: 5px solid #9b59b6;
-        }
+        .modal-title { font-size: 24px; color: #8e44ad; margin-bottom: 15px; border-bottom: 2px dashed #9b59b6; padding-bottom: 8px; }
+        .story-section { margin-bottom: 20px; }
+        .story-section h3 { font-size: 18px; color: #2c3e50; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .story-section p { font-size: 15px; line-height: 1.6; color: #4a5568; margin-bottom: 10px; }
+        .point-card { background: #f8f4fc; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; border-left: 5px solid #9b59b6; }
         .point-card.nino { border-left-color: #e67e22; background: #fff8f0; }
         .point-card.nico { border-left-color: #2980b9; background: #f0f8ff; }
         .point-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
         .point-title.nino { color: #d35400; }
         .point-title.nico { color: #2980b9; }
 
-        /* --- 印刷用エリア（画面上は非表示） --- */
-        #print-area {
-            display: none;
+        .rec-modal-card {
+            background: white; border-radius: 28px;
+            padding: 28px 20px 24px 20px; text-align: center;
+            max-width: 480px; width: 90%;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        @keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .rec-modal-target { font-size: 1.5rem; font-weight: 700; color: #d35400; margin-bottom: 20px; line-height: 1.3; }
+        .rec-modal-btns { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .modal-action-btn {
+            border: none; color: white; padding: 12px 20px;
+            border-radius: 50px; font-size: 1.1rem; font-family: inherit;
+            font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.1s;
+        }
+        .modal-action-btn:active { transform: translateY(2px); box-shadow: none; }
 
-        /* --- 印刷スタイル最適化 --- */
-        /* --- 印刷スタイル最適化（余白・サイズ調整で白紙ページを防止） --- */
-        /* --- 印刷スタイル最適化（印刷ダイアログのスケール変更を有効化） --- */
+        #print-area { display: none; }
         @media print {
-            @page {
-                margin: 10mm 12mm; /* size指定を削除してブラウザの倍率変更を復活 */
-            }
-
-            /* 1. 画面用の要素（スライドやモーダルなど）を完全に存在ごと消す */
-            body > *:not(#print-area) {
-                display: none !important;
-            }
-
-            body {
-                background: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-            }
-
-            /* 2. 印刷用エリアだけを表示 */
-            #print-area {
-                display: block !important;
-                position: static !important;
-                width: 100% !important;
-                color: #000;
-                background: #fff;
-                padding: 0;
-                font-family: 'Zen Maru Gothic', sans-serif;
-            }
-
-            .print-page-title {
-                font-size: 18px;
-                font-weight: bold;
-                margin-bottom: 8px;
-                border-bottom: 2px solid #000;
-                padding-bottom: 4px;
-            }
-            .print-section {
-                margin-bottom: 10px;
-            }
-            .print-section-title {
-                font-size: 14px;
-                font-weight: bold;
-                background: #eee;
-                padding: 3px 6px;
-                margin-bottom: 6px;
-                border-radius: 4px;
-            }
-            .print-story-box {
-                font-size: 11px;
-                line-height: 1.4;
-                color: #222;
-                background: #f9f9f9;
-                padding: 8px 10px;
-                border-radius: 6px;
-                border: 1px solid #ddd;
-                margin-bottom: 8px;
-            }
-            .print-story-box p {
-                margin-bottom: 4px;
-            }
-            .print-dialogue {
-                margin-bottom: 6px;
-                font-size: 12px;
-                line-height: 1.3;
-                page-break-inside: avoid;
-            }
-            .print-speaker {
-                font-weight: bold;
-                color: #111;
-            }
-            .print-en {
-                font-weight: bold;
-                font-size: 13px;
-            }
-            .print-jp {
-                color: #444;
-                font-size: 11px;
-                margin-left: 6px;
-            }
+            @page { margin: 10mm 12mm; }
+            body > *:not(#print-area) { display: none !important; }
+            body { background: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+            #print-area { display: block !important; position: static !important; width: 100% !important; color: #000; background: #fff; padding: 0; font-family: 'Zen Maru Gothic', sans-serif; }
+            .print-page-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; border-bottom: 2px solid #000; padding-bottom: 4px; }
+            .print-section { margin-bottom: 10px; }
+            .print-section-title { font-size: 14px; font-weight: bold; background: #eee; padding: 3px 6px; margin-bottom: 6px; border-radius: 4px; }
+            .print-story-box { font-size: 11px; line-height: 1.4; color: #222; background: #f9f9f9; padding: 8px 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 8px; }
+            .print-story-box p { margin-bottom: 4px; }
+            .print-dialogue { margin-bottom: 6px; font-size: 12px; line-height: 1.3; page-break-inside: avoid; }
+            .print-speaker { font-weight: bold; color: #111; }
+            .print-en { font-weight: bold; font-size: 13px; }
+            .print-jp { color: #444; font-size: 11px; margin-left: 6px; }
         }
     </style>
 </head>
@@ -513,7 +291,8 @@
                     <p class="japanese-text" id="jp1">お前はペテン師で泥棒だ！俺の金を返せ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('You are a cheater and a thief! Give me back my money!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('You are a cheater and a thief! Give me back my money!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('You are a cheater and a thief! Give me back my money!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp1')">和訳</button>
                 </div>
             </div>
@@ -528,7 +307,8 @@
                     <p class="japanese-text" id="jp2">そうだ！返せ、この泥棒！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Yeah! Give it back, you thief!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Yeah! Give it back, you thief!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Yeah! Give it back, you thief!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp2')">和訳</button>
                 </div>
             </div>
@@ -543,7 +323,8 @@
                     <p class="japanese-text" id="jp3">泥棒だって？黙れ！絵の代金は払ったぞ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Thief? Shut up! I paid for the picture!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Thief? Shut up! I paid for the picture!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Thief? Shut up! I paid for the picture!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp3')">和訳</button>
                 </div>
             </div>
@@ -558,7 +339,8 @@
                     <p class="japanese-text" id="jp4">彼はその絵を正々堂々と買ったんだ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('He bought that picture fair and square!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('He bought that picture fair and square!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('He bought that picture fair and square!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp4')">和訳</button>
                 </div>
             </div>
@@ -592,7 +374,8 @@
                     <p class="japanese-text" id="jp5">隠された小切手のことを知っていたんだろう！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('You knew about the hidden check!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('You knew about the hidden check!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('You knew about the hidden check!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp5')">和訳</button>
                 </div>
             </div>
@@ -607,7 +390,8 @@
                     <p class="japanese-text" id="jp6">嘘をついたな！この欲張りブタめ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('You lied to him! You greedy pig!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('You lied to him! You greedy pig!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('You lied to him! You greedy pig!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp6')">和訳</button>
                 </div>
             </div>
@@ -622,7 +406,8 @@
                     <p class="japanese-text" id="jp7">欲張りブタだと！？自分のことを棚に上げやがって！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Greedy pig?! Look who is talking!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Greedy pig?! Look who is talking!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Greedy pig?! Look who is talking!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp7')">和訳</button>
                 </div>
             </div>
@@ -637,7 +422,8 @@
                     <p class="japanese-text" id="jp8">見苦しい負け犬！お前のことだよ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('A sore sore loser! That is what you are!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('A sore sore loser! That is what you are!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('A sore sore loser! That is what you are!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp8')">和訳</button>
                 </div>
             </div>
@@ -671,7 +457,8 @@
                     <p class="japanese-text" id="jp9">何て言った！？絶対に許さないぞ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('What did you call me?! I will never forgive you!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('What did you call me?! I will never forgive you!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('What did you call me?! I will never forgive you!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp9')">和訳</button>
                 </div>
             </div>
@@ -686,7 +473,8 @@
                     <p class="japanese-text" id="jp10">あぁ、勝手にしろ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Fine! Whatever!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Fine! Whatever!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Fine! Whatever!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp10')">和訳</button>
                 </div>
             </div>
@@ -701,7 +489,8 @@
                     <p class="japanese-text" id="jp11">消え失せろ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Get out of our face!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Get out of our face!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Get out of our face!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp11')">和訳</button>
                 </div>
             </div>
@@ -712,7 +501,8 @@
                     <p class="japanese-text" id="jp12">［モモが争いの渦中に引きずり込まれる。］</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Momo is dragged into the middle of the clash.')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Momo is dragged into the middle of the clash.')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Momo is dragged into the middle of the clash.', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp12')">和訳</button>
                 </div>
             </div>
@@ -749,7 +539,8 @@
                     複雑に絡まり合った結び目は、もう解けない！
                 </p>
                 <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                    <button class="audio-btn" onclick="speakWithPauses('Shout, shout! Spitting fire! Anger rising, higher and higher! Spiky words! Sharp and hot! Tangled up in a heavy knot!')"><i class="fa-solid fa-volume-high"></i> 🔊 歌の読み上げ</button>
+                    <button class="audio-btn" onclick="speak('Shout, shout! Spitting fire! Anger rising, higher and higher! Spiky words! Sharp and hot! Tangled up in a heavy knot!')"><i class="fa-solid fa-volume-high"></i> 🔊 歌の読み上げ</button>
+                    <button class="record-btn" onclick="toggleRecording('Shout, shout! Spitting fire! Anger rising, higher and higher! Spiky words! Sharp and hot! Tangled up in a heavy knot!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp-song')">歌詞の和訳</button>
                 </div>
             </div>
@@ -764,7 +555,8 @@
                     <p class="japanese-text" id="jp13">何か言ってよ、モモ！</p>
                 </div>
                 <div class="btn-group">
-                    <button class="audio-btn" onclick="speakWithPauses('Say something, Momo!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="audio-btn" onclick="speak('Say something, Momo!')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecording('Say something, Momo!', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
                     <button class="trans-btn" onclick="toggleJp('jp13')">和訳</button>
                 </div>
             </div>
@@ -775,6 +567,7 @@
         </div>
     </div>
 
+    <!-- 解説用モーダル -->
     <div class="modal-overlay" id="storyModal" onclick="closeStoryModal(event)">
         <div class="modal-content">
             <button class="modal-close" onclick="closeStoryModalDirect()">✕</button>
@@ -804,6 +597,25 @@
         </div>
     </div>
 
+    <!-- 録音聞き比べモーダル -->
+    <div class="modal-overlay" id="recModal">
+        <div class="rec-modal-card">
+            <div class="rec-modal-target" id="recTargetText">Target Phrase</div>
+            <div class="rec-modal-btns">
+                <button class="modal-action-btn" style="background: #9b59b6;" onclick="playTargetVoice()">
+                    <i class="fa-solid fa-play"></i> ▶️ お手本
+                </button>
+                <button class="modal-action-btn" style="background: #3498db;" onclick="playRecordedAudio()">
+                    <i class="fa-solid fa-headphones"></i> 🎧 じぶんの声
+                </button>
+                <button class="modal-action-btn" style="background: #2ecc71;" onclick="closeRecModal()">
+                    <i class="fa-solid fa-check"></i> OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 印刷エリア -->
     <div id="print-area">
         <div class="print-page-title">Momo - Scene 2 - Part 1: Nino and Nico's Angry Clash </div>
         
@@ -851,8 +663,10 @@
         </div>
     </div>
 
+    <audio id="user-audio-player" style="display:none;"></audio>
+
     <script>
-        // モーダル表示/非表示
+        // モーダル制御
         function openStoryModal() {
             document.getElementById('storyModal').style.display = 'flex';
         }
@@ -865,7 +679,6 @@
             }
         }
 
-        // 和訳ボタンの表示切り替え
         function toggleJp(id) {
             const el = document.getElementById(id);
             if (el.style.display === "block") {
@@ -875,18 +688,24 @@
             }
         }
 
-        // 音声読み上げ機能
+        /* --- 音声読み上げ機能（若いアメリカ人女性・スピード0.55） --- */
         let preferredVoice = null;
-        let currentSpeechId = 0; // 途中キャンセル検知用
 
         function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
             const voices = window.speechSynthesis.getVoices();
             if (voices.length === 0) return;
+
+            const usVoices = voices.filter(v => v.lang === "en-US" || v.lang === "en_US");
             preferredVoice = 
-                voices.find(v => v.lang === "en-US" && v.name.includes("Google US English")) ||
-                voices.find(v => v.lang === "en-US" && v.name.includes("Samantha")) ||
-                voices.find(v => v.lang.startsWith("en-US")) ||
-                voices.find(v => v.lang.startsWith("en"));
+                usVoices.find(v => v.name.includes("Ava")) ||
+                usVoices.find(v => v.name.includes("Ana")) ||
+                usVoices.find(v => v.name.includes("Jenny")) ||
+                usVoices.find(v => v.name.includes("Google US English")) ||
+                usVoices.find(v => v.name.includes("Samantha")) ||
+                usVoices.find(v => v.name.includes("Aria")) ||
+                usVoices.find(v => v.name.includes("Female")) ||
+                usVoices[0];
         }
 
         if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -894,47 +713,182 @@
             loadVoices();
         }
 
-        // 単一フレーズを再生するPromise関数
-        function playSinglePhrase(phrase) {
-            return new Promise(resolve => {
-                let cleaned = phrase.replace(/["'“]/g, "");
-                if (!cleaned.trim()) {
-                    resolve();
-                    return;
-                }
-                
-                const uttr = new SpeechSynthesisUtterance(cleaned);
-                if (preferredVoice) uttr.voice = preferredVoice;
-                uttr.rate = 0.65; // スピード0.65
-                uttr.pitch = 1.1; // 明るいトーン
-                uttr.onend = () => resolve();
-                uttr.onerror = () => resolve();
-                window.speechSynthesis.speak(uttr);
-            });
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+
+            const uttr = new SpeechSynthesisUtterance(text);
+            if (preferredVoice) uttr.voice = preferredVoice;
+            uttr.lang = 'en-US';
+            uttr.rate = 0.55;
+            uttr.pitch = 1.0;
+            window.speechSynthesis.speak(uttr);
         }
 
-        // 文節（!や?や.）ごとに分解して、間（ポーズ）を入れて順番に読む関数
-        async function speakWithPauses(text) {
-            window.speechSynthesis.cancel(); // 進行中の読み上げをストップ
+        /* --- 判定アルゴリズム (長文対応・厳格チェック) --- */
+        function normalizeText(text) {
+            return text.toLowerCase()
+                       .replace(/['’]/g, "")           
+                       .replace(/[^a-z0-9\s]/g, "")    
+                       .trim();
+        }
+
+        function getSimilarity(str1, str2) {
+            const s1 = normalizeText(str1);
+            const s2 = normalizeText(str2);
             
-            const mySpeechId = ++currentSpeechId;
+            if (s1 === s2) return 1.0;
+            if (!s1 || !s2) return 0.0;
 
-            // ! ? . などの記号で分割
-            const phrases = text.match(/[^.!?]+[.!?]+/g) || [text];
+            const len1 = s1.length;
+            const len2 = s2.length;
+            const matrix = Array.from({ length: len1 + 1 }, () => Array(len2 + 1).fill(0));
 
-            for (let i = 0; i < phrases.length; i++) {
-                if (mySpeechId !== currentSpeechId) break; // 途中で別のボタンが押されたら中断
-                
-                let phrase = phrases[i].trim();
-                if (phrase.length === 0) continue;
+            for (let i = 0; i <= len1; i++) matrix[i][0] = i;
+            for (let j = 0; j <= len2; j++) matrix[0][j] = j;
 
-                await playSinglePhrase(phrase);
-
-                if (mySpeechId !== currentSpeechId) break;
-
-                // 文の区切り（! ? .）のあとに 500ミリ秒（0.5秒）の間を入れる
-                await new Promise(resolve => setTimeout(resolve, 500));
+            for (let i = 1; i <= len1; i++) {
+                for (let j = 1; j <= len2; j++) {
+                    const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j - 1] + cost
+                    );
+                }
             }
+
+            const distance = matrix[len1][len2];
+            const maxLength = Math.max(len1, len2);
+            return 1 - distance / maxLength;
+        }
+
+        /* --- レコーディング & 音声認識機能（長文対応・途切れ防止） --- */
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioUrl = null;
+        let isRecording = false;
+        let recordingTimer = null;
+        let recognition = null;
+        let activeRecBtn = null;
+        let currentTargetText = "";
+        let recognizedSpeechText = "";
+
+        async function toggleRecording(targetText, btnEl) {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                currentTargetText = targetText;
+                activeRecBtn = btnEl;
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                recognizedSpeechText = "";
+                
+                let mimeType = '';
+                if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+                else if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
+
+                const options = mimeType ? { mimeType } : {};
+                mediaRecorder = new MediaRecorder(stream, options);
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
+                    recordedAudioUrl = URL.createObjectURL(blob);
+                    document.getElementById("user-audio-player").src = recordedAudioUrl;
+
+                    // 録音終了時に認識結果の判定を実施
+                    if (recognizedSpeechText) {
+                        const similarity = getSimilarity(recognizedSpeechText, currentTargetText);
+                        
+                        // 長文でもしっかり比較（82%以上の一致率で合格）
+                        if (similarity >= 0.82) {
+                            document.getElementById("recTargetText").textContent = currentTargetText;
+                            document.getElementById("recModal").style.display = "flex";
+                        } else {
+                            alert(`Try Again! 🎤\n\nあなたの発音: "${recognizedSpeechText}"\n正解台詞: "${currentTargetText}"`);
+                            speak("Try again!");
+                        }
+                    } else {
+                        alert("音声がうまく聞き取れませんでした。もう一度お試しください。");
+                    }
+                };
+
+                // 音声認識（長文・息継ぎ対応）
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    recognition = new SpeechRecognition();
+                    recognition.lang = 'en-US';
+                    recognition.interimResults = false;
+                    recognition.continuous = true; // 息継ぎで途切れないように連続認識を有効化
+
+                    recognition.onresult = (event) => {
+                        let fullText = "";
+                        for (let i = 0; i < event.results.length; i++) {
+                            fullText += event.results[i][0].transcript + " ";
+                        }
+                        recognizedSpeechText = fullText.trim();
+                    };
+                    recognition.start();
+                }
+
+                mediaRecorder.start(100);
+                isRecording = true;
+
+                if (activeRecBtn) {
+                    activeRecBtn.classList.add("recording");
+                    activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Recording...';
+                }
+
+                // 文字数に応じた可変タイマー（長文でも途切れないよう最長12秒に拡張）
+                const autoStopDelay = Math.max(5000, Math.min(12000, currentTargetText.length * 150));
+                recordingTimer = setTimeout(() => {
+                    if (isRecording) stopRecording();
+                }, autoStopDelay);
+
+            } catch (err) {
+                alert("マイクの使用が許可されていないか、対応していないブラウザです。");
+                console.error("録音エラー:", err);
+            }
+        }
+
+        function stopRecording() {
+            if (recordingTimer) clearTimeout(recordingTimer);
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+            if (recognition) {
+                try { recognition.stop(); } catch(e){}
+            }
+            isRecording = false;
+            if (activeRecBtn) {
+                activeRecBtn.classList.remove("recording");
+                activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
+            }
+        }
+
+        function playTargetVoice() {
+            speak(currentTargetText);
+        }
+
+        function playRecordedAudio() {
+            const player = document.getElementById("user-audio-player");
+            if (!player.src) return;
+            player.currentTime = 0;
+            player.play().catch(e => console.error("再生エラー:", e));
+        }
+
+        function closeRecModal() {
+            document.getElementById("recModal").style.display = "none";
         }
     </script>
 </body>

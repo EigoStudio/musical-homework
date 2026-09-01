@@ -763,7 +763,7 @@
             return 1 - distance / maxLength;
         }
 
-        /* --- レコーディング & 音声認識機能（スマホ2回目以降のフリーズ対策版） --- */
+        /* --- スマホ（iOS Safari）完全対応版レコーディング＆判定ロジック --- */
 let mediaRecorder = null;
 let audioChunks = [];
 let recordedAudioUrl = null;
@@ -772,7 +772,6 @@ let recordingTimer = null;
 let recognition = null;
 let activeRecBtn = null;
 let currentTargetText = "";
-let recognizedSpeechText = "";
 
 async function toggleRecording(targetText, btnEl) {
     if (isRecording) {
@@ -786,15 +785,9 @@ async function toggleRecording(targetText, btnEl) {
 
 async function startRecording() {
     try {
-        // 1. 前回の残骸があれば完全にリセット・破棄する
-        if (recognition) {
-            try { recognition.abort(); } catch(e){}
-            recognition = null;
-        }
-
+        // マイクストリームを取得
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioChunks = [];
-        recognizedSpeechText = "";
         
         let mimeType = '';
         if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
@@ -807,53 +800,18 @@ async function startRecording() {
             if (e.data.size > 0) audioChunks.push(e.data);
         };
 
+        // 録音が停止した時の処理
         mediaRecorder.onstop = () => {
-            // 録音トラックを終了してマイクを解放
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            // 1. マイクのトラックを即座に完全停止してiPhoneの「通話モード」を解除
+            stream.getTracks().forEach(track => track.stop());
 
             const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
             recordedAudioUrl = URL.createObjectURL(blob);
             document.getElementById("user-audio-player").src = recordedAudioUrl;
 
-            // 認識結果の判定
-            if (recognizedSpeechText && recognizedSpeechText.trim() !== "") {
-                const similarity = getSimilarity(recognizedSpeechText, currentTargetText);
-                
-                if (similarity >= 0.82) {
-                    document.getElementById("recTargetText").textContent = currentTargetText;
-                    document.getElementById("recModal").style.display = "flex";
-                } else {
-                    alert(`Try Again! 🎤\n\nあなたの発音: "${recognizedSpeechText}"\n正解台詞: "${currentTargetText}"`);
-                    speak("Try again!");
-                }
-            } else {
-                alert("Try Again! 🎤\n(声が聞き取れませんでした。もう一度短くはっきりと話してみてください)");
-                speak("Try again!");
-            }
+            // 2. 録音完了後に音声認識を単体で起動（同時起動の競合を回避）
+            processSpeechRecognition();
         };
-
-        // 2. 音声認識（毎回ゼロから新規作成することでスマホのフリーズを回避）
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.continuous = false; // スマホでの誤作動を防ぐため単発認識モードに変更
-
-            recognition.onresult = (event) => {
-                if (event.results && event.results[0]) {
-                    recognizedSpeechText = event.results[0][0].transcript;
-                }
-            };
-
-            recognition.onerror = (e) => {
-                console.log("SpeechRec Error:", e.error);
-            };
-
-            recognition.start();
-        }
 
         mediaRecorder.start(100);
         isRecording = true;
@@ -863,7 +821,7 @@ async function startRecording() {
             activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Recording...';
         }
 
-        // 制限時間（最長10秒）
+        // 台詞の長さに応じた自動ストップタイマー（5〜10秒）
         const autoStopDelay = Math.max(5000, Math.min(10000, currentTargetText.length * 150));
         recordingTimer = setTimeout(() => {
             if (isRecording) stopRecording();
@@ -879,16 +837,62 @@ function stopRecording() {
     if (recordingTimer) clearTimeout(recordingTimer);
     
     if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-    }
-    if (recognition) {
-        try { recognition.stop(); } catch(e){}
+        mediaRecorder.stop(); // これにより onstop が呼ばれ、マイク解放と判定処理へ移行します
     }
     
     isRecording = false;
     if (activeRecBtn) {
         activeRecBtn.classList.remove("recording");
         activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
+    }
+}
+
+// 録音終了後に単体で音声認識を走らせる処理
+function processSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        // 音声認識非対応ブラウザの場合は聞き比べモーダルを直接出す
+        document.getElementById("recTargetText").textContent = currentTargetText;
+        document.getElementById("recModal").style.display = "flex";
+        return;
+    }
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+
+    let recognizedText = "";
+
+    rec.onresult = (event) => {
+        if (event.results && event.results[0]) {
+            recognizedText = event.results[0][0].transcript;
+        }
+    };
+
+    rec.onerror = (e) => {
+        console.log("Speech Error:", e.error);
+    };
+
+    rec.onend = () => {
+        if (recognizedText && recognizedText.trim() !== "") {
+            const similarity = getSimilarity(recognizedText, currentTargetText);
+            if (similarity >= 0.80) { // スマホ用に判定基準を80%に微調整
+                document.getElementById("recTargetText").textContent = currentTargetText;
+                document.getElementById("recModal").style.display = "flex";
+            } else {
+                alert(`Try Again! 🎤\n\n認識された声: "${recognizedText}"\n正解の台詞: "${currentTargetText}"`);
+                speak("Try again!");
+            }
+        } else {
+            alert("Try Again! 🎤\n(声が聞き取れませんでした。もう一度はっきり話してみてください)");
+            speak("Try again!");
+        }
+    };
+
+    try {
+        rec.start();
+    } catch(e) {
+        console.error("Recognition start error:", e);
     }
 }
 

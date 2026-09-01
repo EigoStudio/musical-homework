@@ -57,16 +57,11 @@
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .story-btn {
             background: #9b59b6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
+            color: white; border: none;
+            padding: 8px 16px; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: bold;
             font-family: 'Zen Maru Gothic', sans-serif;
-            box-shadow: 0 3px 0 #8e44ad;
-            transition: all 0.1s;
+            box-shadow: 0 3px 0 #8e44ad; transition: all 0.1s;
             display: flex; align-items: center; gap: 6px;
         }
         .story-btn:hover { background: #8e44ad; }
@@ -74,16 +69,11 @@
 
         .print-btn {
             background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: bold;
+            color: white; border: none;
+            padding: 8px 16px; border-radius: 12px;
+            cursor: pointer; font-size: 15px; font-weight: bold;
             font-family: 'Zen Maru Gothic', sans-serif;
-            box-shadow: 0 3px 0 #27ae60;
-            transition: all 0.1s;
+            box-shadow: 0 3px 0 #27ae60; transition: all 0.1s;
             display: flex; align-items: center; gap: 6px;
         }
         .print-btn:hover { background: #27ae60; }
@@ -725,176 +715,87 @@
             window.speechSynthesis.speak(uttr);
         }
 
-        /* --- 判定アルゴリズム (長文対応・厳格チェック) --- */
-        function normalizeText(text) {
-            return text.toLowerCase()
-                       .replace(/['’]/g, "")           
-                       .replace(/[^a-z0-9\s]/g, "")    
-                       .trim();
-        }
+        /* --- 即時録音＆聞き比べ機能（正誤判定なし・爆速動作仕様） --- */
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioUrl = null;
+        let isRecording = false;
+        let recordingTimer = null;
+        let activeRecBtn = null;
+        let currentTargetText = "";
 
-        function getSimilarity(str1, str2) {
-            const s1 = normalizeText(str1);
-            const s2 = normalizeText(str2);
-            
-            if (s1 === s2) return 1.0;
-            if (!s1 || !s2) return 0.0;
-
-            const len1 = s1.length;
-            const len2 = s2.length;
-            const matrix = Array.from({ length: len1 + 1 }, () => Array(len2 + 1).fill(0));
-
-            for (let i = 0; i <= len1; i++) matrix[i][0] = i;
-            for (let j = 0; j <= len2; j++) matrix[0][j] = j;
-
-            for (let i = 1; i <= len1; i++) {
-                for (let j = 1; j <= len2; j++) {
-                    const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j - 1] + cost
-                    );
-                }
-            }
-
-            const distance = matrix[len1][len2];
-            const maxLength = Math.max(len1, len2);
-            return 1 - distance / maxLength;
-        }
-
-        /* --- スマホ（iOS Safari）完全対応版レコーディング＆判定ロジック --- */
-let mediaRecorder = null;
-let audioChunks = [];
-let recordedAudioUrl = null;
-let isRecording = false;
-let recordingTimer = null;
-let recognition = null;
-let activeRecBtn = null;
-let currentTargetText = "";
-
-async function toggleRecording(targetText, btnEl) {
-    if (isRecording) {
-        stopRecording();
-    } else {
-        currentTargetText = targetText;
-        activeRecBtn = btnEl;
-        await startRecording();
-    }
-}
-
-async function startRecording() {
-    try {
-        // マイクストリームを取得
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioChunks = [];
-        
-        let mimeType = '';
-        if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
-        else if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
-
-        const options = mimeType ? { mimeType } : {};
-        mediaRecorder = new MediaRecorder(stream, options);
-
-        mediaRecorder.ondataavailable = e => {
-            if (e.data.size > 0) audioChunks.push(e.data);
-        };
-
-        // 録音が停止した時の処理
-        mediaRecorder.onstop = () => {
-            // 1. マイクのトラックを即座に完全停止してiPhoneの「通話モード」を解除
-            stream.getTracks().forEach(track => track.stop());
-
-            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
-            recordedAudioUrl = URL.createObjectURL(blob);
-            document.getElementById("user-audio-player").src = recordedAudioUrl;
-
-            // 2. 録音完了後に音声認識を単体で起動（同時起動の競合を回避）
-            processSpeechRecognition();
-        };
-
-        mediaRecorder.start(100);
-        isRecording = true;
-
-        if (activeRecBtn) {
-            activeRecBtn.classList.add("recording");
-            activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Recording...';
-        }
-
-        // 台詞の長さに応じた自動ストップタイマー（5〜10秒）
-        const autoStopDelay = Math.max(5000, Math.min(10000, currentTargetText.length * 150));
-        recordingTimer = setTimeout(() => {
-            if (isRecording) stopRecording();
-        }, autoStopDelay);
-
-    } catch (err) {
-        alert("マイクの使用が許可されていないか、エラーが発生しました。");
-        console.error("録音エラー:", err);
-    }
-}
-
-function stopRecording() {
-    if (recordingTimer) clearTimeout(recordingTimer);
-    
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop(); // これにより onstop が呼ばれ、マイク解放と判定処理へ移行します
-    }
-    
-    isRecording = false;
-    if (activeRecBtn) {
-        activeRecBtn.classList.remove("recording");
-        activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
-    }
-}
-
-// 録音終了後に単体で音声認識を走らせる処理
-function processSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        // 音声認識非対応ブラウザの場合は聞き比べモーダルを直接出す
-        document.getElementById("recTargetText").textContent = currentTargetText;
-        document.getElementById("recModal").style.display = "flex";
-        return;
-    }
-
-    const rec = new SpeechRecognition();
-    rec.lang = 'en-US';
-    rec.interimResults = false;
-
-    let recognizedText = "";
-
-    rec.onresult = (event) => {
-        if (event.results && event.results[0]) {
-            recognizedText = event.results[0][0].transcript;
-        }
-    };
-
-    rec.onerror = (e) => {
-        console.log("Speech Error:", e.error);
-    };
-
-    rec.onend = () => {
-        if (recognizedText && recognizedText.trim() !== "") {
-            const similarity = getSimilarity(recognizedText, currentTargetText);
-            if (similarity >= 0.80) { // スマホ用に判定基準を80%に微調整
-                document.getElementById("recTargetText").textContent = currentTargetText;
-                document.getElementById("recModal").style.display = "flex";
+        async function toggleRecording(targetText, btnEl) {
+            if (isRecording) {
+                stopRecording();
             } else {
-                alert(`Try Again! 🎤\n\n認識された声: "${recognizedText}"\n正解の台詞: "${currentTargetText}"`);
-                speak("Try again!");
+                currentTargetText = targetText;
+                activeRecBtn = btnEl;
+                await startRecording();
             }
-        } else {
-            alert("Try Again! 🎤\n(声が聞き取れませんでした。もう一度はっきり話してみてください)");
-            speak("Try again!");
         }
-    };
 
-    try {
-        rec.start();
-    } catch(e) {
-        console.error("Recognition start error:", e);
-    }
-}
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                
+                let mimeType = '';
+                if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+                else if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
+
+                const options = mimeType ? { mimeType } : {};
+                mediaRecorder = new MediaRecorder(stream, options);
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                // 録音終了時に待ち時間0秒で即座にポップアップ表示
+                mediaRecorder.onstop = () => {
+                    // マイクを完全に解放してスマホの音量低下を防止
+                    stream.getTracks().forEach(track => track.stop());
+
+                    const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
+                    recordedAudioUrl = URL.createObjectURL(blob);
+                    document.getElementById("user-audio-player").src = recordedAudioUrl;
+
+                    // ポップアップを開く
+                    document.getElementById("recTargetText").textContent = currentTargetText;
+                    document.getElementById("recModal").style.display = "flex";
+                };
+
+                mediaRecorder.start(100);
+                isRecording = true;
+
+                if (activeRecBtn) {
+                    activeRecBtn.classList.add("recording");
+                    activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Recording...';
+                }
+
+                // 長めのセリフでも切れないように6秒間録音（もう一度ボタンを押せば途中停止可能）
+                const autoStopDelay = Math.max(4000, Math.min(8000, currentTargetText.length * 100));
+                recordingTimer = setTimeout(() => {
+                    if (isRecording) stopRecording();
+                }, autoStopDelay);
+
+            } catch (err) {
+                alert("マイクの使用が許可されていないか、エラーが発生しました。");
+                console.error("録音エラー:", err);
+            }
+        }
+
+        function stopRecording() {
+            if (recordingTimer) clearTimeout(recordingTimer);
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+            }
+            
+            isRecording = false;
+            if (activeRecBtn) {
+                activeRecBtn.classList.remove("recording");
+                activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
+            }
+        }
 
         function playTargetVoice() {
             speak(currentTargetText);

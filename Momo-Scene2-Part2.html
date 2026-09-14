@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momo - Scene 2 - Part 2: Listening and Making Peace</title>
+    <script src="auth.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            font-family: 'Comic Neue', 'Zen Maru Gothic', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            width: 100%;
+            max-width: 1280px;
+            min-height: 720px;
+            background-color: #fff3dd;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 50px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #e67e22;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-titles { display: flex; flex-direction: column; }
+        .main-title { font-size: 30px; font-weight: 700; color: #d35400; margin: 0; }
+        .sub-title { font-size: 18px; font-weight: 700; color: #7f8c8d; margin: 0; }
+
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .story-btn {
+            background: #9b59b6; color: white; border: none;
+            padding: 8px 16px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: bold; font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 3px 0 #8e44ad; transition: all 0.1s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .story-btn:hover { background: #8e44ad; }
+        .story-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .print-btn {
+            background: #2ecc71; color: white; border: none;
+            padding: 8px 16px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: bold; font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 3px 0 #27ae60; transition: all 0.1s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .print-btn:hover { background: #27ae60; }
+        .print-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .content-area {
+            flex-grow: 1; display: flex; flex-direction: column;
+            justify-content: space-around; gap: 12px;
+        }
+
+        .dialogue-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #e2e8f0; border-radius: 18px;
+            padding: 10px 20px; display: flex; align-items: center;
+            gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            transition: transform 0.2s; flex-wrap: wrap;
+        }
+        .dialogue-box:hover { transform: translateY(-2px); border-color: #f39c12; }
+
+        .speaker-info { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
+        .icon-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: white; margin-bottom: 2px;
+        }
+        .speaker-name { font-size: 13px; font-weight: 700; color: #475569; }
+
+        .icon-nino { background-color: #e67e22; }
+        .icon-nico { background-color: #2980b9; }
+        .icon-momo { background-color: #9b59b6; }
+        .icon-all { background-color: #c0392b; }
+
+        .text-group { flex-grow: 1; min-width: 200px; }
+        .english-text { font-size: 24px; font-weight: 700; color: #2c3e50; margin: 0; line-height: 1.2; word-break: break-word; }
+        .japanese-text { font-size: 17px; color: #d35400; margin-top: 4px; display: none; font-family: 'Zen Maru Gothic', sans-serif; font-weight: 500; word-break: break-word; }
+
+        .btn-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+        .audio-btn {
+            background: #ff78ae; color: white; border: none;
+            padding: 8px 14px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: bold; box-shadow: 0 3px 0 #d64d8a;
+            transition: all 0.1s; display: flex; align-items: center; gap: 6px;
+        }
+        .audio-btn:hover { background: #e06194; }
+        .audio-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .record-btn {
+            background: #e74c3c; color: white; border: none;
+            padding: 8px 14px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: bold; box-shadow: 0 3px 0 #c0392b;
+            transition: all 0.1s; display: flex; align-items: center; gap: 6px;
+        }
+        .record-btn:hover { background: #ff5252; }
+        .record-btn:active { transform: translateY(3px); box-shadow: none; }
+        .record-btn.recording {
+            background: #2ecc71; box-shadow: 0 3px 0 #27ae60;
+            animation: pulse-rec 1s infinite;
+        }
+
+        @keyframes pulse-rec { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .trans-btn {
+            background: #3498db; color: white; border: none;
+            padding: 8px 14px; border-radius: 12px; cursor: pointer;
+            font-size: 15px; font-weight: bold; font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 3px 0 #2980b9; transition: all 0.1s;
+        }
+        .trans-btn:hover { background: #2980b9; }
+        .trans-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .lyrics-box {
+            background: #fff; border: 3px dashed #2ecc71;
+            border-radius: 20px; padding: 20px 25px;
+            text-align: center; margin-bottom: 5px;
+        }
+        .lyrics-section {
+            padding: 12px; border-radius: 14px;
+            background: #fdfbf7; margin-bottom: 12px;
+            border: 1px solid #fae1c3;
+        }
+        .lyrics-line { font-size: 24px; font-weight: 700; color: #2c3e50; margin-bottom: 6px; word-break: break-word; }
+
+        .footer { display: flex; justify-content: flex-end; margin-top: 15px; }
+        .page-num { font-size: 16px; font-weight: bold; color: #a0aec0; background: #edf2f7; padding: 3px 12px; border-radius: 8px; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+            padding: 20px; backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: #ffffff; border-radius: 24px; width: 100%;
+            max-width: 800px; padding: 30px 35px; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); border: 4px solid #9b59b6;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px;
+            background: #e74c3c; color: white; border: none;
+            width: 36px; height: 36px; border-radius: 50%;
+            font-size: 18px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 3px 0 #c0392b;
+        }
+        .modal-title { font-size: 24px; color: #8e44ad; margin-bottom: 15px; border-bottom: 2px dashed #9b59b6; padding-bottom: 8px; }
+        .story-section { margin-bottom: 20px; }
+        .story-section h3 { font-size: 18px; color: #2c3e50; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .story-section p { font-size: 15px; line-height: 1.6; color: #4a5568; margin-bottom: 10px; }
+        .point-card { background: #f8f4fc; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; border-left: 5px solid #9b59b6; }
+        .point-card.nino { border-left-color: #e67e22; background: #fff8f0; }
+        .point-card.nico { border-left-color: #2980b9; background: #f0f8ff; }
+        .point-card.momo { border-left-color: #9b59b6; background: #fcf4ff; }
+        .point-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .point-title.nino { color: #d35400; }
+        .point-title.nico { color: #2980b9; }
+        .point-title.momo { color: #8e44ad; }
+
+        .rec-modal-card {
+            background: white; border-radius: 28px;
+            padding: 28px 20px 24px 20px; text-align: center;
+            max-width: 480px; width: 90%;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .rec-modal-target { font-size: 1.5rem; font-weight: 700; color: #d35400; margin-bottom: 20px; line-height: 1.3; }
+        .rec-modal-btns { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .modal-action-btn {
+            border: none; color: white; padding: 12px 20px;
+            border-radius: 50px; font-size: 1.1rem; font-family: inherit;
+            font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.1s;
+        }
+        .modal-action-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        #print-area { display: none; }
+        @media print {
+            @page { margin: 10mm 12mm; }
+            body > *:not(#print-area) { display: none !important; }
+            body { background: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+            #print-area { display: block !important; position: static !important; width: 100% !important; color: #000; background: #fff; padding: 0; font-family: 'Zen Maru Gothic', sans-serif; }
+            .print-page-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; border-bottom: 2px solid #000; padding-bottom: 4px; }
+            .print-section { margin-bottom: 10px; }
+            .print-section-title { font-size: 14px; font-weight: bold; background: #eee; padding: 3px 6px; margin-bottom: 6px; border-radius: 4px; }
+            .print-story-box { font-size: 11px; line-height: 1.4; color: #222; background: #f9f9f9; padding: 8px 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 8px; }
+            .print-story-box p { margin-bottom: 4px; }
+            .print-dialogue { margin-bottom: 6px; font-size: 12px; line-height: 1.3; page-break-inside: avoid; }
+            .print-speaker { font-weight: bold; color: #111; }
+            .print-en { font-weight: bold; font-size: 13px; }
+            .print-jp { color: #444; font-size: 11px; margin-left: 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Nino の気づき -->
+    <div class="slide-container">
+        <div class="header">
+            <div class="header-titles">
+                <h1 class="main-title">Momo - Scene 2 - Part 2</h1>
+                <h2 class="sub-title">Listening and Making Peace</h2>
+            </div>
+            <div class="header-actions">
+                <button class="story-btn" onclick="openStoryModal()"><i class="fa-solid fa-lightbulb"></i> 💡 どんなお話？</button>
+                <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 台本を印刷</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
+                    <span class="speaker-name">Nino</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en1">...Well, maybe you didn't trick me, and maybe I am to blame.</p>
+                    <p class="japanese-text" id="jp1">…まあ、君は僕を騙したわけじゃないのかもしれないし、僕にも悪いところがあったのかも。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en1')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en1', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp1')">和訳</button>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
+                    <span class="speaker-name">Nino</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en2">It was a picture from a magazine, and I made you trade it for a radio.</p>
+                    <p class="japanese-text" id="jp2">あれは雑誌の切り抜きの絵だったのに、ラジオと交換させてしまったからね。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en2')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en2', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp2')">和訳</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="page-num">1 / 5</span>
+        </div>
+    </div>
+
+    <!-- Slide 2: Nico の告白 (Part 2) -->
+    <div class="slide-container">
+        <div class="header">
+            <div class="header-titles">
+                <h1 class="main-title">Momo - Scene 2 - Part 2</h1>
+                <h2 class="sub-title">Listening and Making Peace</h2>
+            </div>
+            <div class="header-actions">
+                <button class="story-btn" onclick="openStoryModal()"><i class="fa-solid fa-lightbulb"></i> 💡 どんなお話？</button>
+                <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 台本を印刷</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
+                    <span class="speaker-name">Nico</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en3">Well, maybe I tried to trick you, and so I am to blame too.</p>
+                    <p class="japanese-text" id="jp3">いや、僕だって君を騙そうとしたのかもしれないし、僕にも責任があるよ。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en3')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en3', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp3')">和訳</button>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
+                    <span class="speaker-name">Nico</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en4">I should have told you about the check right away.</p>
+                    <p class="japanese-text" id="jp4">小切手のことをすぐに君に言うべきだったんだ。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en4')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en4', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp4')">和訳</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="page-num">2 / 5</span>
+        </div>
+    </div>
+
+    <!-- Slide 3: 謝罪の応酬 (Part 3) -->
+    <div class="slide-container">
+        <div class="header">
+            <div class="header-titles">
+                <h1 class="main-title">Momo - Scene 2 - Part 2</h1>
+                <h2 class="sub-title">Listening and Making Peace</h2>
+            </div>
+            <div class="header-actions">
+                <button class="story-btn" onclick="openStoryModal()"><i class="fa-solid fa-lightbulb"></i> 💡 どんなお話？</button>
+                <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 台本を印刷</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nino"><i class="fa-solid fa-wine-glass"></i></div>
+                    <span class="speaker-name">Nino</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en5">I'm sorry. I called you a pig. I'm sorry.</p>
+                    <p class="japanese-text" id="jp5">ごめんよ。ブタなんて呼んで悪かった。ごめんなさい。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en5')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en5', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp5')">和訳</button>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-nico"><i class="fa-solid fa-trowel"></i></div>
+                    <span class="speaker-name">Nico</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en6">I'm sorry. I called you a loser. I'm sorry.</p>
+                    <p class="japanese-text" id="jp6">僕こそごめん。負け犬なんて言って悪かった。ごめんなさい。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en6')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en6', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp6')">和訳</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="page-num">3 / 5</span>
+        </div>
+    </div>
+
+    <!-- Slide 4: 歌 -->
+    <div class="slide-container">
+        <div class="header">
+            <div class="header-titles">
+                <h1 class="main-title">Momo - Scene 2 - Part 2</h1>
+                <h2 class="sub-title">Listening and Making Peace</h2>
+            </div>
+            <div class="header-actions">
+                <button class="story-btn" onclick="openStoryModal()"><i class="fa-solid fa-lightbulb"></i> 💡 どんなお話？</button>
+                <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 台本を印刷</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="lyrics-box">
+                <!-- Part 1 of Song -->
+                <div class="lyrics-section">
+                    <div class="lyrics-line" id="song-en-1">Untangle, untangle, soft and slow,<br>Just listen, just listen, and let it go!</div>
+                    <p class="japanese-text" id="jp-song-1" style="margin-top: 4px;">解きほぐそう、優しくゆっくりと。<br>ただ耳を傾けて、手放してみよう！</p>
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button class="audio-btn" onclick="speakById('song-en-1')"><i class="fa-solid fa-volume-high"></i> 🔊 読み上げ 1</button>
+                        <button class="record-btn" onclick="toggleRecordingById('song-en-1', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record 1</button>
+                        <button class="trans-btn" onclick="toggleJp('jp-song-1')">和訳</button>
+                    </div>
+                </div>
+
+                <!-- Part 2 of Song -->
+                <div class="lyrics-section">
+                    <div class="lyrics-line" id="song-en-2" style="color: #e67e22;">Bad feelings turn to ashes!<br>No more yelling, no more fights,</div>
+                    <p class="japanese-text" id="jp-song-2" style="margin-top: 4px;">嫌な気持ちは灰になって消えていく！<br>怒鳴り声も、喧嘩ももうおしまい。</p>
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button class="audio-btn" onclick="speakById('song-en-2')"><i class="fa-solid fa-volume-high"></i> 🔊 読み上げ 2</button>
+                        <button class="record-btn" onclick="toggleRecordingById('song-en-2', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record 2</button>
+                        <button class="trans-btn" onclick="toggleJp('jp-song-2')">和訳</button>
+                    </div>
+                </div>
+
+                <!-- Part 3 of Song -->
+                <div class="lyrics-section" style="margin-bottom:0;">
+                    <div class="lyrics-line" id="song-en-3" style="color: #27ae60;">Everything is turning out right!</div>
+                    <p class="japanese-text" id="jp-song-3" style="margin-top: 4px;">すべてが良い方向に向かっていくんだ！</p>
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button class="audio-btn" onclick="speakById('song-en-3')"><i class="fa-solid fa-volume-high"></i> 🔊 読み上げ 3</button>
+                        <button class="record-btn" onclick="toggleRecordingById('song-en-3', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record 3</button>
+                        <button class="trans-btn" onclick="toggleJp('jp-song-3')">和訳</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="page-num">4 / 5</span>
+        </div>
+    </div>
+
+    <!-- Slide 5: 全員とモモの締めくくり -->
+    <div class="slide-container">
+        <div class="header">
+            <div class="header-titles">
+                <h1 class="main-title">Momo - Scene 2 - Part 2</h1>
+                <h2 class="sub-title">Listening and Making Peace</h2>
+            </div>
+            <div class="header-actions">
+                <button class="story-btn" onclick="openStoryModal()"><i class="fa-solid fa-lightbulb"></i> 💡 どんなお話？</button>
+                <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 台本を印刷</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-all"><i class="fa-solid fa-users-line"></i></div>
+                    <span class="speaker-name">All</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en7" style="font-size: 26px; color: #c0392b;">Momo! You did it again!</p>
+                    <p class="japanese-text" id="jp7">モモ！またやってくれたね！（また解決してくれたね！）</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en7')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en7', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp7')">和訳</button>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <div class="speaker-info">
+                    <div class="icon-circle icon-momo"><i class="fa-solid fa-child-dress"></i></div> 
+                    <span class="speaker-name">Momo</span>
+                </div>
+                <div class="text-group">
+                    <p class="english-text" id="en8">I don't know. I just listened. Anyway, I'm glad to see you smiling.</p>
+                    <p class="japanese-text" id="jp8">どうしてかな、私はただ話を聞いていただけだよ。とにかく、ふたりの笑顔が見られて嬉しいな。</p>
+                </div>
+                <div class="btn-group">
+                    <button class="audio-btn" onclick="speakById('en8')"><i class="fa-solid fa-volume-high"></i> 🔊</button>
+                    <button class="record-btn" onclick="toggleRecordingById('en8', this)"><i class="fa-solid fa-microphone"></i> 🎤 Record</button>
+                    <button class="trans-btn" onclick="toggleJp('jp8')">和訳</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="page-num">5 / 5</span>
+        </div>
+    </div>
+
+    <!-- 解説用モーダル -->
+    <div class="modal-overlay" id="storyModal" onclick="closeStoryModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeStoryModalDirect()">✕</button>
+            <h2 class="modal-title">📖 Scene 2 - Part 2 背景のお話</h2>
+            <div class="story-section">
+                <h3>🤝 仲直りの奇跡（モモの「聴く力」）</h3>
+                <p>あんなに激しく罵り合っていたニノとニコですが、モモが静かに、ただ心を開いてじっと話を聞いているうちに、二人の心の中の「怒りの結び目」がゆっくりとほどけていきます。</p>
+                <p>モモは一言も説教をしたりアドバイスをしたりしていません。ただしっかりと耳を傾けただけで、二人は自分自身の身勝手さに気づき、自発的に「自分にも悪いところがあった」「ごめんね」と謝り合って仲直りを果たします。</p>
+            </div>
+            <div class="story-section">
+                <h3>✨ このシーンのポイント！</h3>
+                <div class="point-card nino">
+                    <div class="point-title nino">🍷 ニノの素直な気づき：</div>
+                    「ただの雑誌の絵だったのに、価値あるラジオと交換させてしまった自分も悪かった」と気づき、素直に謝ります。
+                </div>
+                <div class="point-card nico">
+                    <div class="point-title nico">🧱 ニコの素直な気づき：</div>
+                    「小切手のことを隠して交換した自分もずるかった」と認め、暴言を吐いたことを謝ります。
+                </div>
+                <div class="point-card momo">
+                    <div class="point-title momo">👧 モモの不思議な力：</div>
+                    「特別なことは何もしていないよ、ただ聞いていただけ」と言うモモ。相手の話を真剣に聞くことが、どれほど大きな解決の力になるかを象徴しています。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 録音聞き比べモーダル -->
+    <div class="modal-overlay" id="recModal">
+        <div class="rec-modal-card">
+            <div class="rec-modal-target" id="recTargetText">Target Phrase</div>
+            <div class="rec-modal-btns">
+                <button class="modal-action-btn" style="background: #9b59b6;" onclick="playTargetVoice()">
+                    <i class="fa-solid fa-play"></i> ▶️ お手本
+                </button>
+                <button class="modal-action-btn" style="background: #3498db;" onclick="playRecordedAudio()">
+                    <i class="fa-solid fa-headphones"></i> 🎧 じぶんの声
+                </button>
+                <button class="modal-action-btn" style="background: #2ecc71;" onclick="closeRecModal()">
+                    <i class="fa-solid fa-check"></i> OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 印刷エリア -->
+    <div id="print-area">
+        <div class="print-page-title">Momo - Scene 2 - Part 2: Listening and Making Peace</div>
+        <div class="print-section">
+            <div class="print-section-title">📖 背景のお話</div>
+            <div class="print-story-box">
+                <p><b>【仲直りの奇跡（モモの「聴く力」）】</b><br>
+                あんなに激しく罵り合っていたニノとニコですが、モモが静かに、ただ心を開いてじっと話を聞いているうちに、二人の心の中の「怒りの結び目」がゆっくりとほどけていきます。<br>
+                モモは一言も説教をしたりアドバイスをしたりしていません。ただしっかりと耳を傾けただけで、二人は自分自身の身勝手さに気づき、自発的に「自分にも悪いところがあった」「ごめんね」と謝り合って仲直りを果たします。</p>
+            </div>
+        </div>
+        <div class="print-section">
+            <div class="print-section-title">🎭 Dialogue</div>
+            <div class="print-dialogue"><span class="print-speaker">Nino:</span> <span class="print-en">...Well, maybe you didn't trick me, and maybe I am to blame.</span><br><span class="print-jp">（…まあ、君は僕を騙したわけじゃないのかもしれないし、僕にも悪いところがあったのかも。）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Nino:</span> <span class="print-en">It was a picture from a magazine, and I made you trade it for a radio.</span><br><span class="print-jp">（あれは雑誌の切り抜きの絵だったのに、ラジオと交換させてしまったからね。）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Nico:</span> <span class="print-en">Well, maybe I tried to trick you, and so I am to blame too.</span><br><span class="print-jp">（いや、僕だって君を騙そうとしたのかもしれないし、僕にも責任があるよ。）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Nico:</span> <span class="print-en">I should have told you about the check right away.</span><br><span class="print-jp">（小切手のことをすぐに君に言うべきだったんだ。）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Nino:</span> <span class="print-en">I'm sorry. I called you a pig. I'm sorry.</span><br><span class="print-jp">（ごめんよ。ブタなんて呼んで悪かった。ごめんなさい。）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Nico:</span> <span class="print-en">I'm sorry. I called you a loser. I'm sorry.</span><br><span class="print-jp">（僕こそごめん。負け犬なんて言って悪かった。ごめんなさい。）</span></div>
+            
+            <div class="print-dialogue" style="margin-top:6px;">
+                <span class="print-speaker">Song (All):</span><br>
+                <span class="print-en">Untangle, untangle, soft and slow, / Just listen, just listen, and let it go!</span><br>
+                <span class="print-en">Bad feelings turn to ashes! / No more yelling, no more fights, / Everything is turning out right!</span><br>
+                <span class="print-jp">（解きほぐそう、優しくゆっくりと。 / ただ耳を傾けて、手放してみよう！ / 嫌な気持ちは灰になって消えていく！ / 怒鳴り声も、喧嘩ももうおしまい。 / すべてが良い方向に向かっていくんだ！）</span>
+            </div>
+            
+            <div class="print-dialogue" style="margin-top:6px;"><span class="print-speaker">All:</span> <span class="print-en">Momo! You did it again!</span><br><span class="print-jp">（モモ！またやってくれたね！）</span></div>
+            <div class="print-dialogue"><span class="print-speaker">Momo 👧:</span> <span class="print-en">I don't know. I just listened. Anyway, I'm glad to see you smiling.</span><br><span class="print-jp">（どうしてかな、私はただ話を聞いていただけだよ。とにかく、ふたりの笑顔が見られた嬉しいな。）</span></div>
+        </div>
+    </div>
+
+    <audio id="user-audio-player" style="display:none;"></audio>
+
+    <script>
+        function openStoryModal() { document.getElementById('storyModal').style.display = 'flex'; }
+        function closeStoryModalDirect() { document.getElementById('storyModal').style.display = 'none'; }
+        function closeStoryModal(e) { if (e.target.id === 'storyModal') closeStoryModalDirect(); }
+
+        function toggleJp(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === "block") ? "none" : "block";
+        }
+
+        /* --- 音声選択 --- */
+        let preferredVoice = null;
+
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) return;
+
+            const usVoices = voices.filter(v => v.lang === "en-US" || v.lang === "en_US" || v.lang.startsWith("en"));
+            
+            preferredVoice = 
+                usVoices.find(v => v.name.includes("Ava")) ||
+                usVoices.find(v => v.name.includes("Ana")) ||
+                usVoices.find(v => v.name.includes("Jenny")) ||
+                usVoices.find(v => v.name.includes("Google US English")) ||
+                usVoices.find(v => v.name.includes("Google English")) ||
+                usVoices.find(v => v.name.includes("Samantha")) ||
+                usVoices.find(v => v.name.includes("Aria")) ||
+                usVoices[0] || 
+                voices[0];
+        }
+
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function getTextById(id) {
+            const el = document.getElementById(id);
+            if (!el) return "";
+            return el.innerText.replace(/<br\s*[\/]?>/gi, " ").trim();
+        }
+
+        function speakById(elementId) {
+            const text = getTextById(elementId);
+            if (!text) return;
+            speak(text);
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            if (!preferredVoice) loadVoices();
+
+            const uttr = new SpeechSynthesisUtterance(text);
+            if (preferredVoice) uttr.voice = preferredVoice;
+            uttr.lang = 'en-US';
+            uttr.rate = 0.55;
+            uttr.pitch = 1.0;
+
+            window.speechSynthesis.resume();
+            window.speechSynthesis.speak(uttr);
+        }
+
+        /* --- 録音機能（時間を1.5倍に延長） --- */
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedAudioUrl = null;
+        let isRecording = false;
+        let recordingTimer = null;
+        let activeRecBtn = null;
+        let currentTargetText = "";
+
+        async function toggleRecordingById(elementId, btnEl) {
+            const text = getTextById(elementId);
+            if (isRecording) {
+                stopRecording();
+            } else {
+                currentTargetText = text;
+                activeRecBtn = btnEl;
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                
+                let mimeType = '';
+                if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+                else if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
+
+                mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    stream.getTracks().forEach(track => track.stop());
+                    const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/wav' });
+                    recordedAudioUrl = URL.createObjectURL(blob);
+                    document.getElementById("user-audio-player").src = recordedAudioUrl;
+
+                    document.getElementById("recTargetText").textContent = currentTargetText;
+                    document.getElementById("recModal").style.display = "flex";
+                };
+
+                mediaRecorder.start(100);
+                isRecording = true;
+
+                if (activeRecBtn) {
+                    activeRecBtn.classList.add("recording");
+                    activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Recording...';
+                }
+
+                // ★録音時間を1.5倍に延長（最小6秒〜最大12秒まで自動調整）
+                const autoStopDelay = Math.max(6000, Math.min(12000, currentTargetText.length * 150));
+                recordingTimer = setTimeout(() => { if (isRecording) stopRecording(); }, autoStopDelay);
+
+            } catch (err) {
+                alert("マイクの使用が許可されていないか、エラーが発生しました。");
+            }
+        }
+
+        function stopRecording() {
+            if (recordingTimer) clearTimeout(recordingTimer);
+            if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+            isRecording = false;
+            if (activeRecBtn) {
+                activeRecBtn.classList.remove("recording");
+                activeRecBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎤 Record';
+            }
+        }
+
+        function playTargetVoice() { speak(currentTargetText); }
+        function playRecordedAudio() {
+            const player = document.getElementById("user-audio-player");
+            if (player.src) { player.currentTime = 0; player.play(); }
+        }
+        function closeRecModal() { document.getElementById("recModal").style.display = "none"; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momo - Scene 2 - Part 1 - Practice!</title>
+    <script src="auth.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 15px 10px 60px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Comic Neue', 'Zen Maru Gothic', sans-serif;
+            color: #1e293b;
+        }
+
+        /* LISTEN埋め込みプレイヤー・固定バー */
+        .karaoke-sticky-bar {
+            position: sticky;
+            top: 10px;
+            z-index: 900;
+            width: 100%;
+            max-width: 850px;
+            background: #ffffff;
+            border: 2px solid #ff793f;
+            padding: 10px 15px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .karaoke-header-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #d35400;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* プレイヤー操作ボタンエリア */
+        .player-control-btns {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .ctrl-btn {
+            background: #fff3dd;
+            color: #d35400;
+            border: 1px solid #ff793f;
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+        }
+        .ctrl-btn:hover { background: #ffe0b2; }
+        .ctrl-btn:active { transform: scale(0.96); }
+
+        /* 台本メインコンテナ */
+        .script-container {
+            width: 100%;
+            max-width: 850px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff793f;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .main-title { font-size: 24px; font-weight: 700; color: #d35400; margin: 0; }
+        .sub-title { font-size: 15px; font-weight: 700; color: #64748b; margin: 0; }
+
+        .print-btn {
+            background: #2ecc71;
+            color: white; border: none;
+            padding: 6px 14px; border-radius: 10px;
+            cursor: pointer; font-size: 13px; font-weight: bold;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 2px 0 #27ae60;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .print-btn:hover { background: #27ae60; }
+
+        /* 台詞行 */
+        .dialogue-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 6px 8px;
+            border-bottom: 1px dotted #e2e8f0;
+        }
+        .dialogue-row:hover { background-color: #fff8f0; border-radius: 6px; }
+
+        .speaker-tag {
+            min-width: 110px;
+            font-size: 15px;
+            font-weight: 700;
+            padding-top: 2px;
+        }
+        .speaker-nino { color: #e67e22; }
+        .speaker-nico { color: #2980b9; }
+        .speaker-friends { color: #64748b; }
+        .speaker-all { color: #c0392b; }
+
+        .text-content { flex-grow: 1; }
+        .english-text { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; line-height: 1.4; }
+
+        /* タップして発音チェックできる単語 */
+        .word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 2px;
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
+        .word:hover { background-color: #fde047; color: #000; }
+        .word:active { background-color: #f59e0b; color: #fff; }
+
+        /* ト書き */
+        .stage-direction-row {
+            background: #f1f5f9;
+            border-left: 4px solid #64748b;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-style: italic;
+            font-size: 16px;
+            color: #475569;
+        }
+
+        /* 歌詞ブロック */
+        .lyrics-section {
+            background: #fff7ed;
+            border: 2px dashed #f97316;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin: 10px 0;
+        }
+        .lyrics-title { font-size: 13px; font-weight: bold; color: #ea580c; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .lyrics-line { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+
+        @media print {
+            body > *:not(#script-container) { display: none !important; }
+            .karaoke-sticky-bar, .print-btn { display: none !important; }
+            .script-container { box-shadow: none; padding: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LISTEN埋め込みプレイヤー ＋ リセット/コントロール補助バー -->
+    <div class="karaoke-sticky-bar">
+        <div class="karaoke-header-text">
+            <span><i class="fa-solid fa-microphone-lines"></i> 🎤 Karaoke Track: Shout, Shout!</span>
+            <div class="player-control-btns">
+                <button class="ctrl-btn" onclick="resetPlayer()"><i class="fa-solid fa-rotate-left"></i> 最初から再生 (0:00)</button>
+                <button class="ctrl-btn" onclick="reloadIframe()"><i class="fa-solid fa-arrows-rotate"></i> プレイヤー再読み込み</button>
+            </div>
+        </div>
+        <iframe id="listen-iframe" src="https://listen.style/p/eigostudio-stepforward-instrumentals/instrumental-for-shout-shout-tqgmd2fi?embed=true&mini=true" allow="autoplay; encrypted-media" style="width:100%; height:70px; border:none; border-radius:8px;"></iframe>
+    </div>
+
+    <!-- 台本領域 -->
+    <div class="script-container" id="script-container">
+        <div class="header">
+            <div>
+                <h1 class="main-title">Momo - Scene 2 - Part 1 - Practice!</h1>
+                <h2 class="sub-title">Nino and Nico's Angry Clash</h2>
+            </div>
+            <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> 🖨️ 印刷</button>
+        </div>
+
+        <!-- セリフ一覧 -->
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nino">Nino</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('You')">You</span>
+                    <span class="word" onclick="speakWord('are')">are</span>
+                    <span class="word" onclick="speakWord('a')">a</span>
+                    <span class="word" onclick="speakWord('cheater')">cheater</span>
+                    <span class="word" onclick="speakWord('and')">and</span>
+                    <span class="word" onclick="speakWord('a')">a</span>
+                    <span class="word" onclick="speakWord('thief!')">thief!</span>
+                    <span class="word" onclick="speakWord('Give')">Give</span>
+                    <span class="word" onclick="speakWord('me')">me</span>
+                    <span class="word" onclick="speakWord('back')">back</span>
+                    <span class="word" onclick="speakWord('my')">my</span>
+                    <span class="word" onclick="speakWord('money!')">money!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-friends">Nino's Friends</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('Yeah!')">Yeah!</span>
+                    <span class="word" onclick="speakWord('Give')">Give</span>
+                    <span class="word" onclick="speakWord('it')">it</span>
+                    <span class="word" onclick="speakWord('back,')">back,</span>
+                    <span class="word" onclick="speakWord('you')">you</span>
+                    <span class="word" onclick="speakWord('thief!')">thief!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nico">Nico</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('Thief?')">Thief?</span>
+                    <span class="word" onclick="speakWord('Shut')">Shut</span>
+                    <span class="word" onclick="speakWord('up!')">up!</span>
+                    <span class="word" onclick="speakWord('I')">I</span>
+                    <span class="word" onclick="speakWord('paid')">paid</span>
+                    <span class="word" onclick="speakWord('for')">for</span>
+                    <span class="word" onclick="speakWord('the')">the</span>
+                    <span class="word" onclick="speakWord('picture!')">picture!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-friends">Nico's Friends</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('He')">He</span>
+                    <span class="word" onclick="speakWord('bought')">bought</span>
+                    <span class="word" onclick="speakWord('that')">that</span>
+                    <span class="word" onclick="speakWord('picture')">picture</span>
+                    <span class="word" onclick="speakWord('fair')">fair</span>
+                    <span class="word" onclick="speakWord('and')">and</span>
+                    <span class="word" onclick="speakWord('square!')">square!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nino">Nino</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('You')">You</span>
+                    <span class="word" onclick="speakWord('knew')">knew</span>
+                    <span class="word" onclick="speakWord('about')">about</span>
+                    <span class="word" onclick="speakWord('the')">the</span>
+                    <span class="word" onclick="speakWord('hidden')">hidden</span>
+                    <span class="word" onclick="speakWord('check!')">check!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-friends">Nino's Friends</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('You')">You</span>
+                    <span class="word" onclick="speakWord('lied')">lied</span>
+                    <span class="word" onclick="speakWord('to')">to</span>
+                    <span class="word" onclick="speakWord('him!')">him!</span>
+                    <span class="word" onclick="speakWord('You')">You</span>
+                    <span class="word" onclick="speakWord('greedy')">greedy</span>
+                    <span class="word" onclick="speakWord('pig!')">pig!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nico">Nico</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('Greedy')">Greedy</span>
+                    <span class="word" onclick="speakWord('pig?!')">pig?!</span>
+                    <span class="word" onclick="speakWord('Look')">Look</span>
+                    <span class="word" onclick="speakWord('who\'s')">who's</span>
+                    <span class="word" onclick="speakWord('talking!')">talking!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-friends">Nico's Friends</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('A')">A</span>
+                    <span class="word" onclick="speakWord('sore')">sore</span>
+                    <span class="word" onclick="speakWord('sore')">sore</span>
+                    <span class="word" onclick="speakWord('loser!')">loser!</span>
+                    <span class="word" onclick="speakWord('That\'s')">That's</span>
+                    <span class="word" onclick="speakWord('what')">what</span>
+                    <span class="word" onclick="speakWord('you')">you</span>
+                    <span class="word" onclick="speakWord('are!')">are!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nino">Nino</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('What')">What</span>
+                    <span class="word" onclick="speakWord('did')">did</span>
+                    <span class="word" onclick="speakWord('you')">you</span>
+                    <span class="word" onclick="speakWord('call')">call</span>
+                    <span class="word" onclick="speakWord('me?!')">me?!</span>
+                    <span class="word" onclick="speakWord('I\'ll')">I'll</span>
+                    <span class="word" onclick="speakWord('never')">never</span>
+                    <span class="word" onclick="speakWord('forgive')">forgive</span>
+                    <span class="word" onclick="speakWord('you!')">you!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-nico">Nico</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('Fine!')">Fine!</span>
+                    <span class="word" onclick="speakWord('Whatever!')">Whatever!</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-all">All</div>
+            <div class="text-content">
+                <p class="english-text">
+                    <span class="word" onclick="speakWord('Get')">Get</span>
+                    <span class="word" onclick="speakWord('out')">out</span>
+                    <span class="word" onclick="speakWord('of')">of</span>
+                    <span class="word" onclick="speakWord('our')">our</span>
+                    <span class="word" onclick="speakWord('face!')">face!</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- ト書き -->
+        <div class="stage-direction-row">
+            [<span class="word" onclick="speakWord('Momo')">Momo</span>
+            <span class="word" onclick="speakWord('is')">is</span>
+            <span class="word" onclick="speakWord('dragged')">dragged</span>
+            <span class="word" onclick="speakWord('into')">into</span>
+            <span class="word" onclick="speakWord('the')">the</span>
+            <span class="word" onclick="speakWord('middle')">middle</span>
+            <span class="word" onclick="speakWord('of')">of</span>
+            <span class="word" onclick="speakWord('the')">the</span>
+            <span class="word" onclick="speakWord('clash.')">clash.]</span>
+        </div>
+
+        <!-- 歌詞エリア -->
+        <div class="lyrics-section">
+            <div class="lyrics-title">
+                <i class="fa-solid fa-music"></i> 🎵 SONG: Shout, Shout!
+            </div>
+            <div class="lyrics-line">
+                <span class="word" onclick="speakWord('Shout,')">Shout,</span>
+                <span class="word" onclick="speakWord('shout!')">shout!</span>
+                <span style="font-weight:normal;">(</span>
+                <span class="word" onclick="speakWord('Spitting')">Spitting</span>
+                <span class="word" onclick="speakWord('fire!')">fire!</span>
+                <span style="font-weight:normal;">)</span>
+            </div>
+            <div class="lyrics-line">
+                <span class="word" onclick="speakWord('Anger')">Anger</span>
+                <span class="word" onclick="speakWord('rising')">rising</span>
+                <span style="font-weight:normal;">(</span>
+                <span class="word" onclick="speakWord('Higher')">Higher</span>
+                <span class="word" onclick="speakWord('and')">and</span>
+                <span class="word" onclick="speakWord('higher!')">higher!</span>
+                <span style="font-weight:normal;">)</span>
+            </div>
+            <div class="lyrics-line">
+                <span class="word" onclick="speakWord('Spiky')">Spiky</span>
+                <span class="word" onclick="speakWord('words!')">words!</span>
+                <span style="font-weight:normal;">(</span>
+                <span class="word" onclick="speakWord('Sharp')">Sharp</span>
+                <span class="word" onclick="speakWord('and')">and</span>
+                <span class="word" onclick="speakWord('hot!')">hot!</span>
+                <span style="font-weight:normal;">)</span>
+            </div>
+            <div class="lyrics-line">
+                <span class="word" onclick="speakWord('Tangled')">Tangled</span>
+                <span class="word" onclick="speakWord('up')">up</span>
+                <span class="word" onclick="speakWord('in')">in</span>
+                <span class="word" onclick="speakWord('a')">a</span>
+                <span class="word" onclick="speakWord('heavy')">heavy</span>
+                <span class="word" onclick="speakWord('knot!')">knot!</span>
+            </div>
+        </div>
+
+        <div class="dialogue-row">
+            <div class="speaker-tag speaker-all">All</div>
+            <div class="text-content">
+                <p class="english-text" style="font-size: 22px; color: #c0392b;">
+                    <span class="word" onclick="speakWord('Say')">Say</span>
+                    <span class="word" onclick="speakWord('something,')">something,</span>
+                    <span class="word" onclick="speakWord('Momo!')">Momo!</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- プレイヤー制御補助 --- */
+        function reloadIframe() {
+            const iframe = document.getElementById('listen-iframe');
+            iframe.src = iframe.src;
+        }
+
+        function resetPlayer() {
+            reloadIframe();
+        }
+
+        /* --- 単語タップ発音機能 --- */
+        let preferredVoice = null;
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) return;
+            const usVoices = voices.filter(v => v.lang === "en-US" || v.lang === "en_US" || v.lang.startsWith("en"));
+            preferredVoice = usVoices.find(v => v.name.includes("Ava")) ||
+                             usVoices.find(v => v.name.includes("Jenny")) ||
+                             usVoices.find(v => v.name.includes("Google US English")) ||
+                             usVoices[0] || voices[0];
+        }
+
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function speakWord(word) {
+            if (!('speechSynthesis' in window)) return;
+            if (!preferredVoice) loadVoices();
+            window.speechSynthesis.cancel();
+            
+            const cleanWord = word.replace(/[!?,.:;()"]/g, "");
+            const uttr = new SpeechSynthesisUtterance(cleanWord);
+            if (preferredVoice) uttr.voice = preferredVoice;
+            uttr.lang = 'en-US';
+            uttr.rate = 0.50;
+            window.speechSynthesis.resume();
+            window.speechSynthesis.speak(uttr);
+        }
+    </script>
+</body>
+</html>

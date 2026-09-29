@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>保護者みんなのサイコロトーク 🎲</title>
+  <!-- Google Fonts & Canvas Confetti -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #F4F6F0;
+      --card-bg: #FFFFFF;
+      --primary: #2D5A27;
+      --primary-light: #EAF2E8;
+      --accent: #E05A47;
+      --accent-hover: #C84635;
+      --text-main: #1F2937;
+      --text-sub: #4B5563;
+      --border-color: #D1D5DB;
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px 24px;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* ステータスバー（大画面用） */
+    .status-bar {
+      background: white;
+      padding: 12px 28px;
+      border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      border: 2px solid #E5E7EB;
+      margin-top: 10px;
+    }
+
+    .turn-badge {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-dots {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #9CA3AF;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      color: white;
+      transform: scale(1.15);
+    }
+
+    main {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      margin: auto 0;
+    }
+
+    /* 3D サイコロエリア（大型化） */
+    .scene {
+      width: 180px;
+      height: 180px;
+      perspective: 800px;
+      margin: 10px 0;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 2.5s cubic-bezier(0.15, 0.9, 0.25, 1);
+    }
+
+    .cube__face {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: #FFFFFF;
+      border: 4px solid #E5E7EB;
+      border-radius: 32px;
+      display: grid;
+      padding: 24px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.06), 0 12px 30px rgba(0,0,0,0.15);
+      backface-visibility: hidden;
+    }
+
+    /* サイコロの目 */
+    .pip {
+      display: block;
+      background-color: #374151;
+      border-radius: 50%;
+      align-self: center;
+      justify-self: center;
+      width: 28px;
+      height: 28px;
+    }
+
+    .pip-red {
+      background-color: var(--accent);
+    }
+
+    .cube__face--1 { transform: rotateY(0deg) translateZ(90px); grid-template: 1fr / 1fr; }
+    .cube__face--2 { transform: rotateY(90deg) translateZ(90px); grid-template: repeat(2, 1fr) / repeat(2, 1fr); }
+    .cube__face--2 .pip:nth-child(2) { grid-area: 2 / 2; }
+    .cube__face--3 { transform: rotateY(180deg) translateZ(90px); grid-template: repeat(3, 1fr) / repeat(3, 1fr); }
+    .cube__face--3 .pip:nth-child(1) { grid-area: 1 / 1; }
+    .cube__face--3 .pip:nth-child(2) { grid-area: 2 / 2; }
+    .cube__face--3 .pip:nth-child(3) { grid-area: 3 / 3; }
+    .cube__face--4 { transform: rotateY(-90deg) translateZ(90px); grid-template: repeat(2, 1fr) / repeat(2, 1fr); }
+    .cube__face--5 { transform: rotateX(90deg) translateZ(90px); grid-template: repeat(3, 1fr) / repeat(3, 1fr); }
+    .cube__face--5 .pip:nth-child(1) { grid-area: 1 / 1; }
+    .cube__face--5 .pip:nth-child(2) { grid-area: 1 / 3; }
+    .cube__face--5 .pip:nth-child(3) { grid-area: 2 / 2; }
+    .cube__face--5 .pip:nth-child(4) { grid-area: 3 / 1; }
+    .cube__face--5 .pip:nth-child(5) { grid-area: 3 / 3; }
+    .cube__face--6 { transform: rotateX(-90deg) translateZ(90px); grid-template: repeat(3, 1fr) / repeat(2, 1fr); }
+
+    /* 操作ボタンエリア（巨大化） */
+    .controls {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      padding: 20px 32px;
+      border-radius: 20px;
+      font-family: inherit;
+      font-size: 1.5rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      flex: 2;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      background: #9CA3AF;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--primary);
+      border: 3px solid var(--primary);
+      flex: 1;
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary-light);
+    }
+
+    /* 大画面向け・超巨大結果カード */
+    .result-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      border: 3px solid var(--border-color);
+      text-align: center;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .result-number {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: white;
+      background: var(--accent);
+      padding: 6px 20px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .result-topic {
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: var(--text-main);
+      line-height: 1.35;
+      margin-bottom: 24px;
+    }
+
+    /* 本人向けのヒント（例えばこんなこと！） */
+    .examples-box {
+      width: 100%;
+      background: var(--primary-light);
+      border: 2px dashed var(--primary);
+      border-radius: 20px;
+      padding: 20px 28px;
+      text-align: left;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .examples-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .examples-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .examples-list li {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.4;
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .examples-list li::before {
+      content: "👉";
+      font-size: 1.1rem;
+      position: absolute;
+      left: 0;
+      top: 0px;
+    }
+
+    .placeholder-text {
+      color: var(--text-sub);
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    footer {
+      margin-top: 10px;
+    }
+
+    .text-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 1.1rem;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* モーダル */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal {
+      background: white;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 700px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--primary); }
+    .close-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-sub); }
+
+    .topic-list-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎲 保護者サイコロトーク</h1>
+    <div class="status-bar">
+      <div class="turn-badge">
+        👤 <span id="person-counter">1人目の方の番です</span>
+      </div>
+      <div class="history-dots" id="history-dots">
+        <div class="dot" id="dot-1">1</div>
+        <div class="dot" id="dot-2">2</div>
+        <div class="dot" id="dot-3">3</div>
+        <div class="dot" id="dot-4">4</div>
+        <div class="dot" id="dot-5">5</div>
+        <div class="dot" id="dot-6">6</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 3D サイコロ -->
+    <div class="scene">
+      <div class="cube" id="cube">
+        <div class="cube__face cube__face--1"><span class="pip pip-red"></span></div>
+        <div class="cube__face cube__face--2"><span class="pip"></span><span class="pip"></span></div>
+        <div class="cube__face cube__face--3"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="cube__face cube__face--4"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="cube__face cube__face--5"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+        <div class="cube__face cube__face--6"><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+      </div>
+    </div>
+
+    <!-- 操作ボタン -->
+    <div class="controls">
+      <button class="btn btn-primary" id="roll-btn">
+        <span>🎲</span> サイコロを振る！
+      </button>
+      <button class="btn btn-secondary" id="next-person-btn">
+        次の人へ ➔
+      </button>
+    </div>
+
+    <!-- 本人向け表示・結果カード -->
+    <div class="result-card" id="result-card">
+      <p class="placeholder-text" id="placeholder">「サイコロを振る！」を押して<br>トークをはじめよう！</p>
+      
+      <div id="topic-content" style="display: none; width: 100%;">
+        <span class="result-number" id="result-number">出た目: 1</span>
+        <h2 class="result-topic" id="result-title">ここにテーマが表示されます</h2>
+        
+        <!-- 本人向けエピソード例 -->
+        <div class="examples-box" id="examples-box">
+          <div class="examples-title">💡 たとえばこんな話でもOK！</div>
+          <ul class="examples-list" id="examples-list">
+            <!-- JSで動的挿入 -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <button class="text-btn" id="open-modal-btn">📋 お題一覧を見る</button>
+  </footer>
+
+  <!-- お題一覧モーダル -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">🎲 お題＆ヒント一覧</h3>
+        <button class="close-btn" id="close-modal-btn">&times;</button>
+      </div>
+      <div id="modal-topic-list"></div>
+    </div>
+  </div>
+
+  <script>
+    // 【本人向け・大画面用】語りかける口調のお題データ
+    const topics = [
+      {
+        id: 1,
+        title: "「これってうちだけ！？」我が家の事件簿を教えて！",
+        examples: [
+          "朝出かけようとしたら靴下の中にドングリが詰まってた...",
+          "リモコンが行方不明と思ったら冷蔵庫の奥から出てきた！",
+          "「ママ（パパ）大好き」と言われた直後に服で鼻水を拭かれた"
+        ]
+      },
+      {
+        id: 2,
+        title: "宿題や習い事、みんなはどう乗り切ってる？",
+        examples: [
+          "「音読」を聞く担当を決めて役割分担してる！",
+          "タイマーを鳴らして「何分で終わるかゲーム」にしている",
+          "ぶっちゃけ習い事の宿題、直前の車の中でバタバタやってます..."
+        ]
+      },
+      {
+        id: 3,
+        title: "ついつい怒りそうな時…我が家の「マイルール」は？",
+        examples: [
+          "怒りそうになったらとりあえず一回キッチンで水を飲む！",
+          "「〇〇ちゃん（君）は好きだけど行動はダメ」と伝える",
+          "パパとママで同時に怒らず、どっちかが逃げ道になる"
+        ]
+      },
+      {
+        id: 4,
+        title: "助かってます！お子様の「お手伝い・できたこと」は？",
+        examples: [
+          "自分の食べたお皿をシンクに運んでくれるようになった！",
+          "洗濯物をたたむのを一緒にお宝探し感覚でやってくれる",
+          "弟や妹の靴を履かせてくれていて感動した..."
+        ]
+      },
+      {
+        id: 5,
+        title: "朝のバタバタ時間を乗り切る「我が家の神アイデア」！",
+        examples: [
+          "前日の夜に服も靴下も全部セットして置いておく！",
+          "朝ごはんはおにぎりかパンの固定にして迷わせない",
+          "「この曲が終わるまでに着替えよう」と音楽をかけて勝負！"
+        ]
+      },
+      {
+        id: 6,
+        title: "子供に「ごめん！」って思ったプチ失敗談はある？",
+        examples: [
+          "「早くしなさい！」と怒ったら靴下が裏返しだったのは私だった...",
+          "イベントの日程を1週間勘違いして気合の弁当を作った",
+          "言い間違いを笑いすぎて本気で泣かれた..."
+        ]
+      }
+    ];
+
+    const faceRotations = {
+      1: { x: 0, y: 0 },
+      2: { x: 0, y: -90 },
+      3: { x: 0, y: -180 },
+      4: { x: 0, y: 90 },
+      5: { x: -90, y: 0 },
+      6: { x: 90, y: 0 }
+    };
+
+    let personCount = 1;
+    let currentPersonHistory = [];
+    let isRolling = false;
+    let currentRotation = { x: 0, y: 0, z: 0 };
+
+    const cube = document.getElementById('cube');
+    const rollBtn = document.getElementById('roll-btn');
+    const nextPersonBtn = document.getElementById('next-person-btn');
+    const personCounterEl = document.getElementById('person-counter');
+    const placeholderEl = document.getElementById('placeholder');
+    const topicContentEl = document.getElementById('topic-content');
+    const resultNumberEl = document.getElementById('result-number');
+    const resultTitleEl = document.getElementById('result-title');
+    const examplesListEl = document.getElementById('examples-list');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalTopicList = document.getElementById('modal-topic-list');
+
+    function init() {
+      updateHistoryDots();
+      renderModalTopics();
+    }
+
+    function rollDice() {
+      if (isRolling) return;
+
+      if (currentPersonHistory.length >= 6) {
+        alert("全6つのお題が出ました！「次の人へ」を押してください🎉");
+        return;
+      }
+
+      isRolling = true;
+      rollBtn.disabled = true;
+
+      const availableTopics = topics.filter(t => !currentPersonHistory.includes(t.id));
+      const selectedTopic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
+      const targetNumber = selectedTopic.id;
+
+      currentPersonHistory.push(targetNumber);
+
+      const targetBase = faceRotations[targetNumber];
+      const extraRoundsX = (Math.floor(Math.random() * 2) + 3) * 360;
+      const extraRoundsY = (Math.floor(Math.random() * 2) + 3) * 360;
+
+      currentRotation.x += extraRoundsX + targetBase.x - (currentRotation.x % 360);
+      currentRotation.y += extraRoundsY + targetBase.y - (currentRotation.y % 360);
+
+      cube.style.transform = `rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
+
+      setTimeout(() => {
+        showResult(selectedTopic);
+        updateHistoryDots();
+        isRolling = false;
+        rollBtn.disabled = false;
+
+        if (currentPersonHistory.length === 6) {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+      }, 2500);
+    }
+
+    function showResult(topic) {
+      placeholderEl.style.display = 'none';
+      topicContentEl.style.display = 'block';
+
+      resultNumberEl.textContent = `出た目: ${topic.id}`;
+      resultTitleEl.textContent = topic.title;
+
+      examplesListEl.innerHTML = '';
+      topic.examples.forEach(ex => {
+        const li = document.createElement('li');
+        li.textContent = ex;
+        examplesListEl.appendChild(li);
+      });
+    }
+
+    function updateHistoryDots() {
+      for (let i = 1; i <= 6; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (currentPersonHistory.includes(i)) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      }
+    }
+
+    function nextPerson() {
+      if (isRolling) return;
+
+      personCount++;
+      personCounterEl.textContent = `${personCount}人目の方の番です`;
+      currentPersonHistory = [];
+      updateHistoryDots();
+
+      placeholderEl.style.display = 'block';
+      placeholderEl.innerHTML = `<b>${personCount}人目の方</b>の番です！<br>「サイコロを振る！」を押してください 🎲`;
+      topicContentEl.style.display = 'none';
+
+      currentRotation.x += 180;
+      currentRotation.y += 180;
+      cube.style.transform = `rotateX(${currentRotation.x}deg) rotateY(${currentRotation.y}deg)`;
+    }
+
+    function renderModalTopics() {
+      modalTopicList.innerHTML = '';
+      topics.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'topic-list-item';
+        const examplesHtml = t.examples.map(ex => `<li>${ex}</li>`).join('');
+        item.innerHTML = `
+          <div style="font-weight:900; color:var(--accent); font-size:1.1rem;">🎲 目: ${t.id}</div>
+          <div style="font-weight:900; font-size:1.3rem; margin:6px 0;">${t.title}</div>
+          <ul style="padding-left:20px; font-weight:700; color:var(--text-sub);">${examplesHtml}</ul>
+        `;
+        modalTopicList.appendChild(item);
+      });
+    }
+
+    rollBtn.addEventListener('click', rollDice);
+    nextPersonBtn.addEventListener('click', nextPerson);
+    openModalBtn.addEventListener('click', () => modalOverlay.classList.add('open'));
+    closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('open'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('open');
+    });
+
+    init();
+  </script>
+</body>
+</html>

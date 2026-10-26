@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween English Activity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1f1a3a 0%, #0d0b18 100%);
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            font-family: 'Comic Neue', 'Zen Maru Gothic', sans-serif;
+            color: #f7fafc;
+            min-height: 100vh;
+        }
+
+        .main-app-container {
+            width: 100%;
+            max-width: 1080px;
+            background: #282142;
+            border: 4px solid #ff9f1a;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ヘッダー */
+        .top-nav {
+            background: #1a152d;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff9f1a;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .title-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .title-badge h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #ff9f1a;
+            margin: 0;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        .title-badge span {
+            font-size: 22px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #805ad5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            box-shadow: 0 4px 0 #553c9a;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .action-btn:hover { background: #6b46c1; }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .action-btn.toggle-trans {
+            background: #3182ce;
+            box-shadow: 0 4px 0 #2b6cb0;
+        }
+        .action-btn.toggle-trans:hover { background: #2b6cb0; }
+
+        .action-btn.print-btn {
+            background: #ed64a6;
+            box-shadow: 0 4px 0 #b83280;
+        }
+        .action-btn.print-btn:hover { background: #d53f8c; }
+
+        /* スライドタブナビゲーション */
+        .tabs-bar {
+            display: flex;
+            background: #141124;
+            padding: 10px 20px;
+            gap: 8px;
+            overflow-x: auto;
+            border-bottom: 2px solid #3c325c;
+        }
+
+        .tab-btn {
+            background: #2a2347;
+            color: #a0aec0;
+            border: 2px solid transparent;
+            padding: 8px 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: white;
+            background: #382f5e;
+        }
+        .tab-btn.active {
+            background: #ff9f1a;
+            color: #1a152d;
+            font-weight: 900;
+            box-shadow: 0 4px 10px rgba(255, 159, 26, 0.4);
+        }
+
+        /* スライド表示エリア */
+        .slide-stage {
+            padding: 30px;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .slide-page {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+        .slide-page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header-banner {
+            background: #3c325c;
+            padding: 12px 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 6px solid #ff9f1a;
+        }
+        .page-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fbd38d;
+            margin: 0;
+        }
+        .page-desc {
+            font-size: 13px;
+            color: #cbd5e0;
+            margin: 2px 0 0 0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        /* セリフカード */
+        .dialogue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dialogue-card {
+            background: #ffffff;
+            color: #2d3748;
+            border-radius: 18px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border: 3px solid #e2e8f0;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s, border-color 0.15s;
+            cursor: pointer;
+        }
+        .dialogue-card:hover {
+            transform: translateY(-2px);
+            border-color: #ff9f1a;
+        }
+
+        .dialogue-card.clickable-card {
+            user-select: none;
+        }
+
+        .speaker-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 65px;
+        }
+        .avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+        .avatar-pumpkin { background: #ed8936; }
+        .avatar-ghost { background: #9f7aea; }
+        .avatar-girl { background: #ec4899; }
+        .avatar-mom { background: #f43f5e; }
+
+        .speaker-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        .dialogue-content {
+            flex-grow: 1;
+        }
+        .phrase-en {
+            font-size: 21px;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0;
+            line-height: 1.3;
+        }
+        .phrase-jp {
+            font-size: 15px;
+            color: #2b6cb0;
+            margin: 4px 0 0 0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-weight: 700;
+            display: none;
+        }
+        .phrase-jp.visible {
+            display: block;
+        }
+
+        .card-audio-icon {
+            background: #ff78ae;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 4px 0 #d64d8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.1s;
+        }
+        .card-audio-icon:hover { background: #e06194; }
+        .card-audio-icon:active { transform: translateY(3px); box-shadow: none; }
+
+        /* グリッドカード (Page 2 用) */
+        .costume-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        /* 迷路体験ビジュアル (Page 3 用) */
+        .maze-atmosphere {
+            background: #110d20;
+            border: 2px dashed #ff9f1a;
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            color: #ecc94b;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* 最終ページ画像カード (Page 4 用) */
+        .last-page-visual {
+            background: #1b162e;
+            border: 2px solid #ff9f1a;
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .image-frame {
+            width: 100%;
+            max-width: 680px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid #ff9f1a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            background: #141124;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 画面表示用の画像：ご指定のフォルダ内の画像を表示 */
+        .last-page-img {
+            width: 100%;
+            height: auto;
+            max-height: 340px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .img-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        .color-print-btn {
+            background: #ec4899;
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #b83280;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.1s;
+        }
+        .color-print-btn:hover { background: #db2777; }
+        .color-print-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .print-note {
+            font-size: 12px;
+            color: #cbd5e0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            text-align: center;
+        }
+
+        /* ページ切替フッター */
+        .bottom-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 2px solid #3c325c;
+            margin-top: 20px;
+        }
+        .nav-page-btn {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 0 #2d3748;
+            font-family: inherit;
+        }
+        .nav-page-btn:hover { background: #718096; }
+        .nav-page-btn:active { transform: translateY(3px); box-shadow: none; }
+        .page-indicator {
+            font-weight: 900;
+            color: #ff9f1a;
+            font-size: 17px;
+        }
+
+        /* ＝＝＝＝＝ 塗り絵専用 横向き印刷スタイル (A4 Landscape) ＝＝＝＝＝ */
+        #print-coloring-area {
+            display: none;
+        }
+
+        @media print {
+            @page {
+                size: A4 landscape; /* 横向き印刷 */
+                margin: 6mm 10mm;
+            }
+            body > *:not(#print-coloring-area) {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                color: #000000 !important;
+                font-family: 'Zen Maru Gothic', sans-serif !important;
+            }
+            #print-coloring-area {
+                display: flex !important;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 100% !important;
+                height: 96vh;
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            .coloring-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px dashed #000;
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+            }
+            .coloring-title-block h1 {
+                font-size: 22px;
+                font-weight: 900;
+                margin: 0;
+                color: #000;
+                letter-spacing: 1px;
+            }
+            .coloring-name-box {
+                display: flex;
+                gap: 25px;
+                font-size: 13px;
+                font-weight: bold;
+            }
+            .name-field {
+                border-bottom: 2px solid #000;
+                min-width: 140px;
+                display: inline-block;
+                padding-bottom: 2px;
+            }
+
+            .coloring-image-container {
+                flex-grow: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 3px solid #000;
+                border-radius: 16px;
+                padding: 8px;
+                margin: 4px 0;
+                background: #fff;
+                overflow: hidden;
+            }
+
+            /* 塗り絵画像：
+               1. happy-halloween-coloring.jpg があればそれをそのまま100%綺麗に出力
+               2. 無ければ元の happy-halloween.jpg を白抜き調（暗い背景を飛ばす）で出力 */
+            .coloring-sheet-img {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+            }
+
+            /* 元のカラー画像がフォールバックで使われる時用の白抜きCSS */
+            .fallback-whitening {
+                filter: grayscale(100%) brightness(140%) contrast(160%);
+                -webkit-filter: grayscale(100%) brightness(140%) contrast(160%);
+            }
+
+            .coloring-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-top: 2px dashed #000;
+                padding-top: 6px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            .coloring-footer .catchphrase {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-app-container">
+        <!-- ナビバー -->
+        <div class="top-nav">
+            <div class="title-badge">
+                <span>🎃</span>
+                <h1>Halloween English Fun!</h1>
+            </div>
+            <div class="nav-actions">
+                <button class="action-btn toggle-trans" onclick="toggleAllTranslations()">
+                    <i class="fa-solid fa-language"></i> <span id="trans-btn-label">和訳を表示</span>
+                </button>
+                <button class="action-btn print-btn" onclick="window.print()">
+                    <i class="fa-solid fa-palette"></i> 塗り絵を印刷 (横向き)
+                </button>
+            </div>
+        </div>
+
+        <!-- タブ一覧 -->
+        <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchPage(1)" id="tab-1">1. あいさつ (Greetings)</button>
+            <button class="tab-btn" onclick="switchPage(2)" id="tab-2">2. だれに変身？ (Costumes)</button>
+            <button class="tab-btn" onclick="switchPage(3)" id="tab-3">3. くらやみ迷路 (Dark Maze)</button>
+            <button class="tab-btn" onclick="switchPage(4)" id="tab-4">4. お菓子タイム (Treats!)</button>
+        </div>
+
+        <!-- メイン画面 -->
+        <div class="slide-stage">
+
+            <!-- PAGE 1: あいさつ (JackとGhostの掛け合い) -->
+            <div class="slide-page active" id="page-1">
+                <div class="page-header-banner">
+                    <div>
+                        <h2 class="page-title">Page 1: Happy Halloween!</h2>
+                        <p class="page-desc">JackとGhostの掛け合いを聞いて、元気にあいさつしよう！カードを押すと声が流れるよ。</p>
+                    </div>
+                    <span style="font-size: 32px;">🎃 👻</span>
+                </div>
+
+                <div class="dialogue-list">
+                    <div class="dialogue-card clickable-card" onclick="speak('Happy Halloween!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-pumpkin">🎃</div>
+                            <span class="speaker-label">Jack</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Happy Halloween!</p>
+                            <p class="phrase-jp">ハッピーハロウィン！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Happy Halloween!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Happy Halloween to you, too!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-ghost">👻</div>
+                            <span class="speaker-label">Ghost</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Happy Halloween to you, too!</p>
+                            <p class="phrase-jp">あなたもハッピーハロウィン！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Happy Halloween to you, too!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Are you ready for Halloween?')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-pumpkin">🎃</div>
+                            <span class="speaker-label">Jack</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Are you ready for Halloween?</p>
+                            <p class="phrase-jp">ハロウィンの準備はできた？</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Are you ready for Halloween?')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Yes, I am!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-ghost">👻</div>
+                            <span class="speaker-label">Ghost</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Yes, I am!</p>
+                            <p class="phrase-jp">うん、バッチリだよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Yes, I am!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: だれに変身？ ＆ 褒め言葉 -->
+            <div class="slide-page" id="page-2">
+                <div class="page-header-banner">
+                    <div>
+                        <h2 class="page-title">Page 2: Who are you today?</h2>
+                        <p class="page-desc">「だれに変身したの？」と聞いて、コスチュームを褒め合おう！</p>
+                    </div>
+                    <span style="font-size: 32px;">🧙‍♀️</span>
+                </div>
+
+                <!-- 質問 -->
+                <div class="dialogue-card clickable-card" style="border: 3px solid #ff9f1a; background: #fffaf0;" onclick="speak('Who are you today?')">
+                    <div class="speaker-avatar">
+                        <div class="avatar-circle avatar-pumpkin">❓</div>
+                        <span class="speaker-label">Question</span>
+                    </div>
+                    <div class="dialogue-content">
+                        <p class="phrase-en" style="color: #c05621;">Who are you today?</p>
+                        <p class="phrase-jp">今日はだれに変身しているの？</p>
+                    </div>
+                    <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Who are you today?')">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+
+                <!-- 回答バリエーション (I'm a...) -->
+                <div style="font-weight: 900; color: #ff9f1a; font-size: 15px; margin-top: 6px;">✨ なりきりキャラクター（I'm a...）</div>
+                <div class="costume-grid">
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a ghost! Boo!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#805ad5;">👻</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a ghost! Boo!</p>
+                            <p class="phrase-jp">わたしはおばけだよ！ばあ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a ghost! Boo!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a witch!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#d69e2e;">🧙‍♀️</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a witch!</p>
+                            <p class="phrase-jp">わたしは魔女だよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a witch!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a vampire!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#e53e3e;">🧛‍♀️</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a vampire!</p>
+                            <p class="phrase-jp">わたしは吸血鬼だよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a vampire!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a mermaid!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#319795;">🧜‍♀️</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a mermaid!</p>
+                            <p class="phrase-jp">わたしは人魚だよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a mermaid!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a princess!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#ed64a6;">👸</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a princess!</p>
+                            <p class="phrase-jp">わたしはお姫様よ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a princess!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I\'m a police officer!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#3182ce;">👮‍♀️</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I'm a police officer!</p>
+                            <p class="phrase-jp">わたしは警察官だよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I\'m a police officer!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+
+                <!-- 褒め言葉 -->
+                <div style="font-weight: 900; color: #ff9f1a; font-size: 15px; margin-top: 6px;">💬 ほめ言葉コメント</div>
+                <div class="costume-grid">
+                    <div class="dialogue-card clickable-card" onclick="speak('That\'s so cool!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#38a169;">✨</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">That's so cool!</p>
+                            <p class="phrase-jp">それ、すごくかっこいいね！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('That\'s so cool!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('I love your costume!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#dd6b20;">💖</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I love your costume!</p>
+                            <p class="phrase-jp">その衣装、とってもすてき！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I love your costume!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('What a beautiful dress!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#d53f8c;">👗</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">What a beautiful dress!</p>
+                            <p class="phrase-jp">なんてきれいなドレスなの！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('What a beautiful dress!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('So scary!')">
+                        <div class="speaker-avatar"><div class="avatar-circle" style="background:#805ad5;">🦇</div></div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">So scary!</p>
+                            <p class="phrase-jp">こわ〜い！（最高の褒め言葉！）</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('So scary!')"><i class="fa-solid fa-volume-high"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: くらやみ迷路 -->
+            <div class="slide-page" id="page-3">
+                <div class="page-header-banner">
+                    <div>
+                        <h2 class="page-title">Page 3: Into the Dark Maze!</h2>
+                        <p class="page-desc">暗い迷路を歩きながら、ドキドキする気持ちを声に出してみよう！</p>
+                    </div>
+                    <span style="font-size: 32px;">🔦</span>
+                </div>
+
+                <div class="maze-atmosphere">
+                    <span>🕸️ 🕷️</span>
+                    <span>It's a dark and spooky Halloween maze! Let's go together!</span>
+                    <span>🦇 🕯️</span>
+                </div>
+
+                <div class="dialogue-list">
+                    <div class="dialogue-card clickable-card" onclick="speak('It\'s dark! I\'m scared!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-girl">👧</div>
+                            <span class="speaker-label">Girl A</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">It's dark! I'm scared!</p>
+                            <p class="phrase-jp">暗いよ！こわいよ〜！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('It\'s dark! I\'m scared!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('It\'s okay! It\'s not scary at all!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle" style="background:#9f7aea;">👧</div>
+                            <span class="speaker-label">Girl B</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">It's okay! It's not scary at all!</p>
+                            <p class="phrase-jp">大丈夫！ぜんぜん怖くないよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('It\'s okay! It\'s not scary at all!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Let\'s walk together!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-pumpkin">🤝</div>
+                            <span class="speaker-label">Both</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Let's walk together!</p>
+                            <p class="phrase-jp">いっしょに歩こう！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Let\'s walk together!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" style="border: 3px solid #ed8936;" onclick="speak('Trick or treat!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-pumpkin">🍬</div>
+                            <span class="speaker-label">Goal!</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en" style="color:#c05621; font-size:24px;">Trick or treat!</p>
+                            <p class="phrase-jp">トリック・オア・トリート！（お菓子をくれないとイタズラするぞ！）</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Trick or treat!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 4: お菓子タイム -->
+            <div class="slide-page" id="page-4">
+                <div class="page-header-banner">
+                    <div>
+                        <h2 class="page-title">Page 4: Count the Treats!</h2>
+                        <p class="page-desc">たくさんのお菓子をもらったよ！下のボタンから横向きA4塗り絵を印刷できるよ🎨</p>
+                    </div>
+                    <span style="font-size: 32px;">🍭</span>
+                </div>
+
+                <!-- 画面用画像表示（フォルダ内の画像を直接読み込み） -->
+                <div class="last-page-visual">
+                    <div class="image-frame">
+                        <img class="last-page-img" 
+                             src="images-halloween-party/happy-halloween.jpg" 
+                             alt="Happy Halloween Party">
+                    </div>
+                    
+                    <div class="img-toolbar">
+                        <button class="color-print-btn" onclick="window.print()">
+                            <i class="fa-solid fa-palette"></i> 🎨 この絵の塗り絵をプリントアウトする (横向きA4)
+                        </button>
+                        <div class="print-note">
+                            💡 自分で作成した塗り絵画像を印刷したい場合は、同じフォルダ内に<br>
+                            <code>happy-halloween-coloring.jpg</code> として保存すれば自動でそちらが印刷されます！
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dialogue-list">
+                    <div class="dialogue-card clickable-card" onclick="speak('I got a lot of treats!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-girl">👧</div>
+                            <span class="speaker-label">Girl</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">I got a lot of treats!</p>
+                            <p class="phrase-jp">お菓子たくさんもらったよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('I got a lot of treats!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('My bag is heavy!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-girl">👧</div>
+                            <span class="speaker-label">Girl</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">My bag is heavy!</p>
+                            <p class="phrase-jp">わたしのバッグ、ずっしり重たいよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('My bag is heavy!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Let\'s count the treats! I got 13 treats!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-girl">👧</div>
+                            <span class="speaker-label">Girl</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Let's count the treats! I got 13 treats!</p>
+                            <p class="phrase-jp">お菓子を数えてみよう！13個もゲットしたよ！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Let\'s count the treats! I got 13 treats!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Mom, can I eat this cookie?')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-girl">👧</div>
+                            <span class="speaker-label">Girl</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Mom, can I eat this cookie?</p>
+                            <p class="phrase-jp">ママ、このクッキー食べてもいい？</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Mom, can I eat this cookie?')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <div class="dialogue-card clickable-card" onclick="speak('Sure! Just one!')">
+                        <div class="speaker-avatar">
+                            <div class="avatar-circle avatar-mom">👩</div>
+                            <span class="speaker-label">Mom</span>
+                        </div>
+                        <div class="dialogue-content">
+                            <p class="phrase-en">Sure! Just one!</p>
+                            <p class="phrase-jp">いいわよ！ひとつだけね！</p>
+                        </div>
+                        <button class="card-audio-icon" onclick="event.stopPropagation(); speak('Sure! Just one!')">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ボトム切り替え -->
+        <div class="bottom-pagination" style="padding: 15px 30px; background: #1a152d;">
+            <button class="nav-page-btn" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i> 前へ</button>
+            <span class="page-indicator" id="pageIndicatorText">Page 1 / 4</span>
+            <button class="nav-page-btn" onclick="nextPage()">次へ <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- ＝＝＝＝＝ 印刷エリア (A4 Landscape 横向き全面 塗り絵シート) ＝＝＝＝＝ -->
+    <div id="print-coloring-area">
+        <div class="coloring-header">
+            <div class="coloring-title-block">
+                <h1>🎃 Happy Halloween Coloring Sheet 👻</h1>
+            </div>
+            <div class="coloring-name-box">
+                <div>Date: <span class="name-field"></span></div>
+                <div>Name: <span class="name-field"></span></div>
+            </div>
+        </div>
+
+        <div class="coloring-image-container">
+            <!-- 塗り絵印刷：
+                 自作塗り絵 happy-halloween-coloring.jpg を最優先で読み込み、
+                 無ければ元の happy-halloween.jpg を白抜き調CSSで表示するスマート設計 -->
+            <img class="coloring-sheet-img" 
+                 src="images-halloween-party/happy-halloween-coloring.jpg" 
+                 alt="Halloween Coloring Sheet"
+                 onerror="this.onerror=null; this.src='images-halloween-party/happy-halloween.jpg'; this.classList.add('fallback-whitening');">
+        </div>
+
+        <div class="coloring-footer">
+            <span class="catchphrase">✨ Trick or Treat! Happy Halloween! ✨</span>
+            <span>English Activity Worksheet</span>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 4;
+        let showTranslations = false;
+
+        /* --- ページ切り替え --- */
+        function switchPage(pageNum) {
+            currentPage = pageNum;
+            for (let i = 1; i <= totalPages; i++) {
+                const pageEl = document.getElementById('page-' + i);
+                const tabEl = document.getElementById('tab-' + i);
+                if (pageEl) pageEl.classList.toggle('active', i === pageNum);
+                if (tabEl) tabEl.classList.toggle('active', i === pageNum);
+            }
+            document.getElementById('pageIndicatorText').textContent = `Page ${pageNum} / ${totalPages}`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevPage() {
+            if (currentPage > 1) switchPage(currentPage - 1);
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) switchPage(currentPage + 1);
+        }
+
+        /* --- 和訳の一括トグル機能 --- */
+        function toggleAllTranslations() {
+            showTranslations = !showTranslations;
+            const jpElements = document.querySelectorAll('.phrase-jp');
+            jpElements.forEach(el => {
+                el.classList.toggle('visible', showTranslations);
+            });
+            const label = document.getElementById('trans-btn-label');
+            label.textContent = showTranslations ? '和訳を隠す' : '和訳を表示';
+        }
+
+        /* --- 音声読み上げ設定 --- */
+        let preferredVoice = null;
+
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length === 0) return;
+
+            const usVoices = voices.filter(v => v.lang === "en-US" || v.lang === "en_US" || v.lang.startsWith("en"));
+            
+            preferredVoice = 
+                usVoices.find(v => v.name.includes("Ava")) ||
+                usVoices.find(v => v.name.includes("Ana")) ||
+                usVoices.find(v => v.name.includes("Jenny")) ||
+                usVoices.find(v => v.name.includes("Google US English")) ||
+                usVoices.find(v => v.name.includes("Google English")) ||
+                usVoices.find(v => v.name.includes("Samantha")) ||
+                usVoices.find(v => v.name.includes("Aria")) ||
+                usVoices[0] || 
+                voices[0];
+        }
+
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            if (!preferredVoice) {
+                loadVoices();
+            }
+
+            window.speechSynthesis.cancel();
+
+            const uttr = new SpeechSynthesisUtterance(text);
+            if (preferredVoice) uttr.voice = preferredVoice;
+            uttr.lang = 'en-US';
+            uttr.rate = 0.70;
+            uttr.pitch = 1.0;
+
+            window.speechSynthesis.resume();
+            window.speechSynthesis.speak(uttr);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
+        });
+    </script>
+</body>
+</html>

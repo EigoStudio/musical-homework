@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momo's Weather Adventure - Board Game</title>
+<script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-orange: #f97316;
+            --success-green: #22c55e;
+            --danger-red: #ef4444;
+            --bg-color: #f8fafc;
+            --board-bg: #f1f5f9;
+            --p1-color: #ef4444;
+            --p2-color: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            font-family: 'Comic Neue', 'Zen Maru Gothic', cursive, sans-serif;
+            background-color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1180px;
+            background-color: white;
+            padding: 24px;
+            border-radius: 28px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 4px solid #cbd5e1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px dashed #cbd5e1;
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 { color: #0284c7; font-size: 2.1rem; }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 30px;
+        }
+
+        .mode-btn {
+            border: none;
+            background: transparent;
+            padding: 8px 18px;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            color: #475569;
+            transition: 0.2s;
+        }
+        .mode-btn.active {
+            background: #0284c7;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 6px;
+            background: var(--board-bg);
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            height: 600px;
+        }
+
+        .space {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.15rem;
+            position: relative;
+            color: #334155;
+        }
+
+        .space.start { background: #e0f2fe; color: #0369a1; font-size: 0.95rem; }
+        .space.goal { background: #dcfce7; color: #15803d; font-size: 0.95rem; text-align: center; line-height: 1.1; }
+
+        .token {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 3px solid white;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .token.p1 { background: var(--p1-color); top: 4px; left: 4px; }
+        .token.p2 { background: var(--p2-color); bottom: 4px; right: 4px; }
+
+        .interaction-area {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 22px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .turn-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+
+        .current-turn-badge {
+            padding: 8px 22px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .p1-turn { background-color: var(--p1-color); }
+        .p2-turn { background-color: var(--p2-color); }
+
+        .dice-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dice {
+            width: 58px;
+            height: 58px;
+            background: white;
+            border: 3px solid #334155;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .dice.rolling { animation: roll-anim 0.2s infinite linear; }
+        @keyframes roll-anim { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .quiz-card {
+            min-height: 400px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            text-align: center;
+        }
+        .quiz-card.active { display: flex; }
+
+        .image-container {
+            width: 100%;
+            height: 220px;
+            border-radius: 16px;
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .quiz-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .img-info-tag {
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            background: rgba(255,255,255,0.85);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .quiz-text-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        .quiz-text {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .speaker-btn {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            color: #16a34a;
+            font-size: 1.3rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #15803d;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            transition: transform 0.1s;
+        }
+        .speaker-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: #f8fafc;
+            border: 3px solid #cbd5e1;
+            padding: 12px 6px;
+            border-radius: 14px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            color: #1e293b;
+            transition: all 0.15s;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .option-btn:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; }
+        .option-btn.correct { background: #dcfce7; border-color: var(--success-green); color: #15803d; }
+        .option-btn.wrong { background: #fee2e2; border-color: var(--danger-red); color: #b91c1c; }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.1s;
+        }
+        .btn-roll { background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; }
+        .btn-roll:active { transform: translateY(2px); box-shadow: 0 2px 0 #0369a1; }
+        .btn-roll:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
+
+        .status-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid #e2e8f0;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 100;
+            justify-content: center; align-items: center;
+        }
+        .win-modal {
+            background: white;
+            padding: 36px;
+            border-radius: 28px;
+            text-align: center;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .board-grid { height: 420px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <header>
+        <h1>🏴‍☠️ Momo's Weather Adventure!</h1>
+        <div class="mode-toggle">
+            <button id="mode-1p" class="mode-btn" onclick="setGameMode(1)">👤 1 Player</button>
+            <button id="mode-2p" class="mode-btn active" onclick="setGameMode(2)">👥 2 Players</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <div class="board-grid" id="board"></div>
+
+        <div class="interaction-area">
+            <div class="card turn-card">
+                <div id="turn-badge" class="current-turn-badge p1-turn">Player 1</div>
+                <div class="dice-box">
+                    <div id="dice-val" class="dice">1</div>
+                    <button id="roll-btn" class="btn btn-roll" onclick="startRoll()">Roll Dice! 🎲</button>
+                </div>
+            </div>
+
+            <div id="quiz-area" class="card quiz-card">
+                <div class="image-container">
+                    <img id="q-image" class="quiz-image" src="" alt="Quiz Hint">
+                    <div id="img-tag" class="img-info-tag"></div>
+                </div>
+                <div class="quiz-text-container">
+                    <div id="q-text" class="quiz-text">Question?</div>
+                    <button class="speaker-btn" onclick="speakQuestion()">🔊</button>
+                </div>
+                <div id="options-box" class="options-container"></div>
+                <div id="feedback-text" style="margin-top: 14px; font-weight: bold; font-size: 1.25rem;"></div>
+                <button id="next-turn-btn" class="btn btn-roll" style="display: none; margin-top: 14px;" onclick="switchTurn()">Next ➔</button>
+            </div>
+
+            <div id="guide-area" class="card" style="flex-grow: 1;">
+                <h3 style="color: #0369a1; margin-bottom: 8px;">How to Play:</h3>
+                <ul style="margin: 0 0 0 20px; font-size: 1.1rem; line-height: 1.6; color: #475569;">
+                    <li>Roll the dice and move your ship!</li>
+                    <li>Look at the picture and fill in the blank.</li>
+                    <li>Tap <b>🔊</b> if you want to listen to the question!</li>
+                    <li>If you are <b>Correct</b>, you stay on that space!</li>
+                    <li>If you are <b>Wrong</b>, you go back!</li>
+                    <li>Reach the Goal at <b>Space 40</b> to win! 🌈</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-footer">
+        <div id="stat-p1-box" style="color: var(--p1-color)">🔴 Player 1: Space <span id="stat-p1">1</span></div>
+        <div id="deck-status" style="color: #64748b; font-size: 0.95rem;">Question Deck: Ready</div>
+        <div id="stat-p2-box" style="color: var(--p2-color)">🔵 Player 2: Space <span id="stat-p2">1</span></div>
+    </div>
+</div>
+
+<div id="win-overlay" class="overlay">
+    <div class="win-modal">
+        <h2 style="color: var(--success-green); font-size: 2.8rem; margin-bottom: 16px;">🎉 GOAL!</h2>
+        <p id="winner-name" style="font-size: 1.4rem; margin-bottom: 24px; color: #334155;"></p>
+        <button class="btn btn-roll" onclick="location.reload()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    const MAX_SPACES = 40;
+    const IMAGE_FOLDER = 'images-boardgame-weather/';
+
+    // 🟢 30問マスターデータ（1.jpg、20.jpg、22.jpg、23.jpg、29.jpg、30.jpg 修正反映済み）
+    const masterQuizData = [
+        // シート1 (1.jpg - 8.jpg)
+        { q: "Look at the white (___)! They look fluffy!", a: "clouds", c: ["sun", "sky"], img: "1.jpg" },
+        { q: "A (___) is coming!", a: "storm", c: ["ship", "rainbow"], img: "2.jpg" },
+        { q: "I'm (___)! Let's go home!", a: "scared", c: ["happy", "fine"], img: "3.jpg" },
+        { q: "No way! It's (___) too hard!", a: "raining", c: ["sunny", "windy"], img: "4.jpg" },
+        { q: "Let's stay here with (___)!", a: "Momo", c: ["Captain", "Lily"], img: "5.jpg" },
+        { q: "Hey, let's play (___)!", a: "pretend", c: ["game", "music"], img: "6.jpg" },
+        { q: "Imagine! We're on a (___)!", a: "pirate ship", c: ["bus", "airplane"], img: "7.jpg" },
+        { q: "But what should we (___)?", a: "do", c: ["see", "eat"], img: "8.jpg" },
+
+        // シート2 (9.jpg - 16.jpg)
+        { q: "Look at the (___)!", a: "sun", c: ["stars", "moon"], img: "9.jpg" },
+        { q: "Look at the (___)!", a: "sky", c: ["sea", "ground"], img: "10.jpg" },
+        { q: "Nice and (___).", a: "warm", c: ["cold", "bad"], img: "11.jpg" },
+        { q: "Look at the (___)!", a: "lightning", c: ["rain", "snow"], img: "12.jpg" },
+        { q: "Listen to the (___)!", a: "thunder", c: ["wind", "clouds"], img: "13.jpg" },
+        { q: "It's (___) today.", a: "foggy", c: ["hot", "clear"], img: "14.jpg" },
+        { q: "It's (___) today.", a: "windy", c: ["quiet", "warm"], img: "15.jpg" },
+        { q: "It's (___) today.", a: "cold", c: ["sunny", "nice"], img: "16.jpg" },
+
+        // シート3 (17.jpg - 24.jpg)
+        { q: "It's (___) today.", a: "stormy", c: ["calm", "dry"], img: "17.jpg" },
+        { q: "Let's (___) here with Momo!", a: "stay", c: ["go", "run"], img: "18.jpg" },
+        { q: "Yeah! A (___) pirate ship!", a: "giant", c: ["tiny", "little"], img: "19.jpg" },
+        { q: "I'm a (___)!", a: "pirate", c: ["monster", "robot"], img: "20.jpg" },
+        { q: "We are not afraid of the (___)!", a: "sea", c: ["sky", "sun"], img: "21.jpg" },
+        { q: "The weather's (___) today.", a: "nice", c: ["bad", "scary"], img: "22.jpg" },
+        { q: "The weather's (___) today.", a: "bad", c: ["great", "fine"], img: "23.jpg" },
+        { q: "Playing pretend is (___)!", a: "FUN", c: ["cold", "hard"], img: "24.jpg" },
+
+        // シート4 (25.jpg - 30.jpg)
+        { q: "Watch out! A giant (___)!", a: "jellyfish", c: ["whale", "shark"], img: "25.jpg" },
+        { q: "Look up! A dark (___)!", a: "tornado", c: ["rainbow", "cloud"], img: "26.jpg" },
+        { q: "Our ship goes (___)!", a: "up", c: ["in", "on"], img: "27.jpg" },
+        { q: "Our ship goes (___)!", a: "down", c: ["out", "by"], img: "28.jpg" },
+        { q: "It's (___) outside.", a: "dark", c: ["sunny", "warm"], img: "29.jpg" },
+        { q: "Look at the (___)!", a: "rainbow", c: ["storm", "tornado"], img: "30.jpg" }
+    ];
+
+    let gameMode = 2; // 1 or 2
+    let currentPlayer = 1;
+    let positions = { 1: 1, 2: 1 };
+    let startOfTurnPos = 1;
+    let currentQ = null;
+    let preferredVoice = null;
+
+    let shuffledDeck = [];
+    let currentDeckIndex = 0;
+
+    function buildShuffledDeck() {
+        shuffledDeck = [...masterQuizData].sort(() => Math.random() - 0.5);
+        currentDeckIndex = 0;
+        updateDeckStatus();
+    }
+
+    function getNextQuestion() {
+        if (currentDeckIndex >= shuffledDeck.length) {
+            buildShuffledDeck();
+        }
+        const q = shuffledDeck[currentDeckIndex];
+        currentDeckIndex++;
+        updateDeckStatus();
+        return q;
+    }
+
+    function updateDeckStatus() {
+        document.getElementById('deck-status').innerText = `Cards: ${currentDeckIndex} / ${shuffledDeck.length} used`;
+    }
+
+    function setGameMode(mode) {
+        gameMode = mode;
+        document.getElementById('mode-1p').className = 'mode-btn' + (mode === 1 ? ' active' : '');
+        document.getElementById('mode-2p').className = 'mode-btn' + (mode === 2 ? ' active' : '');
+        
+        document.getElementById('stat-p2-box').style.visibility = (mode === 1) ? 'hidden' : 'visible';
+        
+        positions[1] = 1;
+        positions[2] = 1;
+        currentPlayer = 1;
+        updateTurnBadge();
+        updateTokens();
+        buildShuffledDeck();
+    }
+
+    // 音声設定（School-Board-Game-2Players.html準拠）
+    function loadVoices() {
+        if (!('speechSynthesis' in window)) return;
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) return;
+        preferredVoice = 
+            voices.find(v => v.lang === "en-US" && v.name.includes("Google US English")) ||
+            voices.find(v => v.lang === "en-US" && v.name.includes("Samantha")) ||
+            voices.find(v => v.lang.startsWith("en-US") && (v.name.includes("Female") || v.name.includes("Zira")));
+    }
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadVoices();
+
+  // 🟢 冠詞の「A」を確実に「ア」と読ませる決定版
+    function formatSpeechText(text) {
+        let clean = text.replace(/\(___\)/g, ", ... "); // 空欄をポーズに
+        
+        // 文頭や記号の直後、単語単独の "A" / "a" を "uh"（ア）に強制置換
+        clean = clean.replace(/^A\b/i, "uh");
+        clean = clean.replace(/([!?,."']\s*)A\b/gi, "$1uh");
+        clean = clean.replace(/\bA\b/gi, "uh");
+
+        return clean;
+    }
+
+    function speakText(text) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        
+        const clean = formatSpeechText(text);
+        const uttr = new SpeechSynthesisUtterance(clean);
+        if (preferredVoice) uttr.voice = preferredVoice;
+        uttr.rate = 0.7;  
+        uttr.pitch = 1.1; 
+        window.speechSynthesis.speak(uttr);
+    }
+
+    // 🔊 スピーカーボタンを押した時：問題文の読み上げ
+    function speakQuestion() {
+        if (!currentQ) return;
+        speakText(currentQ.q);
+    }
+
+    function createBoard() {
+        const board = document.getElementById('board');
+        board.innerHTML = "";
+        for (let i = 1; i <= MAX_SPACES; i++) {
+            const div = document.createElement('div');
+            div.className = 'space';
+            div.id = 'space-' + i;
+            if (i === 1) { div.classList.add('start'); div.innerText = "START"; }
+            else if (i === MAX_SPACES) { div.classList.add('goal'); div.innerHTML = "GOAL<br>🌈"; }
+            else { div.innerText = i; }
+            board.appendChild(div);
+        }
+        updateTokens();
+    }
+
+    function updateTokens() {
+        document.querySelectorAll('.token').forEach(t => t.remove());
+
+        const p1Token = document.createElement('div');
+        p1Token.className = 'token p1';
+        document.getElementById('space-' + positions[1]).appendChild(p1Token);
+
+        if (gameMode === 2) {
+            const p2Token = document.createElement('div');
+            p2Token.className = 'token p2';
+            document.getElementById('space-' + positions[2]).appendChild(p2Token);
+        }
+
+        document.getElementById('stat-p1').innerText = positions[1];
+        document.getElementById('stat-p2').innerText = positions[2];
+    }
+
+    function startRoll() {
+        const diceBtn = document.getElementById('roll-btn');
+        const diceDisp = document.getElementById('dice-val');
+        diceBtn.disabled = true;
+        diceDisp.classList.add('rolling');
+
+        startOfTurnPos = positions[currentPlayer];
+
+        setTimeout(() => {
+            diceDisp.classList.remove('rolling');
+            const roll = Math.floor(Math.random() * 6) + 1;
+            diceDisp.innerText = roll;
+            
+            let newPos = positions[currentPlayer] + roll;
+            if (newPos >= MAX_SPACES) newPos = MAX_SPACES;
+            positions[currentPlayer] = newPos;
+            updateTokens();
+
+            if (newPos === MAX_SPACES) {
+                showVictory();
+            } else {
+                showQuiz();
+            }
+        }, 600);
+    }
+
+    function showQuiz() {
+        document.getElementById('guide-area').style.display = 'none';
+        const quizArea = document.getElementById('quiz-area');
+        quizArea.classList.add('active');
+
+        currentQ = getNextQuestion();
+
+        const imgEl = document.getElementById('q-image');
+        imgEl.src = IMAGE_FOLDER + currentQ.img;
+        document.getElementById('img-tag').innerText = currentQ.img;
+
+        document.getElementById('q-text').innerText = currentQ.q;
+        document.getElementById('feedback-text').innerText = "";
+        document.getElementById('next-turn-btn').style.display = 'none';
+
+        const optionsBox = document.getElementById('options-box');
+        optionsBox.innerHTML = "";
+
+        const allOptions = [currentQ.a, ...currentQ.c].sort(() => Math.random() - 0.5);
+        allOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+
+        // 🟢 選択肢をタップした際にその単語を読み上げ
+        speakText(selected);
+
+        const feedbackText = document.getElementById('feedback-text');
+
+        if (selected === currentQ.a) {
+            btn.classList.add('correct');
+            feedbackText.innerText = "✨ Excellent! Stay on this space.";
+            feedbackText.style.color = "var(--success-green)";
+        } else {
+            btn.classList.add('wrong');
+            feedbackText.innerText = `❌ Oh no! Go back to space ${startOfTurnPos}.`;
+            feedbackText.style.color = "var(--danger-red)";
+            positions[currentPlayer] = startOfTurnPos;
+            updateTokens();
+        }
+        document.getElementById('next-turn-btn').style.display = 'block';
+    }
+
+    function switchTurn() {
+        document.getElementById('quiz-area').classList.remove('active');
+        document.getElementById('guide-area').style.display = 'block';
+
+        if (gameMode === 2) {
+            currentPlayer = (currentPlayer === 1) ? 2 : 1;
+        }
+
+        updateTurnBadge();
+        document.getElementById('roll-btn').disabled = false;
+    }
+
+    function updateTurnBadge() {
+        const badge = document.getElementById('turn-badge');
+        badge.innerText = `Player ${currentPlayer}`;
+        badge.className = `current-turn-badge p${currentPlayer}-turn`;
+    }
+
+    function showVictory() {
+        const text = (gameMode === 1) 
+            ? "Congratulations! You reached the Goal! 🌈" 
+            : `Congratulations Player ${currentPlayer}! You reached the Goal! 🌈`;
+        document.getElementById('winner-name').innerText = text;
+        document.getElementById('win-overlay').style.display = 'flex';
+    }
+
+    window.onload = () => {
+        createBoard();
+        buildShuffledDeck();
+    };
+</script>
+</body>
+</html>

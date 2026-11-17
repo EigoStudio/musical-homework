@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Momo - Scene 3 - Part 1: Act & Speak!</title>
+    <script src="auth.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-orange: #e67e22;
+            --dark-orange: #d35400;
+            --bg-cream: #fff3dd;
+            --bg-body: #fffaf0;
+            --text-main: #2c3e50;
+            --accent-blue: #3498db;
+            --accent-purple: #9b59b6;
+            --accent-pink: #ff78ae;
+            --accent-red: #e74c3c;
+            --accent-green: #2ecc71;
+        }
+
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Comic Neue', 'Zen Maru Gothic', cursive, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1080px;
+            background-color: var(--bg-cream);
+            border-radius: 28px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+            padding: 24px 30px;
+            border: 5px dashed var(--primary-orange);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--primary-orange);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-titles { text-align: left; }
+        .main-title { font-size: 1.9rem; font-weight: 700; color: var(--dark-orange); margin: 0; }
+        .sub-title { font-size: 1.05rem; font-weight: 700; color: #7f8c8d; margin: 2px 0 0 0; }
+
+        .mode-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: white;
+            color: #7f8c8d;
+            border: 3px solid #f5deb3;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .mode-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--dark-orange);
+            box-shadow: 0 3px 8px rgba(230, 126, 34, 0.3);
+        }
+
+        /* Top Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 14px 20px;
+            border-radius: 20px;
+            border: 2px solid #f5deb3;
+        }
+
+        .draw-btn {
+            background: linear-gradient(135deg, #ff7675, #e74c3c);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #c0392b;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s;
+        }
+        .draw-btn:hover { filter: brightness(1.05); }
+        .draw-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #c0392b; }
+        .draw-btn:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+
+        .respin-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2980b9;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .respin-btn:active { transform: translateY(2px); box-shadow: none; }
+        .respin-btn:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+
+        .deck-badge {
+            background: #fef5e7;
+            border: 2px solid #f39c12;
+            color: var(--dark-orange);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* Big Stage Card */
+        .stage-card {
+            background: #ffffff;
+            border: 4px solid #f5deb3;
+            border-radius: 26px;
+            padding: 24px 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+        }
+        .stage-card.card-pop {
+            animation: cardFlipIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes cardFlipIn {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-num-badge {
+            background: var(--primary-orange);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 6px 18px;
+            border-radius: 50px;
+        }
+
+        .action-hint-badge {
+            background: #ebf5fb;
+            border: 2px solid #aed6f1;
+            color: #2980b9;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        /* Sentence Frame Box */
+        .frame-box {
+            background: #fff9e6;
+            border: 3px dashed #f39c12;
+            border-radius: 20px;
+            padding: 18px 20px;
+            text-align: center;
+        }
+        .frame-text {
+            font-size: 2.35rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            line-height: 1.3;
+        }
+        .blank-slot {
+            display: inline-block;
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 2px 16px;
+            border-radius: 12px;
+            border-bottom: 4px solid #e74c3c;
+            margin: 0 4px;
+        }
+        .nuance-note {
+            margin-top: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #d35400;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        /* 4 Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .opt-card {
+            background: #f8fafc;
+            border: 4px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+            min-height: 210px;
+        }
+        .opt-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        /* Roulette Spinning Highlight */
+        .opt-card.roulette-scanning {
+            border-color: #f39c12 !important;
+            background: #fef5e7 !important;
+            transform: scale(1.04);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.65);
+            z-index: 4;
+        }
+
+        /* Selected Target State */
+        .opt-card.selected-target {
+            border-color: #ff4757 !important;
+            background: linear-gradient(180deg, #fff5f5 0%, #ffeaa7 100%) !important;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.35);
+            z-index: 5;
+            animation: targetPulse 1.4s infinite ease-in-out;
+        }
+        @keyframes targetPulse {
+            0%, 100% { box-shadow: 0 8px 22px rgba(255, 71, 87, 0.35); }
+            50% { box-shadow: 0 12px 32px rgba(255, 71, 87, 0.65); }
+        }
+
+        .target-star-badge {
+            display: none;
+            position: absolute;
+            top: -16px;
+            right: -10px;
+            background: #ff4757;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 3px solid white;
+            animation: popStar 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .opt-card.selected-target .target-star-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        @keyframes popStar {
+            0% { transform: scale(0) rotate(-30deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .opt-svg-box {
+            width: 105px;
+            height: 105px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .opt-svg-box svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .opt-word {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+            line-height: 1.2;
+        }
+        .opt-sub-jp {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #7f8c8d;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            text-align: center;
+        }
+
+        /* Teacher / Answer Check Footer inside Stage Card */
+        .answer-panel {
+            background: #f4f6f7;
+            border-radius: 18px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 2px solid #e5e8e8;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .teacher-speak-btn {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #763e8f;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .teacher-speak-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .reveal-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #27ae60;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reveal-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .revealed-sentence-box {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #16a085;
+            background: #e8f8f5;
+            padding: 6px 18px;
+            border-radius: 12px;
+            border: 2px solid #a3e4d7;
+            display: none;
+        }
+
+        /* All Cards Picker Grid (Mode 2) */
+        .all-cards-grid {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .all-cards-grid.active {
+            display: grid;
+        }
+        .mini-card {
+            background: white;
+            border: 3px solid #f5deb3;
+            border-radius: 18px;
+            padding: 16px;
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mini-card:hover {
+            border-color: var(--primary-orange);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+        }
+        .mini-card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-orange);
+        }
+        .mini-card-action {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-weight: 700;
+        }
+
+        @media (max-width: 850px) {
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+            .frame-text { font-size: 1.85rem; }
+        }
+        @media (max-width: 550px) {
+            .main-container { padding: 16px 12px; }
+            .all-cards-grid { grid-template-columns: 1fr; }
+            .opt-card { min-height: 175px; padding: 12px 8px; }
+            .opt-svg-box { width: 80px; height: 80px; }
+            .opt-word { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-titles">
+            <h1 class="main-title">🎭 Momo - Scene 3 - Act & Speak!</h1>
+            <h2 class="sub-title">カードを引いて、光ったマスを演じて話そう！</h2>
+        </div>
+        <div class="mode-controls">
+            <button class="mode-btn active" id="btn-mode-game" onclick="setViewMode('game')">🎲 ランダム抽選モード</button>
+            <button class="mode-btn" id="btn-mode-list" onclick="setViewMode('list')">🃏 カード一覧から選ぶ</button>
+        </div>
+    </div>
+
+    <!-- Mode 1: Random Game View -->
+    <div id="game-view" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="action-bar">
+            <button class="draw-btn" id="draw-btn" onclick="drawRandomCard()">
+                🎲 Draw a Card! (カードを引く)
+            </button>
+            <button class="respin-btn" id="respin-btn" onclick="spinRouletteOnly()">
+                ✨ ルーレットだけ回す
+            </button>
+            <span class="deck-badge" id="deck-counter">残り: 8 / 8 枚</span>
+        </div>
+
+        <div class="stage-card" id="stage-card">
+            <div class="card-top-row">
+                <span class="card-num-badge" id="card-badge">Card 1 / 8</span>
+                <span class="action-hint-badge" id="card-action">🎬 Action: 指をさして驚こう！</span>
+            </div>
+
+            <div class="frame-box">
+                <p class="frame-text" id="card-frame">Look at ( <span class="blank-slot">the clouds</span> )!</p>
+                <div class="nuance-note" id="card-nuance" style="display:none;"></div>
+            </div>
+
+            <div class="options-grid" id="options-grid"></div>
+
+            <div class="answer-panel">
+                <div class="answer-buttons">
+                    <button class="teacher-speak-btn" id="teacher-prompt-btn" style="display:none;" onclick="speakTeacherPrompt()">
+                        <i class="fa-solid fa-ear-listen"></i> 🗣️ 先生の質問を聴く
+                    </button>
+                    <button class="reveal-btn" onclick="revealAndSpeakAnswer()">
+                        <i class="fa-solid fa-volume-high"></i> 🔊 答えの英文を聴く
+                    </button>
+                </div>
+                <div class="revealed-sentence-box" id="revealed-sentence">Look at the rainbow!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mode 2: All Cards Grid View -->
+    <div class="all-cards-grid" id="list-view"></div>
+</div>
+
+<script>
+    /* --- SVG Illustrations --- */
+    const svgs = {
+        clouds: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#e0f2fe"/><path d="M25 65 Q15 65 15 54 Q15 44 25 43 Q29 28 45 28 Q60 28 65 41 Q78 41 80 53 Q82 65 70 65 Z" fill="#64748b"/><path d="M35 74 Q26 74 26 65 Q26 57 35 56 Q39 44 52 44 Q64 44 68 55 Q79 55 81 65 Q82 74 72 74 Z" fill="#94a3b8"/></svg>`,
+        rainbow: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#eff6ff"/><path d="M12 75 A38 38 0 0 1 88 75" fill="none" stroke="#ef4444" stroke-width="6"/><path d="M18 75 A32 32 0 0 1 82 75" fill="none" stroke="#f97316" stroke-width="6"/><path d="M24 75 A26 26 0 0 1 76 75" fill="none" stroke="#eab308" stroke-width="6"/><path d="M30 75 A20 20 0 0 1 70 75" fill="none" stroke="#22c55e" stroke-width="6"/><path d="M36 75 A14 14 0 0 1 64 75" fill="none" stroke="#3b82f6" stroke-width="6"/></svg>`,
+        stars: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#1e1b4b"/><polygon points="35,16 40,30 55,30 43,39 47,53 35,44 23,53 27,39 15,30 30,30" fill="#facc15"/><polygon points="73,32 76,41 86,41 78,47 81,56 73,50 65,56 68,47 60,41 70,41" fill="#fde047"/><polygon points="48,60 51,68 59,68 53,73 55,81 48,76 41,81 43,73 37,68 45,68" fill="#fef08a"/></svg>`,
+        moon: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#0f172a"/><path d="M58 20 A30 30 0 1 0 78 72 A24 24 0 1 1 58 20 Z" fill="#fef08a"/><circle cx="72" cy="30" r="2.5" fill="#fde047"/><circle cx="80" cy="45" r="2" fill="#fde047"/></svg>`,
+
+        storm: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#334155"/><path d="M22 52 Q14 52 14 42 Q14 33 23 32 Q27 18 42 18 Q56 18 61 30 Q74 30 76 41 Q78 52 67 52 Z" fill="#475569"/><polygon points="48,50 38,68 47,68 41,86 60,64 50,64" fill="#facc15"/></svg>`,
+        mom: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fce7f3"/><path d="M24 44 C24 20 76 20 76 44 L78 76 L22 76 Z" fill="#5c3a21"/><path d="M30 88 C30 68 70 68 70 88 Z" fill="#ec4899"/><circle cx="50" cy="48" r="20" fill="#fed7aa"/><path d="M30 44 Q42 32 50 40 Q58 32 70 44 Q68 25 50 25 Q32 25 30 44 Z" fill="#5c3a21"/><circle cx="43" cy="48" r="2.5" fill="#1e293b"/><circle cx="57" cy="48" r="2.5" fill="#1e293b"/><path d="M44 56 Q50 61 56 56" fill="none" stroke="#be123c" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+        teacher: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#e0e7ff"/><path d="M23 44 C23 19 77 19 77 44 L79 75 L21 75 Z" fill="#3b2f2f"/><path d="M28 88 C28 68 72 68 72 88 Z" fill="#3b82f6"/><circle cx="50" cy="48" r="20" fill="#fed7aa"/><path d="M30 43 Q50 31 70 43 Q68 24 50 24 Q32 24 30 43 Z" fill="#3b2f2f"/><rect x="35" y="43" width="12" height="9" rx="2" fill="none" stroke="#1e293b" stroke-width="2.2"/><rect x="53" y="43" width="12" height="9" rx="2" fill="none" stroke="#1e293b" stroke-width="2.2"/><line x1="47" y1="47" x2="53" y2="47" stroke="#1e293b" stroke-width="2.2"/><circle cx="41" cy="47.5" r="2" fill="#1e293b"/><circle cx="59" cy="47.5" r="2" fill="#1e293b"/><path d="M44 57 Q50 62 56 57" fill="none" stroke="#be123c" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+        bus: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef3c7"/><rect x="16" y="28" width="68" height="40" rx="8" fill="#f59e0b"/><rect x="22" y="34" width="16" height="14" rx="2" fill="#e0f2fe"/><rect x="42" y="34" width="16" height="14" rx="2" fill="#e0f2fe"/><rect x="62" y="34" width="16" height="14" rx="2" fill="#e0f2fe"/><circle cx="30" cy="70" r="8" fill="#1e293b"/><circle cx="70" cy="70" r="8" fill="#1e293b"/></svg>`,
+
+        scared: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#ede9fe"/><circle cx="50" cy="50" r="32" fill="#c4b5fd"/><circle cx="39" cy="43" r="4" fill="#1e1b4b"/><circle cx="61" cy="43" r="4" fill="#1e1b4b"/><ellipse cx="50" cy="62" rx="7" ry="10" fill="#1e1b4b"/><path d="M26 36 L34 32 M74 36 L66 32" stroke="#1e1b4b" stroke-width="3" stroke-linecap="round"/></svg>`,
+        happy: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef9c3"/><circle cx="50" cy="50" r="32" fill="#facc15"/><path d="M35 43 Q39 37 43 43" fill="none" stroke="#713f12" stroke-width="3.5" stroke-linecap="round"/><path d="M57 43 Q61 37 65 43" fill="none" stroke="#713f12" stroke-width="3.5" stroke-linecap="round"/><path d="M35 55 Q50 72 65 55 Z" fill="#ef4444"/></svg>`,
+        sad: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#e0f2fe"/><circle cx="50" cy="50" r="32" fill="#7dd3fc"/><circle cx="39" cy="44" r="3.5" fill="#0c4a6e"/><circle cx="61" cy="44" r="3.5" fill="#0c4a6e"/><path d="M38 64 Q50 54 62 64" fill="none" stroke="#0c4a6e" stroke-width="3.5" stroke-linecap="round"/><path d="M33 50 Q30 58 33 61 Q36 58 33 50 Z" fill="#0284c7"/></svg>`,
+        nervous: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#ffedd5"/><circle cx="50" cy="50" r="32" fill="#fdba74"/><circle cx="39" cy="44" r="3.5" fill="#431407"/><circle cx="61" cy="44" r="3.5" fill="#431407"/><path d="M36 60 Q43 56 50 60 Q57 64 64 60" fill="none" stroke="#431407" stroke-width="3" stroke-linecap="round"/><path d="M72 28 Q68 38 72 42 Q76 38 72 28 Z" fill="#38bdf8"/></svg>`,
+
+        home: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef3c7"/><polygon points="50,18 18,46 82,46" fill="#ef4444"/><rect x="26" y="46" width="48" height="36" fill="#fff"/><rect x="43" y="58" width="14" height="24" fill="#92400e"/></svg>`,
+        outside: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#dcfce7"/><circle cx="28" cy="26" r="10" fill="#facc15"/><circle cx="55" cy="55" r="20" fill="#f97316"/><path d="M38 45 Q55 55 72 45 M38 65 Q55 55 72 65" fill="none" stroke="#fff" stroke-width="2.5"/></svg>`,
+        lunch: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#ffedd5"/><path d="M26 46 Q26 28 50 28 Q74 28 74 46 Z" fill="#f59e0b"/><rect x="22" y="48" width="56" height="8" rx="4" fill="#22c55e"/><rect x="22" y="57" width="56" height="9" rx="4" fill="#78350f"/><path d="M26 68 L74 68 Q74 76 50 76 Q26 76 26 68 Z" fill="#f59e0b"/></svg>`,
+        english: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#e0e7ff"/><rect x="22" y="26" width="56" height="48" rx="6" fill="#3b82f6"/><rect x="28" y="32" width="44" height="36" rx="3" fill="#fff"/><text x="50" y="56" font-family="Comic Neue, sans-serif" font-size="20" font-weight="bold" fill="#1d4ed8" text-anchor="middle">ABC</text></svg>`,
+
+        rain_walk: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#dbeafe"/><path d="M22 48 A28 24 0 0 1 78 48 Z" fill="#3b82f6"/><path d="M50 48 L50 74 Q50 80 44 80" fill="none" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/><line x1="25" y1="20" x2="20" y2="32" stroke="#0284c7" stroke-width="2.5"/><line x1="75" y1="20" x2="70" y2="32" stroke="#0284c7" stroke-width="2.5"/></svg>`,
+        ghost: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#1e1b4b"/><path d="M30 76 L30 44 A20 20 0 0 1 70 44 L70 76 L62 68 L54 76 L46 68 L38 76 Z" fill="#f8fafc"/><circle cx="43" cy="44" r="3" fill="#0f172a"/><circle cx="57" cy="44" r="3" fill="#0f172a"/><ellipse cx="50" cy="54" rx="4" ry="5" fill="#0f172a"/></svg>`,
+        trophy: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef9c3"/><path d="M32 24 L68 24 L64 52 Q50 64 36 52 Z" fill="#eab308"/><rect x="46" y="56" width="8" height="16" fill="#ca8a04"/><rect x="34" y="72" width="32" height="8" rx="3" fill="#854d0e"/></svg>`,
+        gift: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fce7f3"/><rect x="26" y="40" width="48" height="40" rx="4" fill="#f43f5e"/><rect x="22" y="32" width="56" height="10" rx="3" fill="#e11d48"/><rect x="46" y="32" width="8" height="48" fill="#facc15"/><path d="M50 32 Q36 18 32 28 Q30 34 50 32 Q70 34 68 28 Q64 18 50 32" fill="#facc15"/></svg>`,
+
+        rain_hard: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#cbd5e1"/><path d="M24 44 Q16 44 16 35 Q16 27 25 26 Q29 14 43 14 Q56 14 61 25 Q73 25 75 35 Q77 44 67 44 Z" fill="#475569"/><line x1="30" y1="52" x2="22" y2="74" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round"/><line x1="48" y1="52" x2="40" y2="74" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round"/><line x1="66" y1="52" x2="58" y2="74" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        snow_hard: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#e0f2fe"/><circle cx="32" cy="34" r="6" fill="#fff"/><circle cx="64" cy="28" r="7" fill="#fff"/><circle cx="50" cy="54" r="8" fill="#fff"/><circle cx="28" cy="68" r="6" fill="#fff"/><circle cx="70" cy="66" r="6" fill="#fff"/></svg>`,
+        windy: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#ecfdf5"/><path d="M18 38 L66 38 Q76 38 76 30 Q76 22 68 22 Q62 22 62 28" fill="none" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/><path d="M22 54 L76 54 Q84 54 84 62 Q84 70 76 70 Q70 70 70 64" fill="none" stroke="#059669" stroke-width="4.5" stroke-linecap="round"/></svg>`,
+        cold: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#eff6ff"/><rect x="44" y="20" width="12" height="46" rx="6" fill="#cbd5e1"/><circle cx="50" cy="70" r="13" fill="#3b82f6"/><rect x="47" y="48" width="6" height="22" fill="#3b82f6"/></svg>`,
+
+        momo_here: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef3c7"/><circle cx="50" cy="52" r="24" fill="#f97316"/><path d="M32 36 L26 20 L42 30 Z" fill="#f97316"/><path d="M68 36 L74 20 L58 30 Z" fill="#f97316"/><circle cx="42" cy="50" r="3" fill="#1e293b"/><circle cx="58" cy="50" r="3" fill="#1e293b"/><path d="M45 58 Q50 63 55 58" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+        shopping_mom: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fce7f3"/><rect x="28" y="38" width="44" height="42" rx="4" fill="#ec4899"/><path d="M38 38 Q38 22 50 22 Q62 22 62 38" fill="none" stroke="#be185d" stroke-width="4"/></svg>`,
+        sing_teacher: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#f3e8ff"/><circle cx="38" cy="68" r="9" fill="#9333ea"/><path d="M47 68 L47 28 L72 22 L72 60" fill="none" stroke="#9333ea" stroke-width="4.5"/><circle cx="63" cy="60" r="9" fill="#9333ea"/></svg>`,
+        dog_play: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#ffedd5"/><circle cx="50" cy="52" r="22" fill="#b45309"/><ellipse cx="26" cy="50" rx="7" ry="15" fill="#78350f"/><ellipse cx="74" cy="50" rx="7" ry="15" fill="#78350f"/><circle cx="43" cy="48" r="3" fill="#fff"/><circle cx="57" cy="48" r="3" fill="#fff"/><circle cx="50" cy="56" r="4" fill="#1e293b"/></svg>`,
+
+        do_what: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#f1f5f9"/><text x="50" y="68" font-family="Comic Neue, sans-serif" font-size="56" font-weight="bold" fill="#64748b" text-anchor="middle">?</text></svg>`,
+        wear: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fce7f3"/><path d="M38 22 L43 22 L45 28 L55 28 L57 22 L62 22 L66 38 L58 42 L74 78 L26 78 L42 42 L34 38 Z" fill="#f472b6"/><path d="M40 43 L60 43" stroke="#db2777" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        eat: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#fef3c7"/><polygon points="50,20 24,74 76,74" fill="#facc15"/><circle cx="46" cy="48" r="5" fill="#ef4444"/><circle cx="56" cy="60" r="5" fill="#ef4444"/><circle cx="40" cy="64" r="4" fill="#ef4444"/></svg>`,
+        bring: `<svg viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#dcfce7"/><rect x="28" y="32" width="44" height="48" rx="12" fill="#16a34a"/><path d="M40 32 Q40 20 50 20 Q60 20 60 32" fill="none" stroke="#15803d" stroke-width="4"/><rect x="36" y="52" width="28" height="18" rx="4" fill="#22c55e"/></svg>`
+    };
+
+    /* --- 8 Act & Speak! Cards Data --- */
+    const cardsData = [
+        {
+            id: 1,
+            action: "🎬 Action: 指をさして驚いたり感動したりしよう！",
+            frameHtml: `Look at ( <span class="blank-slot">the clouds</span> )!`,
+            nuance: "",
+            options: [
+                { label: "the clouds", sub: "", svg: svgs.clouds, fullEn: "Look at the clouds!" },
+                { label: "the rainbow", sub: "", svg: svgs.rainbow, fullEn: "Look at the rainbow!" },
+                { label: "the stars", sub: "", svg: svgs.stars, fullEn: "Look at the stars!" },
+                { label: "the moon", sub: "", svg: svgs.moon, fullEn: "Look at the moon!" }
+            ]
+        },
+        {
+            id: 2,
+            action: "🎬 Action: コソコソ隠れたり、急いで教えたりしよう！",
+            frameHtml: `( <span class="blank-slot">A storm</span> ) is coming!`,
+            nuance: "",
+            options: [
+                { label: "A storm", sub: "", svg: svgs.storm, fullEn: "A storm is coming!" },
+                { label: "Mom", sub: "ママが来る！", svg: svgs.mom, fullEn: "Mom is coming!" },
+                { label: "Tamaki-sensei", sub: "先生が来る！", svg: svgs.teacher, fullEn: "Tamaki-sensei is coming!" },
+                { label: "The bus", sub: "バスが来た！", svg: svgs.bus, fullEn: "The bus is coming!" }
+            ]
+        },
+        {
+            id: 3,
+            action: "🎬 Action: 顔と体全体で感情を表現しよう！",
+            frameHtml: `I'm ( <span class="blank-slot">scared</span> )!`,
+            nuance: "",
+            options: [
+                { label: "scared", sub: "怖い", svg: svgs.scared, fullEn: "I'm scared!" },
+                { label: "happy", sub: "嬉しい", svg: svgs.happy, fullEn: "I'm happy!" },
+                { label: "sad", sub: "悲しい", svg: svgs.sad, fullEn: "I'm sad!" },
+                { label: "nervous", sub: "ドキドキする", svg: svgs.nervous, fullEn: "I'm nervous!" }
+            ]
+        },
+        {
+            id: 4,
+            action: "🎬 Action: お友達や家族を元気に誘ってみよう！",
+            frameHtml: `Let's ( <span class="blank-slot">go home</span> )!`,
+            nuance: "",
+            options: [
+                { label: "go home", sub: "おうちに帰ろう", svg: svgs.home, fullEn: "Let's go home!" },
+                { label: "play outside", sub: "外で遊ぼう", svg: svgs.outside, fullEn: "Let's play outside!" },
+                { label: "eat lunch", sub: "お昼を食べよう", svg: svgs.lunch, fullEn: "Let's eat lunch!" },
+                { label: "practice English", sub: "英語を練習しよう", svg: svgs.english, fullEn: "Let's practice English!" }
+            ]
+        },
+        {
+            id: 5,
+            action: "🎬 Action: 「絶対ムリ！」と「えっ、ウソでしょ！？」を演じ分けよう！",
+            frameHtml: `<span class="blank-slot">No way!</span>`,
+            nuance: "💡 先生の質問を聴いて、「絶対ムリ！」か「えっ、ウソでしょ！？」でリアクションしよう！",
+            options: [
+                { label: "Walk in heavy rain?", sub: "", svg: svgs.rain_walk, fullEn: "No way!", teacherPrompt: "Let's walk home in the heavy rain!" },
+                { label: "Go into a haunted house?", sub: "", svg: svgs.ghost, fullEn: "No way!", teacherPrompt: "Let's go into that haunted house!" },
+                { label: "You won the game!", sub: "", svg: svgs.trophy, fullEn: "No way!", teacherPrompt: "Congratulations! You won the game!" },
+                { label: "A big gift for you!", sub: "", svg: svgs.gift, fullEn: "No way!", teacherPrompt: "Look! Here is a big gift for you!" }
+            ]
+        },
+        {
+            id: 6,
+            action: "🎬 Action: 天気に困っている表情で言ってみよう！",
+            frameHtml: `It's ( <span class="blank-slot">raining too hard</span> )!`,
+            nuance: "",
+            options: [
+                { label: "raining too hard", sub: "", svg: svgs.rain_hard, fullEn: "It's raining too hard!" },
+                { label: "snowing too hard", sub: "", svg: svgs.snow_hard, fullEn: "It's snowing too hard!" },
+                { label: "too windy", sub: "", svg: svgs.windy, fullEn: "It's too windy!" },
+                { label: "too cold", sub: "", svg: svgs.cold, fullEn: "It's too cold!" }
+            ]
+        },
+        {
+            id: 7,
+            action: "🎬 Action: 「誰と」「何をするか」をつなげて誘おう！",
+            frameHtml: `Let's ( <span class="blank-slot">action</span> ) with ( <span class="blank-slot">person</span> )!`,
+            nuance: "",
+            options: [
+                { label: "stay here / Momo", sub: "モモとここにいる", svg: svgs.momo_here, fullEn: "Let's stay here with Momo!" },
+                { label: "go shopping / Mom", sub: "ママと買い物に行く", svg: svgs.shopping_mom, fullEn: "Let's go shopping with Mom!" },
+                { label: "sing / Tamaki-sensei", sub: "先生と歌う", svg: svgs.sing_teacher, fullEn: "Let's sing with Tamaki-sensei!" },
+                { label: "play / my dog", sub: "犬と遊ぶ", svg: svgs.dog_play, fullEn: "Let's play with my dog!" }
+            ]
+        },
+        {
+            id: 8,
+            action: "🎬 Action: 腕を組んで「う〜ん、どうしよう？」と迷うポーズ！",
+            frameHtml: `What should I ( <span class="blank-slot">do</span> )?`,
+            nuance: "",
+            options: [
+                { label: "do", sub: "何をしよう", svg: svgs.do_what, fullEn: "What should I do?" },
+                { label: "wear", sub: "何を着よう", svg: svgs.wear, fullEn: "What should I wear?" },
+                { label: "eat", sub: "何を食べよう", svg: svgs.eat, fullEn: "What should I eat?" },
+                { label: "bring", sub: "何を持って行こう", svg: svgs.bring, fullEn: "What should I bring?" }
+            ]
+        }
+    ];
+
+    /* --- State --- */
+    let currentCard = cardsData[0];
+    let selectedOptIdx = 0;
+    let remainingDeck = [];
+    let isSpinning = false;
+    let spinTimeoutId = null;
+
+    /* --- Speech Synthesis --- */
+    let preferredVoice = null;
+    function loadVoices() {
+        if (!('speechSynthesis' in window)) return;
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) return;
+        const usVoices = voices.filter(v => v.lang === "en-US" || v.lang === "en_US" || v.lang.startsWith("en"));
+        preferredVoice = 
+            usVoices.find(v => v.name.includes("Ava")) ||
+            usVoices.find(v => v.name.includes("Ana")) ||
+            usVoices.find(v => v.name.includes("Jenny")) ||
+            usVoices.find(v => v.name.includes("Google US English")) ||
+            usVoices.find(v => v.name.includes("Samantha")) ||
+            usVoices[0] || voices[0];
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+    }
+
+    function speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        if (!preferredVoice) loadVoices();
+        window.speechSynthesis.cancel();
+        const uttr = new SpeechSynthesisUtterance(text);
+        if (preferredVoice) uttr.voice = preferredVoice;
+        uttr.lang = 'en-US';
+        uttr.rate = 0.65;
+        uttr.pitch = 1.05;
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(uttr);
+    }
+
+    /* --- Render Card --- */
+    function renderCard(card, targetIdx = null) {
+        currentCard = card;
+        selectedOptIdx = targetIdx;
+
+        document.getElementById('card-badge').textContent = `Card ${card.id} / 8`;
+        document.getElementById('card-action').textContent = card.action;
+        document.getElementById('card-frame').innerHTML = card.frameHtml;
+
+        const nuanceEl = document.getElementById('card-nuance');
+        if (card.nuance) {
+            nuanceEl.textContent = card.nuance;
+            nuanceEl.style.display = 'block';
+        } else {
+            nuanceEl.style.display = 'none';
+        }
+
+        const revBox = document.getElementById('revealed-sentence');
+        revBox.style.display = 'none';
+
+        const promptBtn = document.getElementById('teacher-prompt-btn');
+        promptBtn.style.display = (card.id === 5) ? 'inline-flex' : 'none';
+
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+
+        card.options.forEach((opt, idx) => {
+            const div = document.createElement('div');
+            div.className = 'opt-card' + (targetIdx === idx ? ' selected-target' : '');
+            div.id = `opt-card-${idx}`;
+            div.onclick = () => manualSelectOption(idx);
+
+            div.innerHTML = `
+                <div class="target-star-badge">⭐ HERE!</div>
+                <div class="opt-svg-box">${opt.svg}</div>
+                <div class="opt-word">${opt.label}</div>
+                ${opt.sub ? `<div class="opt-sub-jp">${opt.sub}</div>` : ''}
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    /* --- Manual Option Click --- */
+    function manualSelectOption(idx) {
+        if (isSpinning) return;
+        selectedOptIdx = idx;
+        document.querySelectorAll('.opt-card').forEach((el, i) => {
+            el.classList.remove('selected-target', 'roulette-scanning');
+            if (i === idx) el.classList.add('selected-target');
+        });
+        document.getElementById('revealed-sentence').style.display = 'none';
+    }
+
+    /* --- Fixed Roulette Animation --- */
+    function runRouletteAnimation() {
+        if (spinTimeoutId) {
+            clearTimeout(spinTimeoutId);
+            spinTimeoutId = null;
+        }
+        isSpinning = true;
+        document.getElementById('draw-btn').disabled = true;
+        document.getElementById('respin-btn').disabled = true;
+        document.getElementById('revealed-sentence').style.display = 'none';
+
+        const cards = document.querySelectorAll('.opt-card');
+        cards.forEach(el => {
+            el.classList.remove('selected-target', 'roulette-scanning');
+        });
+
+        const finalTarget = Math.floor(Math.random() * 4);
+        const totalSteps = 12 + finalTarget; // 0 から totalSteps まで進むと、最後が必ず finalTarget になる
+        let currentStep = 0;
+
+        function tick() {
+            const activeIdx = currentStep % 4;
+
+            cards.forEach((el, i) => {
+                el.classList.remove('roulette-scanning', 'selected-target');
+                if (i === activeIdx) {
+                    if (currentStep === totalSteps) {
+                        el.classList.add('selected-target');
+                    } else {
+                        el.classList.add('roulette-scanning');
+                    }
+                }
+            });
+
+            if (currentStep >= totalSteps) {
+                selectedOptIdx = finalTarget;
+                isSpinning = false;
+                spinTimeoutId = null;
+                document.getElementById('draw-btn').disabled = false;
+                document.getElementById('respin-btn').disabled = false;
+                return;
+            }
+
+            currentStep++;
+            const remaining = totalSteps - currentStep;
+            const delay = remaining < 4 ? 190 : 85;
+            spinTimeoutId = setTimeout(tick, delay);
+        }
+
+        tick();
+    }
+
+    /* --- Deck & Draw Logic --- */
+    function refillDeck() {
+        remainingDeck = [...cardsData].sort(() => Math.random() - 0.5);
+    }
+
+    function updateDeckBadge() {
+        document.getElementById('deck-counter').textContent = `残り: ${remainingDeck.length} / 8 枚`;
+    }
+
+    function drawRandomCard() {
+        if (isSpinning) return;
+        if (remainingDeck.length === 0) {
+            refillDeck();
+        }
+        const nextCard = remainingDeck.pop();
+        updateDeckBadge();
+
+        const stage = document.getElementById('stage-card');
+        stage.classList.remove('card-pop');
+        void stage.offsetWidth;
+        stage.classList.add('card-pop');
+
+        renderCard(nextCard, null);
+        runRouletteAnimation();
+    }
+
+    function spinRouletteOnly() {
+        if (isSpinning) return;
+        runRouletteAnimation();
+    }
+
+    /* --- Answer & Teacher Audio --- */
+    function revealAndSpeakAnswer() {
+        const idx = (selectedOptIdx !== null) ? selectedOptIdx : 0;
+        const opt = currentCard.options[idx];
+        const revBox = document.getElementById('revealed-sentence');
+        revBox.textContent = opt.fullEn;
+        revBox.style.display = 'inline-block';
+        speak(opt.fullEn);
+    }
+
+    function speakTeacherPrompt() {
+        const idx = (selectedOptIdx !== null) ? selectedOptIdx : 0;
+        const opt = currentCard.options[idx];
+        if (opt.teacherPrompt) {
+            speak(opt.teacherPrompt);
+        }
+    }
+
+    /* --- View Mode Switching (Game vs All Cards) --- */
+    function setViewMode(mode) {
+        const gameView = document.getElementById('game-view');
+        const listView = document.getElementById('list-view');
+        const btnGame = document.getElementById('btn-mode-game');
+        const btnList = document.getElementById('btn-mode-list');
+
+        if (mode === 'game') {
+            gameView.style.display = 'flex';
+            listView.classList.remove('active');
+            btnGame.classList.add('active');
+            btnList.classList.remove('active');
+        } else {
+            gameView.style.display = 'none';
+            listView.classList.add('active');
+            btnGame.classList.remove('active');
+            btnList.classList.add('active');
+        }
+    }
+
+    function buildListView() {
+        const listView = document.getElementById('list-view');
+        listView.innerHTML = '';
+        cardsData.forEach(card => {
+            const item = document.createElement('div');
+            item.className = 'mini-card';
+            item.innerHTML = `
+                <div class="mini-card-title">Card ${card.id}: ${card.frameHtml.replace(/<[^>]+>/g, '')}</div>
+                <div class="mini-card-action">${card.action}</div>
+            `;
+            item.onclick = () => {
+                setViewMode('game');
+                renderCard(card, null);
+                runRouletteAnimation();
+            };
+            listView.appendChild(item);
+        });
+    }
+
+    // Initialize
+    refillDeck();
+    buildListView();
+    drawRandomCard();
+</script>
+</body>
+</html>

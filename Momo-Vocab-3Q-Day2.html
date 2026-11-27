@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Momo Vocabulary: Eiken Grade 3 — No. 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================
+       【ブラウザ版】ライトグレー × ネイビー＆ピンク
+       ========================================= */
+    :root { 
+      --primary: #1e3a8a;       /* ネイビーブルー */
+      --pink: #db2777;          /* アクセントピンク */
+      --bg: #f0f2f5;            /* 薄いグレーの背景 */
+      --text: #111827;          /* 黒字 */
+      --card-bg: #ffffff;       /* 白カード */
+      --accent: #e11d48;        /* 不正解・入力文字ピンク */
+      --success: #059669;       /* 正解グリーン */
+      --selected: #db2777;      /* 選択中ピンク */
+    }
+    
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Nunito', 'Kosugi Maru', sans-serif; }
+    
+    .container { width: 210mm; margin: 20px auto; background: var(--card-bg); padding: 10mm 15mm; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(0,0,0,0.08); box-sizing: border-box; border-radius: 8px; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid var(--primary); margin-bottom: 15px; padding-bottom: 6px; }
+    .header h1 { font-size: 21px; color: var(--primary); font-weight: 700; margin: 0; letter-spacing: 0.5px; }
+    .level-badge { font-size: 14px; background: var(--pink); color: white; padding: 3px 12px; border-radius: 12px; font-weight: bold; }
+    
+    .instruction { font-size: 13px; font-weight: bold; color: #111827; margin: 10px 0 15px 0; padding-left: 10px; border-left: 4px solid var(--pink); }
+    
+    #exercise-content { display: flex; flex-direction: column; gap: 18px; }
+    .question-block { display: flex; flex-direction: column; gap: 10px; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; }
+    
+    .word-bank { 
+      font-weight: bold; font-size: 14px; color: var(--primary); 
+      background: #eff6ff; border: 1.5px solid var(--primary); 
+      padding: 10px; border-radius: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    }
+    .draggable-word {
+      cursor: pointer; padding: 4px 10px; border-radius: 4px; transition: all 0.2s;
+      border: 1px solid #cbd5e1; background: #ffffff; color: #1e3a8a; box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    .draggable-word:hover { border-color: var(--pink); }
+    .draggable-word.selected { background: var(--selected); color: #ffffff; border-color: var(--selected); transform: scale(1.05); }
+    .draggable-word.used { opacity: 0.3; text-decoration: line-through; pointer-events: none; background: #e2e8f0; color: #64748b; }
+    
+    .sentence-list { display: flex; flex-direction: column; gap: 16px; }
+    .sentence { font-size: 15px; line-height: 1.5; color: #111827; }
+    
+    .blank { 
+      display: inline-block; min-width: 90px; border-bottom: 2px solid var(--primary); 
+      text-align: center; font-weight: bold; color: var(--pink); 
+      margin: 0 2px; padding: 0px 4px; cursor: pointer; height: 1.4em; vertical-align: bottom;
+    }
+    
+    .notes-container { margin-top: 22px; border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 11px; color: #334155; display: flex; flex-wrap: wrap; gap: 4px 15px; }
+    .notes-item b { color: var(--primary); }
+    
+    .controls { position: fixed; top: 15px; left: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
+    button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+    button:hover { opacity: 0.92; }
+
+    /* =========================================
+       【PDF印刷用】ワークシートレイアウト
+       ========================================= */
+    @media print {
+      @page { size: A4; margin: 7mm 11mm; }
+      body { background: white !important; color: black !important; }
+      .controls, .browser-only, .level-badge, .group-header { display: none !important; }
+      .container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; background: white !important; border-radius: 0 !important; }
+      
+      .header h1 { visibility: hidden; position: relative; height: 26px; margin: 0; }
+      .header h1::after { 
+        content: "Momo Vocabulary: Eiken Grade 3 — No. 2"; 
+        visibility: visible; position: absolute; left: 0; top: 0;
+        color: black !important; font-size: 16pt !important;
+      }
+      .header { border-bottom: 1.5pt solid black !important; margin-bottom: 3.5mm !important; }
+      
+      .instruction { border-left: 2.5pt solid black !important; color: black !important; margin-bottom: 3.5mm !important; font-size: 9.5pt !important; padding: 0 0 0 8px !important; }
+      
+      .word-bank { 
+        background: white !important; border: 1pt solid black !important; 
+        color: black !important; padding: 1.8mm !important; margin-bottom: 1.8mm !important;
+      }
+      .draggable-word { 
+        border: none !important; background: none !important; color: black !important; 
+        padding: 0 !important; box-shadow: none !important; font-size: 10.8pt !important;
+      }
+      .draggable-word::after { content: " / "; }
+      .draggable-word:last-child::after { content: ""; }
+      
+      .question-block { background: none !important; border: none !important; padding: 0 !important; gap: 2.5pt !important; margin-bottom: 1mm !important; }
+      .sentence { color: black !important; font-size: 10.8pt !important; line-height: 1.5 !important; margin-bottom: 4pt !important; }
+      .blank { border-bottom: 1pt solid black !important; color: white !important; min-width: 80px !important; height: 1.2em !important; }
+      
+      .notes-container { border-top: 1pt solid black !important; color: black !important; font-size: 8.8pt !important; margin-top: 4mm !important; gap: 1.5pt 14pt !important; line-height: 1.2 !important; }
+      .notes-item b { color: black !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="changeLevel(1)">Level 1 (4問×4群)</button>
+  <button onclick="changeLevel(2)" style="background: #db2777;">Level 2 (8問×2群)</button>
+  <button onclick="checkAnswers()" style="background: #334155;">答え合わせ</button>
+  <button onclick="window.print()" style="background: #059669;">PDF保存 / 印刷</button>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>Momo Vocabulary: Eiken Grade 3 — No. 2</h1>
+    <span id="level-display" class="level-badge">Level 1</span>
+  </div>
+  <div class="instruction">
+    ★ Fill in the blanks with the correct words from the bank.
+    <span class="browser-only"><br>(Tap a word, then tap a blank. Tap a filled blank to reset.)</span>
+  </div>
+  <div id="exercise-content"></div>
+  <div id="notes-area" class="notes-container"></div>
+</div>
+
+<script>
+const masterData = [
+  { ans: "museum", text: "We saw many old paintings and statues when we visited the art [B] last Sunday." },
+  { ans: "prize", text: "Ken practiced singing every day and finally won first [B] in the school music contest." },
+  { ans: "clothes", text: "The Men in Gray all wore dark gray [B] and walked softly into people's minds." },
+  { ans: "office", text: "Maria's parents stayed at their [B] all day and never had a minute for her." },
+  { ans: "show", text: "Gigi used to put on a great story [B] for the kids, but he lost his ideas." },
+  { ans: "break", text: "Adults rushed from morning to night without taking a single [B] to rest or talk." },
+  { ans: "festival", text: "Many people wear yukata and watch fireworks at the summer [B] in August." },
+  { ans: "floor", text: "DeeDee sat alone on her bedroom [B] with her new toy and wiped her tears away." },
+  { ans: "gym", text: "Because it was raining outside, we played basketball in the school [B]." },
+  { ans: "problem", text: "Momo helped Nino and Nico solve their [B] simply by listening to both sides." },
+  { ans: "report", text: "I have to write a book [B] about my favorite story for English class next week." },
+  { ans: "plan", text: "Momo made a brave [B] to visit the busy adults tomorrow and help them smile again." },
+  { ans: "college", text: "My older sister wants to study history at a [B] in Tokyo after high school." },
+  { ans: "science", text: "In [B] class today, we learned how clouds make thunder and lightning." },
+  { ans: "beach", text: "During summer vacation, my family went swimming and built sandcastles at the [B]." },
+  { ans: "cold", text: "Put on a warm coat before you go out in the rain, or you will catch a [B]." }
+];
+
+const allNotes = [
+  "statue = 像・彫像", "fireworks = 花火", "wipe tears away = 涙をぬぐう", 
+  "sandcastle = 砂の城", "catch a cold = 風邪をひく"
+];
+
+let currentLevel = 1;
+let selectedElement = null;
+let wordIdCounter = 0;
+
+function changeLevel(lv) {
+  currentLevel = lv;
+  document.getElementById('level-display').textContent = `Level ${lv}`;
+  generate();
+}
+
+function generate() {
+  const content = document.getElementById('exercise-content');
+  content.innerHTML = '';
+  wordIdCounter = 0;
+  clearSelection();
+
+  let shuffled = [...masterData].sort(() => Math.random() - 0.5);
+  const chunkSize = (currentLevel === 1) ? 4 : 8;
+  const numBlocks = 16 / chunkSize;
+
+  for (let i = 0; i < numBlocks; i++) {
+    const block = document.createElement('div');
+    block.className = 'question-block';
+    const currentItems = shuffled.slice(i * chunkSize, (i + 1) * chunkSize);
+    const blockWords = currentItems.map(item => item.ans).sort(() => Math.random() - 0.5);
+    
+    const wordBank = document.createElement('div');
+    wordBank.className = 'word-bank';
+    const prefix = document.createElement('span');
+    prefix.className = 'group-header';
+    prefix.textContent = `Group ${i + 1}: `;
+    wordBank.appendChild(prefix);
+
+    blockWords.forEach((word) => {
+      const span = document.createElement('span');
+      span.id = 'word-' + (wordIdCounter++);
+      span.className = 'draggable-word';
+      span.textContent = word;
+      span.setAttribute('data-word', word);
+      
+      span.addEventListener('click', () => {
+        if (span.classList.contains('used')) return;
+        if (span.classList.contains('selected')) { 
+          clearSelection(); 
+        } else {
+          clearSelection();
+          span.classList.add('selected');
+          selectedElement = span;
+        }
+      });
+      wordBank.appendChild(span);
+    });
+    block.appendChild(wordBank);
+
+    const sList = document.createElement('div');
+    sList.className = 'sentence-list';
+    currentItems.forEach(item => {
+      const p = document.createElement('div');
+      p.className = 'sentence';
+      let html = item.text.replace('[B]', `<span class="blank" data-ans="${item.ans}"></span>`);
+      p.innerHTML = html;
+      
+      p.querySelectorAll('.blank').forEach(blank => {
+        blank.addEventListener('click', () => {
+          if (selectedElement) {
+            if (blank.classList.contains('filled')) returnWordToBank(blank);
+            fillWord(blank, selectedElement.getAttribute('data-word'), selectedElement.id);
+            selectedElement.classList.add('used');
+            clearSelection();
+          } else if (blank.classList.contains('filled')) {
+            returnWordToBank(blank);
+          }
+        });
+      });
+      sList.appendChild(p);
+    });
+    block.appendChild(sList);
+    content.appendChild(block);
+  }
+
+  const nArea = document.getElementById('notes-area');
+  nArea.innerHTML = '';
+  allNotes.sort().forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'notes-item';
+    const parts = n.split(' = ');
+    item.innerHTML = parts.length === 2 ? `<b>${parts[0]}</b> = ${parts[1]}` : n;
+    nArea.appendChild(item);
+  });
+}
+
+function fillWord(targetBlank, wordText, sourceId) {
+  targetBlank.textContent = wordText;
+  targetBlank.classList.add('filled');
+  targetBlank.dataset.sourceId = sourceId;
+  targetBlank.style.color = 'var(--pink)';
+}
+
+function returnWordToBank(targetBlank) {
+  const sourceId = targetBlank.dataset.sourceId;
+  if (sourceId) {
+    const sourceEl = document.getElementById(sourceId);
+    if (sourceEl) sourceEl.classList.remove('used');
+  }
+  targetBlank.textContent = '';
+  targetBlank.classList.remove('filled');
+  targetBlank.removeAttribute('data-source-id');
+  targetBlank.style.color = 'var(--pink)';
+}
+
+function clearSelection() {
+  document.querySelectorAll('.draggable-word').forEach(el => el.classList.remove('selected'));
+  selectedElement = null;
+}
+
+function checkAnswers() {
+  clearSelection();
+  document.querySelectorAll('.blank').forEach(b => {
+    const user = b.innerText.trim().toLowerCase();
+    const correct = b.getAttribute('data-ans').toLowerCase();
+    if (!user) return;
+    b.style.color = (user === correct || user === correct + 's') ? 'var(--success)' : 'var(--accent)';
+  });
+}
+
+window.addEventListener('load', generate);
+</script>
+</body>
+</html>
